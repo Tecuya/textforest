@@ -152,7 +152,4 @@ def xhr_nodes_for_text(request, text):
 
 
 def node(request):
-    return render(
-        request,
-        'forest.html',
-        {'user': request.user})
+    return render(request, 'forest.html', {'user': request.user})

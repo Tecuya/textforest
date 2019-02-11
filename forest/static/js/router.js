@@ -3,12 +3,16 @@ define(
     function($, _, Backbone, Node, NodeEdit) {
         return Backbone.Router.extend({
             routes: {
-                "forest/:slug": "node_view",
-                "forest": "node_entry"
+                "f/:slug": "node_view",
+                "": "node_entry"
             },
 
-            node_entry: function() { forest.node_view('_'); },
-            node_view: function(slug) { forest.node_view(slug); },
+            node_entry: function() {
+                fglobals.forest.node_view('_');
+            },
+            node_view: function(slug) {
+                fglobals.forest.node_view(slug);
+            }
         });
     }
 );

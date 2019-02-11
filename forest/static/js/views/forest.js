@@ -12,12 +12,13 @@ define(
             template: foresttpl,
 
             events: {
-                'keyup input#prompt': 'keypress_prompt'
+                'keyup input#prompt': 'keypress_prompt',
             },
 
             elements: {
                 'prompt': 'input#prompt',
-                'text_area': 'div#text_area'
+                'text_area': 'div#text_area',
+                'login_link': 'div#login_link'
             },
 
             initialize: function() {
@@ -31,6 +32,20 @@ define(
 
             render: function() {
                 this.$el.html(this.template());
+
+                var self = this;
+
+                // login link is in the main django template and not $el so i just bind this here..
+                $('div#login_link').click(function() {
+                    $('div#modal').show();
+                });
+
+                $('div#modal').click(function(evt) {
+                    // dont hide if they clicked something besides the modal background itself
+                    if ($(evt.target).attr('id') == 'modal') {
+                        $('div#modal').hide();
+                    }
+                });
 
                 this.relations_view.setElement(this.$el.find('div#relations'));
                 this.relations_view.render();
@@ -71,11 +86,11 @@ define(
 
                     } else if (prompt_contents.slice(0, 3) == '/go') {
                         log_command();
-                        Backbone.history.navigate('/forest/' + prompt_contents.slice(4), true);
+                        Backbone.history.navigate('/f/' + prompt_contents.slice(4), true);
 
                     } else if (prompt_contents == '/help') {
                         log_command();
-                        Backbone.history.navigate('/forest/help', true);
+                        Backbone.history.navigate('/f/help', true);
 
                     } else if (prompt_contents[0] == '/') {
                         log_command();
@@ -115,7 +130,7 @@ define(
 
                 if (selected_relation) {
                     this.$el.find(this.elements.text_area).append(commandhistorytpl({ command: selected_relation.get('text') }));
-                    Backbone.history.navigate('/forest/' + selected_relation.get('child'), true);
+                    Backbone.history.navigate('/f/' + selected_relation.get('child'), true);
                 }
             },
 

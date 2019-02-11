@@ -3,7 +3,6 @@ from django.conf import settings
 from django.urls import path, re_path, include
 from django.contrib.auth import views as auth_views
 
-import comics.views
 import forest.views
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
@@ -11,7 +10,8 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    re_path(r'^forest', forest.views.node, name='node'),
+    path('', forest.views.node, name='node'),
+    re_path(r'f/<slug>', forest.views.node, name='node'),
 
     path('xhr/delete_relation/<slug>', forest.views.xhr_delete_relation, name='xhr_delete_relation'),
     path('xhr/create_relation', forest.views.xhr_create_relation, name='xhr_create_relation'),
