@@ -11,9 +11,6 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('', comics.views.comic),
-    path('<int:comic_id>', comics.views.comic, name='comic'),
-
     re_path(r'^forest', forest.views.node, name='node'),
 
     path('xhr/delete_relation/<slug>', forest.views.xhr_delete_relation, name='xhr_delete_relation'),
