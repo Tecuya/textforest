@@ -237,14 +237,16 @@ div#modal {
 }
 
 div.modal_content {
+  border: 2px solid #000;
+  border-radius: 7px;
   background-color: #333;
   margin: 15% auto; /* 15% from the top and centered */
   padding: 20px;
-  border: 1px solid #888;
   width: 400px; /* Could be more or less, depending on screen size */
+  text-align: center;
 }
 
-div#bottom_bar {
+div#status_bar {
   position: fixed;
   z-index: 100;
   bottom: 0;
@@ -258,13 +260,12 @@ div#login_status_info {
   float: right;
 }
 
-div#login_link {
+div.user_status_link {
   float: right;
   text-decoration: underline;
   cursor: pointer;
   padding-left: 10px;
 }
-
 
 div#login_form_modal {
   text-align: center;
@@ -280,12 +281,17 @@ input.login_input {
   margin-bottom: 8px;
 }
 
-button.login_button {
-  width: 208px;
+button#login_button {
+  width: 100%;
 }
 
 div.login_create {
   cursor: pointer;
   text-decoration: underline;
   margin-bottom: 10px;
+}
+
+div#login_error {
+  display: none;
+  color: red;
 }

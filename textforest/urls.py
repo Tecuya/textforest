@@ -13,6 +13,10 @@ urlpatterns = [
     path('', forest.views.node, name='node'),
     re_path(r'f/<slug>', forest.views.node, name='node'),
 
+    path('xhr/logout', forest.views.xhr_logout, name='xhr_logout'),
+    path('xhr/login', forest.views.xhr_login, name='xhr_login'),
+    path('xhr/user', forest.views.xhr_user, name='xhr_user'),
+
     path('xhr/delete_relation/<slug>', forest.views.xhr_delete_relation, name='xhr_delete_relation'),
     path('xhr/create_relation', forest.views.xhr_create_relation, name='xhr_create_relation'),
     path('xhr/node_by_slug/<slug>', forest.views.xhr_node_by_slug, name='xhr_node_by_slug'),

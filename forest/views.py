@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponseNotFound, HttpResponseNotAllowed
+from django.contrib.auth import logout, authenticate, login
 
+from social_django.models import UserSocialAuth
 import ujson
 from slugify import slugify
 
@@ -149,6 +151,54 @@ def xhr_nodes_for_text(request, text):
           'created': n.created.strftime('%Y-%m-%d')}
          for n in Node.objects.filter(name__contains=text)],
         safe=False)
+
+
+def xhr_user(request):
+    user = request.user
+
+    userobj = {
+        'last_login': request.user.last_login.strftime('%Y-%m-%d'),
+        'is_superuser': request.user.is_superuser,
+        'email': request.user.email,
+        'first_name': request.user.first_name,
+        'last_name': request.user.last_name,
+        'username': request.user.username
+    }
+
+    try:
+        google_login = user.social_auth.get(provider='google-oauth2')
+        userobj['google_uid'] = google_login.uid
+    except UserSocialAuth.DoesNotExist:
+        pass
+
+    try:
+        facebook_login = user.social_auth.get(provider='facebook')
+        userobj['facebook_uid'] = facebook_login.uid
+    except UserSocialAuth.DoesNotExist:
+        pass
+
+    return JsonResponse(userobj, safe=False)
+
+
+
+
+
+def xhr_logout(request):
+    try:
+        logout(request)
+        return JsonResponse({'success': True}, safe=False)
+    except Exception as ex:
+        return JsonResponse({'success': False, 'reason': str(ex)}, safe=False)
+
+
+def xhr_login(request):
+    doc = ujson.loads(request.body)
+    user = authenticate(request, username=doc['username'], password=doc['password'])
+    if user is None:
+        return JsonResponse({'success': False, 'reason': 'Invalid login'}, safe=False)
+
+    login(request, user)
+    return JsonResponse({'success': True}, safe=False)
 
 
 def node(request):

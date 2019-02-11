@@ -1,9 +1,12 @@
 define(
-    ['jquery', 'underscore', 'backbone', 'models/node', 'models/relation', 'views/relations',
-        'collections/relations', 'views/node', 'views/node_edit',
+    ['jquery', 'underscore', 'backbone', 'models/user', 'models/node', 'models/relation',
+        'collections/relations',
+        'views/statusbar',
+        'views/user', 'views/relations',
+        'views/node', 'views/node_edit',
         'util/fetch_completions', 'tpl!templates/forest', 'tpl!templates/command_history'],
-    function($, _, Backbone, Node, Relation, RelationsView, Relations,
-        NodeView, NodeEdit, fetch_completions, foresttpl, commandhistorytpl) {
+    function($, _, Backbone, User, Node, Relation, Relations, StatusBarView, UserView, RelationsView,
+        NodeView, NodeEditView, fetch_completions, foresttpl, commandhistorytpl) {
 
         var global = this;
 
@@ -13,44 +16,89 @@ define(
 
             events: {
                 'keyup input#prompt': 'keypress_prompt',
+                'click div#login_link': 'user_link',
+                'click div#logout_link': 'logout_link',
+                'click div#user_settings_link': 'user_link',
+                'click div#modal': 'click_divmodal'
             },
 
             elements: {
                 'prompt': 'input#prompt',
                 'text_area': 'div#text_area',
-                'login_link': 'div#login_link'
+                'login_link': 'div#login_link',
+                'divmodal': 'div#modal'
             },
 
-            initialize: function() {
+            initialize: function(options) {
                 this.relations_collection = new Relations();
 
                 this.relations_view = new RelationsView({ forest_view: this });
                 this.relations_view.set_relations_collection(this.relations_collection);
 
+                this.user = new User({ 'username': options.username });
+
+                this.user_view = new UserView({ forest_view: this, user: this.user });
+                this.statusbar_view = new StatusBarView({ forest_view: this, user: this.user });
+
                 this.node_counter = 0;
             },
 
             render: function() {
-                this.$el.html(this.template());
+                this.$el.html(this.template({ user: this.user }));
 
-                var self = this;
-
-                // login link is in the main django template and not $el so i just bind this here..
-                $('div#login_link').click(function() {
-                    $('div#modal').show();
-                });
-
-                $('div#modal').click(function(evt) {
-                    // dont hide if they clicked something besides the modal background itself
-                    if ($(evt.target).attr('id') == 'modal') {
-                        $('div#modal').hide();
-                    }
-                });
+                this.user_view.setElement(this.$el.find('div#modal'));
 
                 this.relations_view.setElement(this.$el.find('div#relations'));
                 this.relations_view.render();
 
+                this.statusbar_view.setElement(this.$el.find('div#status_bar'));
+                this.statusbar_view.render();
+
                 this.$el.find(this.elements.prompt).focus();
+            },
+
+            user_link: function() {
+                this.user_view.render();
+                this.show_divmodal();
+            },
+
+            logout_link: function() {
+                var self = this;
+                this.user.logout({
+                    success: function() {
+                        self.statusbar_view.render();
+                    },
+                    error: function(xhr, err, ex) {
+                        self.add_error('Logout failed: ' + err);
+                    }
+                });
+            },
+
+            show_divmodal: function() {
+                this.$el.find(this.elements.divmodal).show();
+            },
+
+            hide_divmodal: function() {
+                this.$el.find(this.elements.divmodal).hide();
+            },
+
+            click_login_button: function() {
+                var self = this;
+                this.user.login({
+                    success: function() {
+                        self.statusbar_view.render();
+                        self.$el.find(this.elements.divmodal).hide();
+                    },
+                    failure: function(error) {
+                        self.user_view.set_error(error);
+                    }
+                });
+            },
+
+            click_divmodal: function(evt) {
+                if ($(evt.target).attr('id') == 'modal') {
+                    this.hide_divmodal();
+                }
             },
 
             keypress_prompt: function(evt) {
@@ -194,22 +242,12 @@ define(
                 text_area.scrollTop(text_area[0].scrollHeight);
             },
 
-            // this is a wrapper for any behavior that requires login;
-            // if a user is not logged in we will put them through the
-            // login process and if it succeeds we will then attempt
-            // to call the callable.
             requires_login: function(callable) {
-
-                console.log('it requires login');
-
-                if (!window.forest.user) {
-
-
-
+                if (!this.user.get('username')) {
+                    $('div#modal').show();
+                } else {
+                    callable();
                 }
-
-
-                callable();
             },
 
             ////////////
@@ -254,7 +292,7 @@ define(
                     {
                         success: function() {
                             // create new nodeview and render (appends to text_area)
-                            var node_edit = new NodeEdit({ node: self.current_node, forest_view: self });
+                            var node_edit = new NodeEditView({ node: self.current_node, forest_view: self });
                             node_edit.setElement('div#' + self.current_node_view.divid); // we will render over the top of the existing node view
                             node_edit.render();
                             self.scroll_bottom();

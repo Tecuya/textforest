@@ -17,14 +17,25 @@ var fglobals = {};
 
 require(['backbone', 'router', 'views/forest'], function(Backbone, Router, Forest) {
 
-    fglobals.forest = new Forest();
+    var username;
+    {% if user and not user.is_anonymous %}
+    username = "{{ user.username }}";
+    {% endif %}
+
+    fglobals.social_oauth_links = {
+        'connect_google': "{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}",
+        'connect_facebook': "{% url 'social:begin' 'facebook-oauth2' %}?next={{ request.path }}",
+        'disconnect_google': "{% url 'social:disconnect' 'google-oauth2' %}",
+        'disconnect_facebook': "{% url 'social:disconnect' 'facebook-oauth2' %}"
+    };
+    
+    fglobals.forest = new Forest({username: username});
     fglobals.forest.setElement('div#forest');
     fglobals.forest.render();
 
-    fglobals.user = "{{ user.username }}";
-
     fglobals.router = new Router();
     Backbone.history.start({pushState: true});
+
 });
 
     </script>
@@ -34,71 +45,6 @@ require(['backbone', 'router', 'views/forest'], function(Backbone, Router, Fores
 
     {% csrf_token %}
 
-    <div id="modal">
-
-      {% if user and not user.is_anonymous %}
-
-      <div class="modal_content" id="login_info">
-        <a>Hello, {{ user.get_full_name }}!</a>
-        <br>
-        <a href="/account/logout">Logout</a>
-      </div>
-
-      {% else %}
-
-      <div class="modal_content" id="login_form_modal">
-
-        <div>In order to modify content, you must log in.</div>
-
-        <div class="login_form">
-          Username / email<br>
-          <input type=text name=username class="login_input"><br>
-          Password<br>
-          <input type=password name=password class="login_input"><br>
-          <button class="login_button">Login</button>
-        </div>
-
-        <div class="login_create">
-          Create new account
-        </div>
-
-        <div>
-          <p>You may also log in with these services:</p>
-        </div>
-
-        <div class="login_oauth_link">
-          <a href="{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}">
-            <img width=191 src="/static/btn_google_signin_dark_normal_web.png">
-          </a>
-        </div>
-
-        <div class="login_oauth_link">
-          <a href="{% url 'social:begin' 'facebook-oauth2' %}?next={{ request.path }}">
-            <img width=212 src="/static/facebook-sign-in-button-png-26.png">
-          </a>
-        </div>
-
-        <div class="cleardiv"></div>
-
-      </div>
-
-      {% endif %}
-
-    </div>
-
     <div id="forest"></div>
-
-    <div id="bottom_bar">
-
-      <div id="login_status_info">
-        {% if user and not user.is_anonymous %}
-        Logged in as {{ user.username }}
-        {% else %}
-        <div id="login_link">Log in</div>
-        Not logged in.
-        {% endif %}
-      </div>
-
-    </div>
-
+    
 {% endblock %}

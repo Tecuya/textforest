@@ -1,0 +1,15 @@
+
+<div id="login_status_info">
+  <% if(user.get('username')) { %>
+
+  <div class="user_status_link" id="logout_link">Logout</div>
+  <div class="user_status_link" id="user_settings_link">Settings</div>
+  Logged in as <%= user.get('username') %>
+
+  <% } else { %>
+
+  <div class="user_status_link" id="login_link">Log in</div>
+  Not logged in.
+
+  <% } %>
+</div>

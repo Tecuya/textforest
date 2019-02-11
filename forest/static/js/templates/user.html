@@ -1,0 +1,45 @@
+<div class="modal_content">
+
+  <% if(user.get('username')) { %>
+
+  <a>Hello, <%= user.get('username') %> !</a>
+
+  <% } else { %>
+
+  <div>In order to modify content, you must log in.</div>
+
+  <div class="login_form">
+    Username / email<br>
+    <input type=text name=username class="login_input"><br>
+    Password<br>
+    <input type=password name=password class="login_input"><br>
+    <button id="login_button">Login</button>
+
+    <div id="login_error"></div>
+  </div>
+
+  <div class="login_create">
+    Create new account
+  </div>
+
+  <div>
+    <p>You may also log in with these services:</p>
+  </div>
+
+  <div class="login_oauth_link">
+    <a href="<%= social_oauth_links.connect_google %>">
+      <img width=191 src="/static/btn_google_signin_dark_normal_web.png">
+    </a>
+  </div>
+
+  <div class="login_oauth_link">
+    <a href="<%= social_oauth_links.connect_facebook %>">
+      <img width=212 src="/static/facebook-sign-in-button-png-26.png">
+    </a>
+  </div>
+
+  <div class="cleardiv"></div>
+
+  <% } %>
+
+</div>
