@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block extrahead %}
+    <script type="text/javascript" src="/static/js/lib/require.js"></script>
+    <script type="text/javascript" src="/static/js/config.js"></script>
+    <script type="text/javascript">
+
+require(['jquery'], function() {
+    $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
+        options.xhrFields = { withCredentials: true };
+        return jqXHR.setRequestHeader(
+            'X-CSRFToken', $('input[name=csrfmiddlewaretoken]').val());
+    });
+});
+
+var forest;
+
+require(['backbone', 'router', 'views/forest'], function(Backbone, Router, Forest) {
+
+    forest = new Forest();
+    forest.setElement('div#forest');
+    forest.render();
+
+    var router = new Router();
+    Backbone.history.start({pushState: true});
+
+    var user = "{{ user.username }}";
+
+    // export to namespace reachable within requirejs modules
+    window.forest = {
+        forest: forest,
+        router: router,
+        user: user
+    };
+    
+});
+
+    </script>
+{% endblock %}
+
+{% block content %}
+
+    {% csrf_token %}
+
+    <div id="login">
+    {% if user and not user.is_anonymous %}
+    <a>Hello, {{ user.get_full_name }}!</a>
+    <br>
+    <a href="/account/logout">Logout</a>
+    {% else %}
+    <a href="{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}">Login with Google</a>
+    <a href="{% url 'social:begin' 'facebook-oauth2' %}?next={{ request.path }}">Login with Facebook</a>
+    {% endif %}
+    </div>
+    
+    <div id="forest"></div>
+
+
+{% endblock %}

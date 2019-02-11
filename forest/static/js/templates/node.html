@@ -1,0 +1,10 @@
+
+<div class="node_text" id="<%= divid%>">
+
+  <div class="node_attribution">
+    <b><a href="/forest/<%= node.get('slug') %>"><%= node.get('name') %></a></b><br>
+    Created <%= node.get('created') %> by <%= node.get('author') %>
+  </div>
+
+  <%= node.get('text') %>
+</div>

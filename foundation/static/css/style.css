@@ -1,0 +1,224 @@
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #333;
+  color: #fff;
+  font-size: 13pt;
+}
+
+a:link {
+  color: #DDDDDD;
+}
+
+a:visited {
+  color: #DDDDDD;
+}
+
+a:hover {
+  color: #FFFFFF;
+}
+
+a:active {
+  color: #DDDDDD;
+}
+
+div.title {
+  text-align: center;
+  font-size: 33pt;
+  padding-bottom: 19px;
+}
+
+textarea {
+  background-color: #777;
+  color: white;
+  font-size: 13pt;
+  border: 2px solid white;
+  border-radius: 7px;
+  padding: 8px;
+}
+
+input {
+  background-color: #777;
+  color: white;
+  font-size: 13pt;
+  border: 2px solid white;
+  border-radius: 7px;
+  padding: 8px;
+}
+
+input#prompt {
+  width: 100%;
+  background-image: url('/static/greater-than.png');
+  background-position: 5px 8px;
+  background-repeat: no-repeat;
+  padding: 3px;
+  padding-left: 20px;
+  margin-top: 10px;
+  font-family: monospace;
+}
+
+div.existing_relation {
+  font-family: monospace;
+}
+
+div.list_item {
+  border: 2px solid white;
+  border-radius: 2px;
+  background-color: #222;
+  padding: 5px;
+  margin-bottom: 2px;
+}
+
+div.relation_create {
+  background-color: #000;
+}
+
+div.list_item:hover {
+  background-color: #777;
+  cursor: pointer;
+}
+
+div.list_item:focus {
+  background-color: #555;
+  cursor: pointer;
+}
+
+div.creation_title {
+  font-size: 14pt;
+}
+
+div.editlink {
+  font-size: 10pt;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+small {
+  font-size: 8pt;
+}
+
+div.node_text {
+  border-top: dashed #444 2px;
+  padding-top: 3px;
+}
+
+div.editbox {
+  font-size: 13pt;
+  padding: 9px;
+}
+
+button {
+  background-color: #777;
+  color: white;
+  font-size: 13pt;
+  border-radius: 4px;
+  background-color: #222;
+  padding: 3px;
+  padding-left: 10px; padding-right: 10px;
+}
+
+div#relation_creation {
+  border: 2px solid white;
+  border-radius: 7px;
+  background-color: #444;
+  padding: 5px;
+  margin-bottom: 2px;
+  display: none;
+}
+
+div.relation_history {
+  font-family: monospace;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  padding-top: 8px;
+}
+
+div.chosen_link_existing {
+  display: none;
+}
+
+div#forest {
+  display: flex;
+  flex-flow: column;
+  align-items: stretch;
+  height: 97%;
+}
+
+div#text_area {
+  border: 2px solid #000;
+  border-radius: 7px;
+  background-color: #111;
+  flex: 0 1 auto;
+  overflow: auto;
+  height: 100%;
+  padding: 10px;
+}
+
+div#user_area {
+  flex: 1 1 auto;
+  height: 300px;
+}
+
+div#relations_list {
+  overflow: auto;
+  height: 100%;
+}
+
+div.relation_list_item_left {
+  float: left;
+  display: inline-block;
+}
+
+div.relation_list_item_right {
+  float: right;
+  display: inline-block;
+  font-size: 8pt;
+  text-align: right;
+}
+
+div.node_attribution {
+  text-align: right;
+  float: right;
+  font-size: 11pt;
+}
+
+input#relation_creation_text {
+  font-family: monospace;
+}
+
+div.relation_link {
+  background-color: #000;
+}
+
+div.relation_link_text {
+  float: left;
+}
+
+div.relation_link_input {
+  float: left;
+  padding-left: 8px;
+}
+
+input#relation_link_dest {
+  font-size: 12pt;
+  padding: 2px;
+  maring-left: 10px;
+}
+
+div.relation_link_button {
+  float: left;
+}
+
+div.cleardiv {
+  clear: both;
+}
+
+div.error {
+  color: red;
+  font-weight: bold;
+}
+
+div.delete_relation {
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: bold;
+}

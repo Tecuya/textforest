@@ -1,0 +1,5 @@
+<% _.each(nodes.models, function(node, idx) { %>
+<div class="node_list_item list_item" data-slug="<%= node.get('slug') %>" tabindex=<%= idx %>>
+  "<%= node.get('name') %>" by <%= node.get('author') %>
+</div>
+<% }) %>

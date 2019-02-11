@@ -1,0 +1,17 @@
+<div class="node_edit">
+
+  <div class="editbox">
+    Name<br>
+    <input name=name type=text size=100 value="<%= node.get('name') %>">
+  </div>
+
+  <div class="editbox">
+    Text<br>
+    <textarea name=text rows=8 cols=120><%= node.get('text') %></textarea>
+  </div>
+
+  <div class="editbox">
+    <button id="save">Save</button>
+  </div>
+
+</div>

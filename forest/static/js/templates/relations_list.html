@@ -1,0 +1,32 @@
+<% _.each(relations.models, function(relation, idx) { %>
+<div class="relation_list_item existing_relation list_item" data-relation-slug="<%= relation.get('slug') %>" tabindex=<%= idx %>>
+  <div class="relation_list_item_left"><%= relation.get('text') %></div>
+  <div class="relation_list_item_right">
+      Created by <%= relation.get('author') %> <%= relation.get('created') %><br>
+      <div class="delete_relation">Delete</div>
+  </div>
+  &nbsp;
+</div>
+<% }) %>
+
+<% if(relations.text && relations.text.length > 0) { %>
+
+<div class="relation_list_item relation_create list_item" id="create_relation" tabindex=<%= relations.models.length %>>
+  Create new branch with this text
+</div>
+
+<div class="relation_list_item relation_link list_item" id="create_relation_link" tabindex=<%= relations.models.length + 1 %>>
+
+  <div class="relation_link_text">
+    Link this text to existing branch:
+  </div>
+
+  <div class="relation_link_input">
+    <input id="relation_link_dest" name=destination type=text placeholder="(Type here to search for existing branch)" size=80>
+    <div id="existing_list"></div>
+  </div>
+
+  <div class="cleardiv"></div>
+</div>
+
+<% } %>
