@@ -345,7 +345,7 @@ div.user_info_row {
 }
 
 div.save_row {
-  padding-top: 25px;
+  padding-top: 15px;
 }
 
 span#pword_small {
@@ -355,4 +355,8 @@ span#pword_small {
 
 form {
   display: inline;
+}
+
+div#user_form_result {
+  margin-bottom: 10px;
 }
