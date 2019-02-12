@@ -236,5 +236,5 @@ def xhr_login(request):
     return JsonResponse({'success': True}, safe=False)
 
 
-def node(request, slug):
+def node(request, slug=None):
     return render(request, 'forest.html', {'user': request.user})
