@@ -61,7 +61,7 @@
     <div class="user_info_block">
 
       <% if(user.get('google_uid')) { %>
-      Google user <%= user.get('google_uid') %>
+      Connected to Google user <%= user.get('google_uid') %>
 
       <%  if(user.get('has_password')) { %>
       <form method="post" action="<%= social_oauth_links.disconnect_google %>">
@@ -81,11 +81,11 @@
       <% } %>
 
       <% if(user.get('facebook_uid')) { %>
-      Facebook user <%= user.get('facebook_uid') %>
+      Connected to Facebook
 
       <% if(user.get('has_password')) { %>
       <form method="post" action="<%= social_oauth_links.disconnect_facebook %>">
-        <input name=csrfmiddlewaretoken value="<%= fglobals.csrf_token %>"> type=hidden>
+        <input name=csrfmiddlewaretoken value="<%= fglobals.csrf_token %>" type=hidden>
         <input type=submit value="Disconnect">
       </form>
       <% } else { %>
