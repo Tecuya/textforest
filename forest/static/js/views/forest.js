@@ -16,16 +16,12 @@ define(
 
             events: {
                 'keyup input#prompt': 'keypress_prompt',
-                'click div#login_link': 'user_link',
-                'click div#logout_link': 'logout_link',
-                'click div#user_settings_link': 'user_link',
                 'click div#modal': 'click_divmodal'
             },
 
             elements: {
                 'prompt': 'input#prompt',
                 'text_area': 'div#text_area',
-                'login_link': 'div#login_link',
                 'divmodal': 'div#modal'
             },
 
@@ -58,8 +54,18 @@ define(
             },
 
             user_link: function() {
-                this.user_view.render();
-                this.show_divmodal();
+                var self = this;
+                if (this.user.get('username')) {
+                    this.user.fetch({
+                        success: function() {
+                            self.user_view.render();
+                            self.show_divmodal();
+                        }
+                    });
+                } else {
+                    this.user_view.render();
+                    this.show_divmodal();
+                }
             },
 
             logout_link: function() {

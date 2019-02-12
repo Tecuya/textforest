@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponseNotFound, HttpResponseNotAllowed
 from django.contrib.auth import logout, authenticate, login
-
+from django.middleware.csrf import get_token
 from social_django.models import UserSocialAuth
 import ujson
 from slugify import slugify
@@ -156,14 +156,42 @@ def xhr_nodes_for_text(request, text):
 def xhr_user(request):
     user = request.user
 
+
     userobj = {
         'last_login': request.user.last_login.strftime('%Y-%m-%d'),
         'is_superuser': request.user.is_superuser,
         'email': request.user.email,
         'first_name': request.user.first_name,
         'last_name': request.user.last_name,
-        'username': request.user.username
+        'username': request.user.username,
     }
+
+    if request.method == 'POST' or request.method == 'PUT':
+        doc = ujson.loads(request.body)
+
+        reauth = False
+
+        if 'email' in doc:
+            user.email = doc['email']
+
+        if 'first_name' in doc:
+            user.first_name = doc['first_name']
+
+        if 'last_name' in doc:
+            user.last_name = doc['last_name']
+
+        if 'password' in doc:
+            user.set_password(doc['password'])
+            reauth = True
+
+        user.save()
+
+        if reauth:
+            user = authenticate(request, username=doc['username'], password=doc['password'])
+            login(request, user)
+            userobj['csrf_token'] = get_token(request)
+
+    userobj['has_password'] = request.user.has_usable_password()
 
     try:
         google_login = user.social_auth.get(provider='google-oauth2')
@@ -178,9 +206,6 @@ def xhr_user(request):
         pass
 
     return JsonResponse(userobj, safe=False)
-
-
-
 
 
 def xhr_logout(request):

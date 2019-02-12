@@ -10,7 +10,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('', forest.views.node, name='node'),
+    path('', forest.views.node, name='home'),
     re_path(r'f/<slug>', forest.views.node, name='node'),
 
     path('xhr/logout', forest.views.xhr_logout, name='xhr_logout'),

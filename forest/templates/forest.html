@@ -5,38 +5,36 @@
     <script type="text/javascript" src="/static/js/config.js"></script>
     <script type="text/javascript">
 
-require(['jquery'], function() {
-    $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
-        options.xhrFields = { withCredentials: true };
-        return jqXHR.setRequestHeader(
-            'X-CSRFToken', $('input[name=csrfmiddlewaretoken]').val());
+    var fglobals = {};
+
+    require(['jquery', 'backbone', 'router', 'views/forest'], function($, Backbone, Router, Forest) {
+
+        fglobals.csrf_token = $('input[name=csrfmiddlewaretoken]').val();
+        $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
+            options.xhrFields = { withCredentials: true };
+            return jqXHR.setRequestHeader('X-CSRFToken', fglobals.csrf_token);
+        });
+
+        var username;
+        {% if user and not user.is_anonymous %}
+        username = "{{ user.username }}";
+        {% endif %}
+
+        fglobals.social_oauth_links = {
+            'connect_google': "{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}",
+            'connect_facebook': "{% url 'social:begin' 'facebook-oauth2' %}?next={{ request.path }}",
+            'disconnect_google': "{% url 'social:disconnect' 'google-oauth2' %}",
+            'disconnect_facebook': "{% url 'social:disconnect' 'facebook-oauth2' %}"
+        };
+        
+        fglobals.forest = new Forest({username: username});
+        fglobals.forest.setElement('div#forest');
+        fglobals.forest.render();
+
+        fglobals.router = new Router();
+        Backbone.history.start({pushState: true});
+
     });
-});
-
-var fglobals = {};
-
-require(['backbone', 'router', 'views/forest'], function(Backbone, Router, Forest) {
-
-    var username;
-    {% if user and not user.is_anonymous %}
-    username = "{{ user.username }}";
-    {% endif %}
-
-    fglobals.social_oauth_links = {
-        'connect_google': "{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}",
-        'connect_facebook': "{% url 'social:begin' 'facebook-oauth2' %}?next={{ request.path }}",
-        'disconnect_google': "{% url 'social:disconnect' 'google-oauth2' %}",
-        'disconnect_facebook': "{% url 'social:disconnect' 'facebook-oauth2' %}"
-    };
-    
-    fglobals.forest = new Forest({username: username});
-    fglobals.forest.setElement('div#forest');
-    fglobals.forest.render();
-
-    fglobals.router = new Router();
-    Backbone.history.start({pushState: true});
-
-});
 
     </script>
 {% endblock %}

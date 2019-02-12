@@ -2,7 +2,115 @@
 
   <% if(user.get('username')) { %>
 
-  <a>Hello, <%= user.get('username') %> !</a>
+  <div id="settings_title">Settings</div>
+
+  <div class="user_info_row">
+    <div class="user_info_label">
+      Username
+    </div>
+    <div class="user_info_block">
+      <%= user.get('username') %>
+    </div>
+  </div>
+
+  <div class="user_info_row">
+    <div class="user_info_label">
+      Last Login
+    </div>
+    <div class="user_info_block">
+      <%= user.get('last_login') %>
+    </div>
+  </div>
+
+
+  <div class="user_info_row">
+    <div class="user_info_label">
+      Name
+    </div>
+    <div class="user_info_block">
+      <input type=text name=first_name value="<%= user.get('first_name') %>"><br>
+      <input type=text name=last_name value="<%= user.get('last_name') %>">
+    </div>
+  </div>
+
+  <div class="user_info_row">
+    <div class="user_info_label">
+      Email
+    </div>
+    <div class="user_info_block">
+      <input type=text name=email value="<%= user.get('email') %>">
+    </div>
+  </div>
+
+  <div class="user_info_row">
+    <div class="user_info_label">
+      Password
+    </div>
+    <div class="user_info_block">
+      <div class="password_form">
+        <input type=password name=chg_password>
+        <input type=password name=chg_password_confirm><span id="pword_small">(confirm)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="user_info_row">
+    <div class="user_info_label">
+      Connections
+    </div>
+    <div class="user_info_block">
+
+      <% if(user.get('google_uid')) { %>
+      Google user <%= user.get('google_uid') %>
+
+      <%  if(user.get('has_password')) { %>
+      <form method="post" action="<%= social_oauth_links.disconnect_google %>">
+        <input name=csrfmiddlewaretoken value="<%= fglobals.csrf_token %>" type=hidden>
+        <input type=submit value="Disconnect">
+      </form>
+      <%  } else { %>
+      <div class="disconnect_password_warning">You cannot disconnect until you set a password.</div>
+      <%  } %>
+
+      <% } else { %>
+
+      <a href="<%= social_oauth_links.connect_google %>">
+        Connect to Google
+      </a><br>
+
+      <% } %>
+
+      <% if(user.get('facebook_uid')) { %>
+      Facebook user <%= user.get('facebook_uid') %>
+
+      <% if(user.get('has_password')) { %>
+      <form method="post" action="<%= social_oauth_links.disconnect_facebook %>">
+        <input name=csrfmiddlewaretoken value="<%= fglobals.csrf_token %>"> type=hidden>
+        <input type=submit value="Disconnect">
+      </form>
+      <% } else { %>
+      <div class="disconnect_password_warning">You cannot disconnect until you set a password.</div>
+      <% } %>
+
+      <% } else { %>
+
+      <a href="<%= social_oauth_links.connect_facebook %>">
+        Connect to Facebook
+      </a><br>
+
+      <% } %>
+
+    </div>
+  </div>
+
+  <div class="cleardiv">
+
+  <div class="user_info_row save_row">
+    <div id="user_form_result"></div>
+    <button id="user_form_save">Save Changes</button>
+  </div>
+
+  <div class="cleardiv">
 
   <% } else { %>
 
@@ -13,7 +121,7 @@
     <input type=text name=username class="login_input"><br>
     Password<br>
     <input type=password name=password class="login_input"><br>
-    <button id="login_button">Login</button>
+    <button id="login_button" class="wide_button">Login</button>
 
     <div id="login_error"></div>
   </div>
