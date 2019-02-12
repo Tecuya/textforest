@@ -67,7 +67,7 @@
       <form method="post" action="<%= social_oauth_links.disconnect_google %>">
         <input name=csrfmiddlewaretoken value="<%= fglobals.csrf_token %>" type=hidden>
         <input type=submit value="Disconnect">
-      </form>
+      </form><br>
       <%  } else { %>
       <div class="disconnect_password_warning">You cannot disconnect until you set a password.</div>
       <%  } %>
@@ -87,7 +87,7 @@
       <form method="post" action="<%= social_oauth_links.disconnect_facebook %>">
         <input name=csrfmiddlewaretoken value="<%= fglobals.csrf_token %>" type=hidden>
         <input type=submit value="Disconnect">
-      </form>
+      </form><br>
       <% } else { %>
       <div class="disconnect_password_warning">You cannot disconnect until you set a password.</div>
       <% } %>
