@@ -75,7 +75,7 @@ define(
                         self.statusbar_view.render();
                     },
                     error: function(xhr, err, ex) {
-                        self.add_error('Logout failed: ' + err);
+                        self.add_error('Logout failed: ' + err.responseText);
                     }
                 });
             },
@@ -126,17 +126,33 @@ define(
 
                     // enter
                     if (prompt_contents == '/edit') {
-                        self.node_edit();
+                        log_command();
+                        self.requires_login(
+                            function() {
+                                self.node_edit();
+                            }
+                        );
 
                     } else if (prompt_contents == '/delete') {
-                        log_command();
-                        this.current_node.destroy({
-                            wait: true,
-                            success: function() { history.back(); },
-                            error: function(node, resp) {
-                                self.add_error(resp);
+
+                        self.requires_login(
+                            function() {
+                                log_command();
+
+                                if (self.current_node.get('author') != self.user.get('username')) {
+                                    self.add_error('You cannot delete this because you do not own it.');
+                                    return;
+                                }
+
+                                this.current_node.destroy({
+                                    wait: true,
+                                    success: function() { history.back(); },
+                                    error: function(node, resp) {
+                                        self.add_error(resp.responseText);
+                                    }
+                                });
                             }
-                        });
+                        );
 
                     } else if (prompt_contents.slice(0, 3) == '/go') {
                         log_command();
@@ -173,7 +189,7 @@ define(
                                 self.relations_collection.set_search_text(prompt_contents);
                                 self.relations_collection.fetch({
                                     success: function() { self.relations_view.render_list(); },
-                                    error: function(col, err) { self.add_error(err); }
+                                    error: function(col, err) { self.add_error(err.responseText); }
                                 });
                             });
                     }, 10);
@@ -214,7 +230,7 @@ define(
                                     self.go_to_relation(relation.get('slug'));
                                 },
                                 error: function(err, resp) {
-                                    self.add_error(resp);
+                                    self.add_error(resp.responseText);
                                 }
                             });
                     });
@@ -226,21 +242,25 @@ define(
                 var selected_relation = this.relations_collection.findWhere({ 'slug': slug });
 
                 if (selected_relation) {
-                    selected_relation.destroy({
-                        wait: true,
-                        success: function() {
-                            self.$el.find(self.elements.text_area).append(commandhistorytpl({ command: 'Deleted relation "' + slug + '"' }));
-                            self.node_view(self.current_node.get('slug'));
-                        },
-                        error: function(node, resp) {
-                            self.add_error(resp);
-                        }
-                    });
+
+                    this.requires_login(
+                        function() {
+                            selected_relation.destroy({
+                                wait: true,
+                                success: function() {
+                                    self.$el.find(self.elements.text_area).append(commandhistorytpl({ command: 'Deleted relation "' + slug + '"' }));
+                                    self.node_view(self.current_node.get('slug'));
+                                },
+                                error: function(node, resp) {
+                                    self.add_error(resp.responseText);
+                                }
+                            });
+                        });
                 }
             },
 
             add_error: function(err) {
-                this.$el.find(this.elements.text_area).append('<div class="error">Error: ' + err.responseText + '</div>');
+                this.$el.find(this.elements.text_area).append('<div class="error">Error: ' + err + '</div>');
             },
 
             scroll_bottom: function() {
@@ -250,7 +270,8 @@ define(
 
             requires_login: function(callable) {
                 if (!this.user.get('username')) {
-                    $('div#modal').show();
+                    this.user_view.render();
+                    this.show_divmodal();
                 } else {
                     callable();
                 }
@@ -280,14 +301,14 @@ define(
                             self.relations_collection.set_search_text('');
                             self.relations_collection.fetch({
                                 success: function() { self.relations_view.render_list(); },
-                                error: function(col, resp) { self.add_error(resp); }
+                                error: function(col, resp) { self.add_error(resp.responseText); }
                             });
 
                             // clear prompt
                             self.$el.find(self.elements.prompt).val('').focus();
 
                         },
-                        error: function(col, resp) { self.add_error(resp); }
+                        error: function(col, resp) { self.add_error(resp.responseText); }
                     }
                 );
             },
@@ -297,6 +318,12 @@ define(
                 this.current_node.fetch(
                     {
                         success: function() {
+
+                            if (self.current_node.get('author') != self.user.get('username')) {
+                                self.add_error('You cannot edit this because you do not own it.');
+                                return;
+                            }
+
                             // create new nodeview and render (appends to text_area)
                             var node_edit = new NodeEditView({ node: self.current_node, forest_view: self });
                             node_edit.setElement('div#' + self.current_node_view.divid); // we will render over the top of the existing node view
@@ -312,7 +339,7 @@ define(
                             // redraw relations view
                             self.relations_view.render();
                         },
-                        error: function(col, resp) { self.add_error(resp); }
+                        error: function(col, resp) { self.add_error(resp.responseText); }
                     }
                 );
             }

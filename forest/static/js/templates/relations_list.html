@@ -2,8 +2,10 @@
 <div class="relation_list_item existing_relation list_item" data-relation-slug="<%= relation.get('slug') %>" tabindex=<%= idx %>>
   <div class="relation_list_item_left"><%= relation.get('text') %></div>
   <div class="relation_list_item_right">
-      Created by <%= relation.get('author') %> <%= relation.get('created') %><br>
-      <div class="delete_relation">Delete</div>
+    Created by <%= relation.get('author') %> <%= relation.get('created') %><br>
+    <% if(relation.get('author') == user.get('username')) { %>
+    <div class="delete_relation">Delete</div>
+    <% } %>
   </div>
   &nbsp;
 </div>

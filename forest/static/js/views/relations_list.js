@@ -27,7 +27,7 @@ define(
                 // we will restore the users focused tabindex after rendering
                 var focused_tabindex = $('div.relation_list_item:focus').attr('tabindex');
 
-                this.$el.html(this.template({ relations: relations_collection }));
+                this.$el.html(this.template({ relations: relations_collection, user: this.forest_view.user }));
 
                 this.node_list_view.setElement('div#existing_list');
                 this.node_list_view.render();

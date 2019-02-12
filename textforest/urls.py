@@ -11,7 +11,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('', forest.views.node, name='home'),
-    re_path(r'f/<slug>', forest.views.node, name='node'),
+    path('f/<slug>', forest.views.node, name='node'),
 
     path('xhr/logout', forest.views.xhr_logout, name='xhr_logout'),
     path('xhr/login', forest.views.xhr_login, name='xhr_login'),

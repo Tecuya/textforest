@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import JsonResponse, HttpResponseNotFound, HttpResponseNotAllowed
+from django.http import JsonResponse, HttpResponseNotFound, HttpResponseNotAllowed, HttpResponseForbidden
 from django.contrib.auth import logout, authenticate, login
 from django.middleware.csrf import get_token
 from social_django.models import UserSocialAuth
@@ -14,7 +14,10 @@ def xhr_delete_relation(request, slug):
     if request.method == 'DELETE':
         rqs = Relation.objects.filter(slug=slug)
         if len(rqs) == 0:
-            return HttpResponseNotFound('<h1>No such relation</h1>')
+            return HttpResponseNotFound('No such relation')
+
+        if not request.user == rqs[0].author:
+            return HttpResponseForbidden('This relation does not belong to you')
 
         rqs[0].delete()
 
@@ -24,7 +27,7 @@ def xhr_delete_relation(request, slug):
 def xhr_create_relation(request):
 
     if not request.method == 'POST':
-        return HttpResponseNotAllowed('<h1>POST only on this endpoint..</h1>')
+        return HttpResponseNotAllowed('POST only on this endpoint')
 
     doc = ujson.loads(request.body)
 
@@ -33,14 +36,14 @@ def xhr_create_relation(request):
     # resolve parent node
     nqs = Node.objects.filter(slug=doc['parent'])
     if len(nqs) == 0:
-        return HttpResponseNotFound('<h1>No such parent</h1>')
+        return HttpResponseNotFound('No such parent')
     parent = nqs[0]
 
     if 'child' in doc:
         # if client specified a child slug it MUST be found or we fail
         nqs = Node.objects.filter(slug=doc['child'])
         if len(nqs) == 0:
-            return HttpResponseNotFound('<h1>No such child</h1>')
+            return HttpResponseNotFound('No such child')
         child = nqs[0]
 
     else:
@@ -86,18 +89,26 @@ def xhr_node_by_slug(request, slug):
 
     nqs = Node.objects.filter(slug=slug)
     if nqs is None or len(nqs) == 0:
-        return HttpResponseNotFound('<h1>No such node</h1>')
+        return HttpResponseNotFound('No such node')
 
     node = nqs[0]
 
     if request.method == 'POST' or request.method == 'PUT':
         doc = ujson.loads(request.body)
+
+        if node.author != request.user:
+            return HttpResponseForbidden('This node does not belong to you')
+
         node.name = doc['name']
         node.slug = slugify(doc['name'])
         node.text = doc['text']
         node.save()
 
     elif request.method == 'DELETE':
+
+        if node.author != request.user:
+            return HttpResponseForbidden('This node does not belong to you')
+
         node.delete()
 
     return JsonResponse(
@@ -155,7 +166,6 @@ def xhr_nodes_for_text(request, text):
 
 def xhr_user(request):
     user = request.user
-
 
     userobj = {
         'last_login': request.user.last_login.strftime('%Y-%m-%d'),
@@ -226,5 +236,5 @@ def xhr_login(request):
     return JsonResponse({'success': True}, safe=False)
 
 
-def node(request):
+def node(request, slug):
     return render(request, 'forest.html', {'user': request.user})
