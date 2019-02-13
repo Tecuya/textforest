@@ -105,12 +105,20 @@ define(
                 this.$el.find(this.elements.login_error).html('Login failed: ' + err).show();
             },
 
+            update_csrf: function(user) {
+                if (this.user.has('csrf_token')) {
+                    fglobals.csrf_token = this.user.get('csrf_token');
+                }
+            },
+
             click_login_button: function() {
                 var self = this;
                 this.user.login({
                     username: this.$el.find(this.elements.username).val(),
                     password: this.$el.find(this.elements.password).val(),
                     success: function() {
+                        self.user.set
+                        self.update_csrf(self.user);
                         self.forest_view.statusbar_view.render();
                         self.forest_view.hide_divmodal();
                     },
@@ -143,10 +151,7 @@ define(
                         {},
                         {
                             success: function() {
-                                // server may send us new csrf token
-                                if (self.user.has('csrf_token')) {
-                                    fglobals.csrf_token = self.user.get('csrf_token');
-                                }
+                                self.update_csrf(self.user);
                                 self.forest_view.hide_divmodal();
                                 self.render();
                             },

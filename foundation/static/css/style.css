@@ -300,6 +300,7 @@ div#user_create_form {
   border: solid #eee 1px;
   border-radius: 7px;
   padding: 10px;
+  width: 420px;
 }
 
 div#login_error {
@@ -339,13 +340,6 @@ div#password_form_open {
   cursor: pointer;
 }
 
-div#password_form {
-  display: none;
-  text-align: left;
-  clear: both;
-  margin-bottom: 8px;
-}
-
 div.user_info_row {
   clear: both;
 }
@@ -378,10 +372,11 @@ div.dash_underline {
 }
 
 div#create_form_instructions {
-  width: 340px;
+  width: 100%;
   padding-bottom: 10px;
 }
 
 div#user_create_form_result {
+  width: 100%;
   padding-bottom: 8px;
 }

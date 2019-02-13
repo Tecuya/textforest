@@ -1,3 +1,7 @@
+import re
+import ujson
+import requests
+
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponseNotFound, HttpResponseNotAllowed, HttpResponseForbidden
 from django.contrib.auth import logout, authenticate, login
@@ -7,11 +11,10 @@ from django.conf import settings
 
 from django_registration.backends.activation.views import RegistrationView
 from social_django.models import UserSocialAuth
-import ujson
-from slugify import slugify
-import requests
 
 from .models import Node, Relation
+
+from slugify import slugify
 
 
 def xhr_delete_relation(request, slug):
@@ -171,10 +174,11 @@ def xhr_nodes_for_text(request, text):
 
 def xhr_user(request):
 
+    doc = False
     if request.method != 'GET':
         doc = ujson.loads(request.body)
 
-    if doc['new']:
+    if doc and 'new' in doc and doc['new']:
         try:
             r = requests.post(
                 settings.RECAPTCHAV3_VERIFY_URL,
@@ -199,6 +203,12 @@ def xhr_user(request):
         uqs = User.objects.filter(username=doc['username'])
         if len(uqs) > 0:
             return HttpResponseForbidden('This username is already taken.')
+
+        if len(doc['password']) < 5:
+            return HttpResponseForbidden('Password must be at least 5 characters.')
+
+        if not re.match('[^@]+@[^@]+\.[^@]+', doc['email']):
+            return HttpResponseForbidden('Email address must at least APPEAR valid.')
 
         user = User.objects.create(
             username=doc['username'],
@@ -237,6 +247,9 @@ def xhr_user(request):
         reauth = False
 
         if 'email' in doc:
+            if not re.match('[^@]+@[^@]+\.[^@]+', doc['email']):
+                return HttpResponseForbidden('Email address must at least APPEAR valid.')
+
             user.email = doc['email']
 
         if 'first_name' in doc:
@@ -246,6 +259,9 @@ def xhr_user(request):
             user.last_name = doc['last_name']
 
         if 'password' in doc:
+            if len(doc['password']) < 5:
+                return HttpResponseForbidden('Password must be at least 5 characters.')
+
             user.set_password(doc['password'])
             reauth = True
 
@@ -288,7 +304,7 @@ def xhr_login(request):
         return JsonResponse({'success': False, 'reason': 'Invalid login'}, safe=False)
 
     login(request, user)
-    return JsonResponse({'success': True}, safe=False)
+    return JsonResponse({'success': True, 'csrf_token': get_token(request)}, safe=False)
 
 
 def node(request, slug=None):

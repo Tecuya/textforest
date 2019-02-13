@@ -31,6 +31,7 @@ define(['backbone'], function(Backbone) {
                 success: function(ret) {
                     if (ret.success) {
                         self.set('username', options.username);
+                        self.set('csrf_token', ret.csrf_token);
                         options.success(ret);
                     } else {
                         options.failure('Invalid login');
