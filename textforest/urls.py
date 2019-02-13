@@ -26,8 +26,9 @@ urlpatterns = [
     path('xhr/relations/<slug>/<text>', forest.views.xhr_relations, name='xhr_relations_for_text'),
 
     re_path(r'^oauth/', include('social_django.urls', namespace='social')),
-    path('account/', include('django.contrib.auth.urls'))
 
+    path('account/', include('django.contrib.auth.urls')),
+    path('account/', include('django_registration.backends.activation.urls'))
 ]
 
 if settings.DEBUG:

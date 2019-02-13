@@ -88,7 +88,6 @@ define(
                 } else {
                     this.node_list_view.update_text($('input#relation_link_dest').val());
                 }
-
             }
 
         });

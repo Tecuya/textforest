@@ -2,7 +2,7 @@
 
   <% if(user.get('username')) { %>
 
-  <div id="settings_title">Settings</div>
+  <div class="settings_title dash_underline">Settings</div>
 
   <div class="user_info_row">
     <div class="user_info_label">
@@ -21,7 +21,6 @@
       <%= user.get('last_login') %>
     </div>
   </div>
-
 
   <div class="user_info_row">
     <div class="user_info_label">
@@ -126,8 +125,54 @@
     <div id="login_error"></div>
   </div>
 
-  <div class="login_create">
+  <div id="user_create">
     Create new account
+  </div>
+
+  <div id="user_create_form">
+
+    <div class="settings_title">Create User</div>
+
+    <div id="create_form_instructions">
+      An email will be sent to the specified address to validate your account.
+    </div>
+
+    <div class="user_info_row">
+      <div class="user_info_label">
+        Username
+      </div>
+      <div class="user_info_block">
+        <input type=hidden name=create_recaptcha_token>
+        <input type=text name=create_username value="">
+      </div>
+    </div>
+
+    <div class="user_info_row">
+      <div class="user_info_label">
+        Email
+      </div>
+      <div class="user_info_block">
+        <input type=text name=create_email value="">
+      </div>
+    </div>
+
+    <div class="user_info_row">
+      <div class="user_info_label">
+        Password
+      </div>
+      <div class="user_info_block">
+        <input type=password name=create_password value=""><br>
+        <input type=password name=create_password_confirm value="">
+      </div>
+    </div>
+
+    <div class="cleardiv"></div>
+
+    <div class="user_info_row save_row">
+      <div id="user_create_form_result"></div>
+      <button id="user_create_form_save">Create User</button>
+    </div>
+
   </div>
 
   <div>

@@ -5,7 +5,10 @@
     <script type="text/javascript" src="/static/js/config.js"></script>
     <script type="text/javascript">
 
-    var fglobals = {};
+    var fglobals = {
+        recaptcha_site_key: "{{ recaptcha_site_key }}",
+        ipaddr: "{{ ipaddr }}"
+    };
 
     require(['jquery', 'backbone', 'router', 'views/forest'], function($, Backbone, Router, Forest) {
 

@@ -289,10 +289,17 @@ button.wide_button {
   width: 100%;
 }
 
-div.login_create {
+div#user_create {
   cursor: pointer;
   text-decoration: underline;
   margin-bottom: 10px;
+}
+
+div#user_create_form {
+  display: none;
+  border: solid #eee 1px;
+  border-radius: 7px;
+  padding: 10px;
 }
 
 div#login_error {
@@ -308,7 +315,6 @@ div.user_info_label {
 }
 
 div.user_info_block {
-  width: 380px;
   display: inline-block;
   float: left;
   text-align: left;
@@ -359,4 +365,23 @@ form {
 
 div#user_form_result {
   margin-bottom: 10px;
+}
+
+div.settings_title {
+  font-size: 19pt;
+  margin-bottom: 14px;
+}
+
+div.dash_underline {
+  border-bottom: dashed #666 3px;
+  padding-bottom: 6px;
+}
+
+div#create_form_instructions {
+  width: 340px;
+  padding-bottom: 10px;
+}
+
+div#user_create_form_result {
+  padding-bottom: 8px;
 }

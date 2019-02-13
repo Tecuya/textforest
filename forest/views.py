@@ -1,10 +1,15 @@
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponseNotFound, HttpResponseNotAllowed, HttpResponseForbidden
 from django.contrib.auth import logout, authenticate, login
+from django.contrib.auth.models import User
 from django.middleware.csrf import get_token
+from django.conf import settings
+
+from django_registration.backends.activation.views import RegistrationView
 from social_django.models import UserSocialAuth
 import ujson
 from slugify import slugify
+import requests
 
 from .models import Node, Relation
 
@@ -165,8 +170,58 @@ def xhr_nodes_for_text(request, text):
 
 
 def xhr_user(request):
-    user = request.user
 
+    if request.method != 'GET':
+        doc = ujson.loads(request.body)
+
+    if doc['new']:
+        try:
+            r = requests.post(
+                settings.RECAPTCHAV3_VERIFY_URL,
+                data={
+                    'secret': settings.RECAPTCHAV3_SECRET_KEY,
+                    'response': doc['recaptcha_token'],
+                    'remoteip': doc['ipaddr']
+                })
+
+            google_response = ujson.loads(r.text)
+
+            if not (google_response['action'] == 'createuser' and
+                    google_response['success'] and
+                    google_response['score'] > 0.5):
+
+                return HttpResponseForbidden('Failure to verify captcha: ' + r.text)
+
+        except Exception as ex:
+            return HttpResponseForbidden('Failure to verify captcha: ' + str(ex))
+
+        # check if username is used
+        uqs = User.objects.filter(username=doc['username'])
+        if len(uqs) > 0:
+            return HttpResponseForbidden('This username is already taken.')
+
+        user = User.objects.create(
+            username=doc['username'],
+            email=doc['email'],
+            is_active=False)
+        user.set_password(doc['password'])
+        user.save()
+
+        try:
+            rv = RegistrationView()
+            rv.request = request
+            rv.send_activation_email(user)
+        except Exception as ex:
+            return HttpResponseForbidden('Failure to send activation email: ' + str(ex))
+
+        userobj = {
+            'email': user.email,
+            'username': user.username
+        }
+
+        return JsonResponse(userobj, safe=False)
+
+    user = request.user
     userobj = {
         'last_login': request.user.last_login.strftime('%Y-%m-%d'),
         'is_superuser': request.user.is_superuser,
@@ -176,7 +231,7 @@ def xhr_user(request):
         'username': request.user.username,
     }
 
-    if request.method == 'POST' or request.method == 'PUT':
+    if request.method == 'PUT':
         doc = ujson.loads(request.body)
 
         reauth = False
@@ -237,4 +292,13 @@ def xhr_login(request):
 
 
 def node(request, slug=None):
-    return render(request, 'forest.html', {'user': request.user})
+    response = render(
+        request,
+        'forest.html',
+        {
+            'user': request.user,
+            'ipaddr': request.META['REMOTE_ADDR'],
+            'recaptcha_site_key': settings.RECAPTCHAV3_SITE_KEY
+        })
+
+    return response

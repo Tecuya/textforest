@@ -1,6 +1,6 @@
 define(
-    ['jquery', 'underscore', 'backbone', 'tpl!templates/user'],
-    function($, _, Backbone, usertpl) {
+    ['jquery', 'underscore', 'backbone', 'models/user', 'tpl!templates/user'],
+    function($, _, Backbone, User, usertpl) {
         return Backbone.View.extend({
             template: usertpl,
 
@@ -14,12 +14,23 @@ define(
                 'input_first_name': 'input[name=first_name]',
                 'input_last_name': 'input[name=last_name]',
                 'input_email': 'input[name=email]',
-                'user_form_result': 'div#user_form_result'
+                'user_form_result': 'div#user_form_result',
+                'user_create_link': 'div#user_create',
+                'user_create_form': 'div#user_create_form',
+                'user_create_form_result': 'div#user_create_form_result',
+                'user_create_save': 'button#user_create_form_save',
+                'input_create_username': 'input[name=create_username]',
+                'input_create_email': 'input[name=create_email]',
+                'input_create_password': 'input[name=create_password]',
+                'input_create_password_confirm': 'input[name=create_password_confirm]',
+                'input_create_recaptcha_token': 'input[name=create_recaptcha_token]'
             },
 
             events: {
                 'click button#login_button': 'click_login_button',
-                'click button#user_form_save': 'user_form_save'
+                'click button#user_form_save': 'user_form_save',
+                'click button#user_create_form_save': 'click_user_create_form_save',
+                'click div#user_create': 'click_user_create'
             },
 
             initialize: function(options) {
@@ -34,6 +45,60 @@ define(
                         social_oauth_links: fglobals.social_oauth_links
                     })
                 );
+            },
+
+            click_user_create: function(evt) {
+                var self = this;
+                require(['//www.google.com/recaptcha/api.js?render=' + fglobals.recaptcha_site_key], function() {
+                    grecaptcha.ready(function() {
+                        grecaptcha
+                            .execute(fglobals.recaptcha_site_key, { action: 'createuser' })
+                            .then(function(token) {
+                                self.$el.find(self.elements.input_create_recaptcha_token).val(token);
+                            });
+                    });
+                });
+
+                this.$el.find(this.elements.user_create_link).hide();
+                this.$el.find(this.elements.user_create_form).css('display', 'inline-block');
+            },
+
+            click_user_create_form_save: function() {
+                var self = this;
+
+                var pass = this.$el.find(this.elements.input_create_password).val();
+                var pass_confirm = this.$el.find(this.elements.input_create_password_confirm).val();
+
+                if (pass != pass_confirm) {
+                    self.set_user_create_form_result('<div class="error">Password fields must match.</div>');
+                    return;
+                }
+
+                var new_user = new User({
+                    username: this.$el.find(this.elements.input_create_username).val(),
+                    email: this.$el.find(this.elements.input_create_email).val(),
+                    password: this.$el.find(this.elements.input_create_password).val(),
+                    recaptcha_token: this.$el.find(this.elements.input_create_recaptcha_token).val(),
+                    ipaddr: fglobals.ipaddr,
+                    new: true
+                });
+
+                new_user.save(
+                    {},
+                    {
+                        success: function() {
+                            self.set_user_create_form_result(
+                                'Check your email for an activation email, and click the activation link within.');
+                        },
+                        error: function(err, resp) {
+                            self.set_user_create_form_result(
+                                '<div class="error">Error: ' + resp.responseText + '</div>');
+                        }
+                    });
+            },
+
+            set_user_create_form_result: function(text) {
+                this.$el.find(this.elements.user_create_form_result).html(text);
             },
 
             set_login_error: function(err) {
