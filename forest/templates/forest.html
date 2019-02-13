@@ -25,9 +25,9 @@
 
         fglobals.social_oauth_links = {
             'connect_google': "{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}",
-            'connect_facebook': "{% url 'social:begin' 'facebook-oauth2' %}?next={{ request.path }}",
+            'connect_facebook': "{% url 'social:begin' 'facebook' %}?next={{ request.path }}",
             'disconnect_google': "{% url 'social:disconnect' 'google-oauth2' %}",
-            'disconnect_facebook': "{% url 'social:disconnect' 'facebook-oauth2' %}"
+            'disconnect_facebook': "{% url 'social:disconnect' 'facebook' %}"
         };
         
         fglobals.forest = new Forest({username: username});
