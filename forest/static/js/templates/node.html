@@ -1,10 +1,17 @@
-
-<div class="node_text" id="<%= divid%>">
-
-  <div class="node_attribution">
-    <b><a href="/forest/<%= node.get('slug') %>"><%= node.get('name') %></a></b><br>
-    Created <%= node.get('created') %> by <%= node.get('author') %>
+<div class="node_attribution">
+  <b><a href="/f/<%= node.get('slug') %>"><%= node.get('name') %></a></b><br>
+  Created <%= node.get('created') %> by <%= node.get('author') %><br>
+  <% if(node.get('author') == user.get('username')) { %>
+  <div class="actionlink" data-action="edit">Edit</div>
+  <div class="actionlink" data-action="delete">Delete</div>
+  <div class="delete_confirm">
+    Really delete this post?
+    <div class="delete_confirm_choice actionlink" data-choice="delete-no">No</div>
+    <div class="delete_confirm_choice actionlink" data-choice="delete-yes">Yes</div>
   </div>
-
-  <%= node.get('text') %>
+  <% } %>
 </div>
+
+<%= node.get('text_presentation') %>
+
+<div class="cleardiv">

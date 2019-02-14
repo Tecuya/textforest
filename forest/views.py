@@ -17,6 +17,9 @@ from .models import Node, Relation
 from slugify import slugify
 
 
+def make_safe(s):
+    return re.sub('<\/?[^>]+(>|$)', '', s)
+
 def xhr_delete_relation(request, slug):
 
     if request.method == 'DELETE':
@@ -74,15 +77,15 @@ def xhr_create_relation(request):
 
         child = Node.objects.create(
             author=request.user,
-            name=doc['text'],
+            name=make_safe(doc['text']),
             slug=new_slug)
 
     relation, created = Relation.objects.get_or_create(
         author=request.user,
-        slug=slugify(doc['text']),
+        slug=slugify(make_safe(doc['text'])),
         parent=parent,
         child=child,
-        text=doc['text'])
+        text=make_safe(doc['text']))
 
     return JsonResponse(
         {'slug': relation.slug,
@@ -107,9 +110,9 @@ def xhr_node_by_slug(request, slug):
         if node.author != request.user:
             return HttpResponseForbidden('This node does not belong to you')
 
-        node.name = doc['name']
+        node.name = make_safe(doc['name'])
         node.slug = slugify(doc['name'])
-        node.text = doc['text']
+        node.text = make_safe(doc['text'])
         node.save()
 
     elif request.method == 'DELETE':
@@ -211,8 +214,8 @@ def xhr_user(request):
             return HttpResponseForbidden('Email address must at least APPEAR valid.')
 
         user = User.objects.create(
-            username=doc['username'],
-            email=doc['email'],
+            username=make_safe(doc['username']),
+            email=make_safe(doc['email']),
             is_active=False)
         user.set_password(doc['password'])
         user.save()
@@ -250,13 +253,13 @@ def xhr_user(request):
             if not re.match('[^@]+@[^@]+\.[^@]+', doc['email']):
                 return HttpResponseForbidden('Email address must at least APPEAR valid.')
 
-            user.email = doc['email']
+            user.email = make_safe(doc['email'])
 
         if 'first_name' in doc:
-            user.first_name = doc['first_name']
+            user.first_name = make_safe(doc['first_name'])
 
         if 'last_name' in doc:
-            user.last_name = doc['last_name']
+            user.last_name = make_safe(doc['last_name'])
 
         if 'password' in doc:
             if len(doc['password']) < 5:
@@ -268,7 +271,7 @@ def xhr_user(request):
         user.save()
 
         if reauth:
-            user = authenticate(request, username=doc['username'], password=doc['password'])
+            user = authenticate(request, username=make_safe(doc['username']), password=doc['password'])
             login(request, user)
             userobj['csrf_token'] = get_token(request)
 

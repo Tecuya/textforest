@@ -30,7 +30,8 @@ define(
                 'click button#login_button': 'click_login_button',
                 'click button#user_form_save': 'user_form_save',
                 'click button#user_create_form_save': 'click_user_create_form_save',
-                'click div#user_create': 'click_user_create'
+                'click div#user_create': 'click_user_create',
+                'keyup input[name=password]': 'keyup_password'
             },
 
             initialize: function(options) {
@@ -111,13 +112,18 @@ define(
                 }
             },
 
+            keyup_password: function(evt) {
+                if (evt.which == 13) {
+                    this.click_login_button();
+                }
+            },
+
             click_login_button: function() {
                 var self = this;
                 this.user.login({
                     username: this.$el.find(this.elements.username).val(),
                     password: this.$el.find(this.elements.password).val(),
                     success: function() {
-                        self.user.set
                         self.update_csrf(self.user);
                         self.forest_view.statusbar_view.render();
                         self.forest_view.hide_divmodal();

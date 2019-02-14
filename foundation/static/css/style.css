@@ -86,10 +86,13 @@ div.creation_title {
   font-size: 14pt;
 }
 
-div.editlink {
-  font-size: 10pt;
+div.actionlink {
+  font-size: 11pt;
   text-decoration: underline;
   cursor: pointer;
+  float: right;
+  display: inline-block;
+  padding-left: 5px;
 }
 
 small {
@@ -97,7 +100,6 @@ small {
 }
 
 div.node_text {
-  border-top: dashed #444 2px;
   padding-top: 3px;
 }
 
@@ -125,11 +127,12 @@ div#relation_creation {
   display: none;
 }
 
-div.relation_history {
+div.command_history {
   font-family: monospace;
   padding-bottom: 8px;
   margin-bottom: 8px;
   padding-top: 8px;
+  border-bottom: dashed #444 2px;
 }
 
 div.chosen_link_existing {
@@ -179,6 +182,9 @@ div.node_attribution {
   text-align: right;
   float: right;
   font-size: 11pt;
+  padding: 4px;
+  margin: 4px;
+  border: dashed #333 1px;
 }
 
 input#relation_creation_text {
@@ -379,4 +385,22 @@ div#create_form_instructions {
 div#user_create_form_result {
   width: 100%;
   padding-bottom: 8px;
+}
+
+div#editpreview {
+  display: none;
+  border: solid white 1px;
+  border-radius: 7px;
+  padding: 3px;
+}
+
+div.delete_confirm {
+  clear: both;
+  color: red;
+  display: none;
+}
+
+div.delete_confirm_choice {
+  padding-left: 10px;
+  color: #eee;
 }

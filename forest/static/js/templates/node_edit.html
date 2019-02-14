@@ -1,17 +1,20 @@
-<div class="node_edit">
 
-  <div class="editbox">
-    Name<br>
-    <input name=name type=text size=100 value="<%= node.get('name') %>">
-  </div>
+<div class="editbox">
+  Name<br>
+  <input name=name type=text size=100 value="<%= node.get('name') %>">
+</div>
 
-  <div class="editbox">
-    Text<br>
-    <textarea name=text rows=8 cols=120><%= node.get('text') %></textarea>
-  </div>
+<div class="editbox">
+  <textarea name=text rows=16 cols=120><%= node.get('text') %></textarea>
+  <div id="editpreview"></div>
+</div>
 
-  <div class="editbox">
-    <button id="save">Save</button>
-  </div>
+<div class="editbox">
+  <a target="_new" href="https://guides.github.com/pdfs/markdown-cheatsheet-online.pdf">Markdown cheat sheet</a>
+</div>
 
+<div class="editbox">
+  <button id="cancel">Cancel</button>
+  <button id="preview">Preview</button>
+  <button id="save">Save</button>
 </div>

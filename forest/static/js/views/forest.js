@@ -107,6 +107,11 @@ define(
                 }
             },
 
+            log_command: function(prompt_contents) {
+                this.$el.find(this.elements.prompt).val('');
+                this.$el.find(this.elements.text_area).append(commandhistorytpl({ command: prompt_contents }));
+            },
+
             keypress_prompt: function(evt) {
                 var self = this;
 
@@ -120,50 +125,25 @@ define(
 
                 } else if (evt.which == 13) {
 
-                    var log_command = function() {
-                        self.$el.find(self.elements.text_area).append(commandhistorytpl({ command: prompt_contents }));
-                    };
-
                     // enter
                     if (prompt_contents == '/edit') {
-                        log_command();
-                        self.requires_login(
-                            function() {
-                                self.node_edit();
-                            }
-                        );
+                        self.log_command(prompt_contents);
+                        self.node_edit();
 
                     } else if (prompt_contents == '/delete') {
-
-                        self.requires_login(
-                            function() {
-                                log_command();
-
-                                if (self.current_node.get('author') != self.user.get('username')) {
-                                    self.add_error('You cannot delete this because you do not own it.');
-                                    return;
-                                }
-
-                                this.current_node.destroy({
-                                    wait: true,
-                                    success: function() { history.back(); },
-                                    error: function(node, resp) {
-                                        self.add_error(resp.responseText);
-                                    }
-                                });
-                            }
-                        );
+                        self.log_command(prompt_contents);
+                        self.delete_node();
 
                     } else if (prompt_contents.slice(0, 3) == '/go') {
-                        log_command();
+                        self.log_command(prompt_contents);
                         Backbone.history.navigate('/f/' + prompt_contents.slice(4), true);
 
                     } else if (prompt_contents == '/help') {
-                        log_command();
+                        self.log_command(prompt_contents);
                         Backbone.history.navigate('/f/help', true);
 
                     } else if (prompt_contents[0] == '/') {
-                        log_command();
+                        self.log_command(prompt_contents);
                         self.add_error('Invalid command: ' + prompt_contents);
                         this.$el.find(this.elements.prompt).val('');
 
@@ -193,6 +173,25 @@ define(
                                 });
                             });
                     }, 10);
+            },
+
+            delete_node: function() {
+                self.requires_login(
+                    function() {
+                        if (self.current_node.get('author') != self.user.get('username')) {
+                            self.add_error('You cannot delete this because you do not own it.');
+                            return;
+                        }
+
+                        this.current_node.destroy({
+                            wait: true,
+                            success: function() { history.back(); },
+                            error: function(node, resp) {
+                                self.add_error(resp.responseText);
+                            }
+                        });
+                    }
+                );
             },
 
             go_to_relation: function(slug) {
@@ -255,7 +254,8 @@ define(
                                     self.add_error(resp.responseText);
                                 }
                             });
-                        });
+                        }
+                    );
                 }
             },
 
@@ -290,7 +290,13 @@ define(
 
                             // each time will replace the old view with a new view
                             self.current_node_view = new NodeView({ node: self.current_node, forest_view: self });
-                            self.current_node_view.setElement(self.$el.find(self.elements.text_area));
+
+                            var node_div = $(document.createElement('DIV'))
+                                .attr('class', 'node_text')
+                                .attr('id', self.node_counter);
+
+                            self.$el.find(self.elements.text_area).append(node_div);
+                            self.current_node_view.setElement(node_div);
 
                             self.node_counter += 1;
                             self.current_node_view.render(self.node_counter);
@@ -313,33 +319,48 @@ define(
                 );
             },
 
-            node_edit: function() {
+            node_edit: function(slug) {
                 var self = this;
-                this.current_node.fetch(
-                    {
-                        success: function() {
 
-                            if (self.current_node.get('author') != self.user.get('username')) {
-                                self.add_error('You cannot edit this because you do not own it.');
-                                return;
+                this.requires_login(
+                    function() {
+
+                        if (slug) {
+                            self.current_node.set('slug', slug);
+                        }
+
+                        self.current_node.fetch(
+                            {
+                                success: function() {
+
+                                    if (self.current_node.get('author') != self.user.get('username')) {
+                                        self.add_error('You cannot edit this because you do not own it.');
+                                        return;
+                                    }
+
+                                    // create new nodeview and render (appends to text_area)
+                                    var node_edit = new NodeEditView({ node: self.current_node, forest_view: self });
+
+                                    var node_div = $(document.createElement('DIV')).attr('class', 'node_edit');
+                                    self.$el.find(self.elements.text_area).append(node_div);
+
+                                    node_edit.setElement(node_div);
+                                    node_edit.render();
+
+                                    self.scroll_bottom();
+
+                                    // clear out relations collection
+                                    self.relations_collection.reset();
+
+                                    // clear prompt
+                                    self.$el.find(self.elements.prompt).val('');
+
+                                    // redraw relations view
+                                    self.relations_view.render();
+                                },
+                                error: function(col, resp) { self.add_error(resp.responseText); }
                             }
-
-                            // create new nodeview and render (appends to text_area)
-                            var node_edit = new NodeEditView({ node: self.current_node, forest_view: self });
-                            node_edit.setElement('div#' + self.current_node_view.divid); // we will render over the top of the existing node view
-                            node_edit.render();
-                            self.scroll_bottom();
-
-                            // clear out relations collection
-                            self.relations_collection.reset();
-
-                            // clear prompt
-                            self.$el.find(self.elements.prompt).val('');
-
-                            // redraw relations view
-                            self.relations_view.render();
-                        },
-                        error: function(col, resp) { self.add_error(resp.responseText); }
+                        );
                     }
                 );
             }

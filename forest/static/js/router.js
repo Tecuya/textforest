@@ -8,7 +8,7 @@ define(
             },
 
             node_entry: function() {
-                fglobals.forest.node_view('_');
+                fglobals.forest.node_view('home');
             },
             node_view: function(slug) {
                 fglobals.forest.node_view(slug);

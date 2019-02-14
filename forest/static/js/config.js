@@ -7,6 +7,13 @@ require.config({
         backbone: 'lib/backbone',
         put_cursor_at_end: 'lib/put_cursor_at_end',
         tpl: 'lib/tpl',
-        text: 'lib/text'
+        text: 'lib/text',
+        showdown: 'lib/showdown.min'
+    },
+
+    shim: {
+        showdown: {
+            exports: 'showdown'
+        }
     }
 });
