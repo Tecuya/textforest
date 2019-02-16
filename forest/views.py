@@ -41,6 +41,9 @@ def xhr_create_relation(request):
     if not request.method == 'POST':
         return HttpResponseNotAllowed('POST only on this endpoint')
 
+    if request.user.is_active:
+        return HttpResponseForbidden('You are not logged in')
+
     doc = ujson.loads(request.body)
 
     new_relation_slug = slugify(doc['text'])
@@ -95,7 +98,7 @@ def xhr_create_relation(request):
 
 def xhr_node_by_relation_slug(request, slug):
 
-    if request.user:
+    if request.user.is_active:
         r = Relation.objects.get(slug=slug)
         UserRelation.handle_user_action(request.user, r)
         nqs = Node.objects.filter(inbound_relations=r)
