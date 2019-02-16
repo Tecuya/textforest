@@ -41,7 +41,7 @@ def xhr_create_relation(request):
     if not request.method == 'POST':
         return HttpResponseNotAllowed('POST only on this endpoint')
 
-    if request.user.is_active:
+    if not request.user.is_active:
         return HttpResponseForbidden('You are not logged in')
 
     doc = ujson.loads(request.body)
@@ -52,6 +52,7 @@ def xhr_create_relation(request):
     nqs = Node.objects.filter(slug=doc['parent'])
     if len(nqs) == 0:
         return HttpResponseNotFound('No such parent')
+
     parent = nqs[0]
 
     if 'child' in doc:
@@ -59,6 +60,7 @@ def xhr_create_relation(request):
         nqs = Node.objects.filter(slug=doc['child'])
         if len(nqs) == 0:
             return HttpResponseNotFound('No such child')
+
         child = nqs[0]
 
     else:
@@ -102,6 +104,7 @@ def xhr_node_by_relation_slug(request, slug):
         r = Relation.objects.get(slug=slug)
         UserRelation.handle_user_action(request.user, r)
         nqs = Node.objects.filter(inbound_relations=r)
+
     else:
         nqs = Node.objects.filter(inbound_relations__slug=slug)
 
@@ -110,9 +113,7 @@ def xhr_node_by_relation_slug(request, slug):
 
     node = nqs[0]
 
-    return JsonResponse(
-        node.make_json_response_dict(),
-        safe=False)
+    return JsonResponse(node.make_json_response_dict(), safe=False)
 
 
 def xhr_node_by_slug(request, slug):
@@ -345,6 +346,7 @@ def xhr_logout(request):
     try:
         logout(request)
         return JsonResponse({'success': True}, safe=False)
+
     except Exception as ex:
         return JsonResponse({'success': False, 'reason': str(ex)}, safe=False)
 
