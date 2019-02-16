@@ -30,6 +30,7 @@ define(
             render_list: function() {
                 this.relations_list_view.render(this.relations_collection);
             }
+
         });
     }
 );

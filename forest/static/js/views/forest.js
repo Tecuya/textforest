@@ -26,17 +26,21 @@ define(
             },
 
             initialize: function(options) {
-                this.relations_collection = new Relations();
+                this.sort = 'views';
+                this.sortdir = 'desc';
+
+                this.relations_collection = new Relations({ 'sort': this.sort, 'sortdir': this.sortdir });
+
+                this.user = new User({ 'username': options.username });
 
                 this.relations_view = new RelationsView({ forest_view: this });
                 this.relations_view.set_relations_collection(this.relations_collection);
-
-                this.user = new User({ 'username': options.username });
 
                 this.user_view = new UserView({ forest_view: this, user: this.user });
                 this.statusbar_view = new StatusBarView({ forest_view: this, user: this.user });
 
                 this.node_counter = 0;
+
             },
 
             render: function() {
@@ -199,7 +203,7 @@ define(
 
                 if (selected_relation) {
                     this.$el.find(this.elements.text_area).append(commandhistorytpl({ command: selected_relation.get('text') }));
-                    Backbone.history.navigate('/f/' + selected_relation.get('child'), true);
+                    Backbone.history.navigate('/r/' + selected_relation.get('slug'), true);
                 }
             },
 
@@ -233,6 +237,40 @@ define(
                                 }
                             });
                     });
+            },
+
+            vote: function(slug, dir) {
+                var relation = this.relations_collection.findWhere({ 'slug': slug });
+
+                if (relation) {
+
+                    // and update server in background
+                    var self = this;
+                    $.ajax({
+                        url: '/xhr/relation/vote/' + slug + '/' + dir,
+                        dataType: 'json',
+                        success: function(data) {
+
+                            if (data.success) {
+
+                                if (dir == 'up') {
+                                    relation.set('vote', relation.get('vote') + 1);
+                                    self.relations_view.render_list();
+
+                                } else if (dir == 'down') {
+                                    relation.set('vote', relation.get('vote') - 1);
+                                    self.relations_view.render_list();
+                                }
+
+                            } else {
+                                self.add_error('Vote failed: ' + data.reason);
+                            }
+                        },
+                        error: function(xhr, err, ex) {
+                            self.add_error('Vote failed: ' + err.responseText);
+                        }
+                    });
+                }
             },
 
             delete_relation: function(slug) {
@@ -277,8 +315,62 @@ define(
                 }
             },
 
+            fetch_relations_collection: function() {
+                var self = this;
+                this.relations_collection.fetch({
+                    success: function() { self.relations_view.render_list(); },
+                    error: function(col, resp) { self.add_error(resp.responseText); }
+                });
+            },
+
+            update_sort: function(sort, sortdir) {
+                this.sort = sort;
+                this.sortdir = sortdir;
+                this.relations_collection.update_sort(sort, sortdir);
+                this.statusbar_view.render();
+                this.fetch_relations_collection();
+            },
+
+            update_current_node: function() {
+
+                // each time will replace the old view with a new view
+                this.current_node_view = new NodeView({ node: this.current_node, forest_view: this });
+
+                var node_div = $(document.createElement('DIV'))
+                    .attr('class', 'node_text')
+                    .attr('id', this.node_counter);
+
+                this.$el.find(this.elements.text_area).append(node_div);
+                this.current_node_view.setElement(node_div);
+
+                this.node_counter += 1;
+                this.current_node_view.render(this.node_counter);
+                this.scroll_bottom();
+
+                // update relations collection for new node and reset
+                this.relations_collection.set_parent_node(this.current_node);
+                this.relations_collection.set_search_text('');
+                this.fetch_relations_collection();
+
+                // clear prompt
+                this.$el.find(this.elements.prompt).val('').focus();
+
+            },
+
             ////////////
             // routes
+
+            node_view_for_relation: function(relation_slug) {
+                var self = this;
+
+                this.current_node = new Node({ relation_slug: relation_slug });
+                this.current_node.fetch(
+                    {
+                        success: function() { self.update_current_node(); },
+                        error: function(col, resp) { self.add_error(resp.responseText); }
+                    }
+                );
+            },
 
             node_view: function(slug) {
                 var self = this;
@@ -286,34 +378,7 @@ define(
                 this.current_node = new Node({ slug: slug });
                 this.current_node.fetch(
                     {
-                        success: function() {
-
-                            // each time will replace the old view with a new view
-                            self.current_node_view = new NodeView({ node: self.current_node, forest_view: self });
-
-                            var node_div = $(document.createElement('DIV'))
-                                .attr('class', 'node_text')
-                                .attr('id', self.node_counter);
-
-                            self.$el.find(self.elements.text_area).append(node_div);
-                            self.current_node_view.setElement(node_div);
-
-                            self.node_counter += 1;
-                            self.current_node_view.render(self.node_counter);
-                            self.scroll_bottom();
-
-                            // update relations collection for new node and reset
-                            self.relations_collection.set_parent_node(self.current_node);
-                            self.relations_collection.set_search_text('');
-                            self.relations_collection.fetch({
-                                success: function() { self.relations_view.render_list(); },
-                                error: function(col, resp) { self.add_error(resp.responseText); }
-                            });
-
-                            // clear prompt
-                            self.$el.find(self.elements.prompt).val('').focus();
-
-                        },
+                        success: function() { self.update_current_node(); },
                         error: function(col, resp) { self.add_error(resp.responseText); }
                     }
                 );
@@ -364,7 +429,6 @@ define(
                     }
                 );
             }
-
         });
     }
 );

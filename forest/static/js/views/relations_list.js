@@ -13,12 +13,12 @@ define(
             events: {
                 'click .relation_list_item': 'click_relation',
                 'keyup .relation_list_item': 'keypress_relation',
-                'keyup input#relation_link_dest': 'keypress_destination'
+                'keyup input#relation_link_dest': 'keypress_destination',
+                'click .voteup': 'vote_up',
+                'click .votedown': 'vote_down'
             },
 
             initialize: function(options) {
-                // this.relations_view = options.relations_view;
-
                 this.forest_view = options.forest_view;
                 this.node_list_view = new NodeList({ forest_view: this.forest_view });
             },
@@ -88,8 +88,19 @@ define(
                 } else {
                     this.node_list_view.update_text($('input#relation_link_dest').val());
                 }
-            }
+            },
 
+            vote_up: function(evt) {
+                evt.stopPropagation();
+                var slug = $(evt.target).data('slug');
+                this.forest_view.vote(slug, 'up');
+            },
+
+            vote_down: function(evt) {
+                evt.stopPropagation();
+                var slug = $(evt.target).data('slug');
+                this.forest_view.vote(slug, 'down');
+            }
         });
     }
 );

@@ -3,9 +3,19 @@
   <div class="relation_list_item_left"><%= relation.get('text') %></div>
   <div class="relation_list_item_right">
     Created by <%= relation.get('author') %> <%= relation.get('created') %><br>
+
     <% if(relation.get('author') == user.get('username')) { %>
     <div class="delete_relation">Delete</div>
     <% } %>
+
+    <div class="relation_stats">
+      Views: <%= relation.get('views') %>
+      Vote:
+      <span class="voteup clickable" data-slug="<%= relation.get('slug') %>">&uarr;</span>
+      <%= relation.get('vote') %>
+      <span class="votedown clickable" data-slug="<%= relation.get('slug') %>">&darr;</span>
+    </div>
+
   </div>
   &nbsp;
 </div>

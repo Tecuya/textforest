@@ -12,13 +12,14 @@ from django.conf import settings
 from django_registration.backends.activation.views import RegistrationView
 from social_django.models import UserSocialAuth
 
-from .models import Node, Relation
+from .models import Node, Relation, UserRelation
 
 from slugify import slugify
 
 
 def make_safe(s):
     return re.sub('<\/?[^>]+(>|$)', '', s)
+
 
 def xhr_delete_relation(request, slug):
 
@@ -88,11 +89,26 @@ def xhr_create_relation(request):
         text=make_safe(doc['text']))
 
     return JsonResponse(
-        {'slug': relation.slug,
-         'child': relation.child.slug,
-         'text': relation.text,
-         'author': relation.author.username,
-         'created': relation.created.strftime('%Y-%m-%d')},
+        relation.make_json_response_dict(),
+        safe=False)
+
+
+def xhr_node_by_relation_slug(request, slug):
+
+    if request.user:
+        r = Relation.objects.get(slug=slug)
+        UserRelation.handle_user_action(request.user, r)
+        nqs = Node.objects.filter(inbound_relations=r)
+    else:
+        nqs = Node.objects.filter(inbound_relations__slug=slug)
+
+    if nqs is None or len(nqs) == 0:
+        return HttpResponseNotFound('No such node')
+
+    node = nqs[0]
+
+    return JsonResponse(
+        node.make_json_response_dict(),
         safe=False)
 
 
@@ -123,24 +139,13 @@ def xhr_node_by_slug(request, slug):
         node.delete()
 
     return JsonResponse(
-        {'name': node.name,
-         'slug': node.slug,
-         'text': node.text,
-         'author': node.author.username,
-         'created': node.created.strftime('%Y-%m-%d')},
+        node.make_json_response_dict(),
         safe=False)
 
 
 def xhr_relations_for_parent_node(request, slug):
     return JsonResponse(
-        [{'text': r.text,
-          'slug': r.slug,
-
-          'parent': r.parent.slug,
-          'child': r.child.slug,
-
-          'author': r.author.username,
-          'created': r.created.strftime('%Y-%m-%d')}
+        [r.make_json_response_dict()
          for r in Relation.objects.filter(parent__slug=slug).order_by('-created')],
         safe=False)
 
@@ -152,25 +157,31 @@ def xhr_relations(request, slug, text=None):
     if text:
         filters['text__contains'] = text
 
+    orderby = []
+
+    sortdir = request.GET.get('sortdir')
+    sort = request.GET.get('sort')
+
+    sortmap = {
+        'views': Relation.views.field_name,
+        'vote': Relation.vote.field_name,
+        'date': Relation.created.field_name
+    }
+
+    modifier = '-' if sortdir == 'desc' else ''
+
+    if sort in sortmap:
+        orderby.append(modifier + sortmap[sort])
+
     return JsonResponse(
-        [{'text': r.text,
-          'slug': r.slug,
-
-          'parent': r.parent.slug,
-          'child': r.child.slug,
-
-          'author': r.author.username,
-          'created': r.created.strftime('%Y-%m-%d')}
-         for r in Relation.objects.filter(**filters).order_by('-created')],
+        [r.make_json_response_dict()
+         for r in Relation.objects.filter(**filters).order_by(*orderby)],
         safe=False)
 
 
 def xhr_nodes_for_text(request, text):
     return JsonResponse(
-        [{'name': n.name,
-          'slug': n.slug,
-          'author': n.author.username,
-          'created': n.created.strftime('%Y-%m-%d')}
+        [n.make_json_response_dict()
          for n in Node.objects.filter(name__contains=text)],
         safe=False)
 
@@ -290,6 +301,41 @@ def xhr_user(request):
         pass
 
     return JsonResponse(userobj, safe=False)
+
+
+def xhr_vote(request, slug, direction):
+
+    if not request.user.is_active:
+        return JsonResponse({'success': False, 'reason': 'You are not logged in'}, safe=False)
+
+    rqs = Relation.objects.filter(slug=slug)
+    if len(rqs) == 0:
+        return HttpResponseNotFound('No such relation')
+
+    relation = rqs[0]
+
+    user_relation, created = UserRelation.objects.get_or_create(
+        user=request.user,
+        relation=relation)
+
+    if user_relation.vote == -1 and direction == 'down':
+        return JsonResponse({'success': False, 'reason': 'You already voted down on this item'}, safe=False)
+
+    if user_relation.vote == 1 and direction == 'up':
+        return JsonResponse({'success': False, 'reason': 'You already voted up on this item'}, safe=False)
+
+    if direction == 'up':
+        user_relation.vote = 1
+        relation.vote += 1
+
+    elif direction == 'down':
+        user_relation.vote = -1
+        relation.vote -= 1
+
+    relation.save()
+    user_relation.save()
+
+    return JsonResponse({'success': True}, safe=False)
 
 
 def xhr_logout(request):

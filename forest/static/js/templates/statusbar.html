@@ -1,15 +1,31 @@
 
+<div id="status_title">
+  <img src="/static/favicon.ico" height=16>TextForest
+</div>
+
+<div id="status_sort_prefs">
+  Sort:
+
+  <div class="sort_pref <% if(sort != 'views') { %>clickable<% } %>" data-sort="views">Views</div>
+  <div class="sort_pref <% if(sort != 'vote') { %>clickable<% } %>" data-sort="vote">Vote</div>
+  <div class="sort_pref <% if(sort != 'date') { %>clickable<% } %>" data-sort="date">Date</div>
+  <div class="sort_pref <% if(sortdir != 'asc') { %>clickable<% } %>" data-sortdir="asc">(asc</div> or
+  <div class="sort_pref <% if(sortdir != 'desc') { %>clickable<% } %>" data-sortdir="desc">desc)</div>
+
+</div>
+
 <div id="login_status_info">
+
   <% if(user.get('username')) { %>
 
-  <div class="status_info user_status_link" id="logout_link">Logout</div>
-  <div class="status_info user_status_link" id="user_settings_link">Settings</div>
+  <div class="status_info clickable" id="logout_link">Logout</div>
+  <div class="status_info clickable" id="user_settings_link">Settings</div>
 
   <div class="status_info">Logged in as <%= user.get('username') %></div>
 
   <% } else { %>
 
-  <div class="status_info user_status_link" id="login_link">Log in</div>
+  <div class="status_info clickable" id="login_link">Log in</div>
 
   <div class="status_info">Not logged in</div>
 
