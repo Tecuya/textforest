@@ -3,7 +3,7 @@ define(['backbone', 'models/node'], function(Backbone, node) {
         model: node,
 
         url: function() {
-            return '/xhr/nodes_for_text/' + this.text;
+            return '/xhr/nodes_for_text/' + escape(this.text);
         }
     });
 });

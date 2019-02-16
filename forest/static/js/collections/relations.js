@@ -21,9 +21,9 @@ define(['backbone', 'models/relation'], function(Backbone, relation) {
 
         url: function() {
             if (this.text) {
-                return '/xhr/relations/' + this.parent_node.get('slug') + '/' + this.text + '?sort=' + this.sort + '&sortdir=' + this.sortdir;
+                return '/xhr/relations/' + escape(this.parent_node.get('slug')) + '/' + escape(this.text) + '?sort=' + this.sort + '&sortdir=' + this.sortdir;
             } else {
-                return '/xhr/relations/' + this.parent_node.get('slug') + '?sort=' + this.sort + '&sortdir=' + this.sortdir;;
+                return '/xhr/relations/' + escape(this.parent_node.get('slug')) + '?sort=' + this.sort + '&sortdir=' + this.sortdir;;
             }
         }
     });

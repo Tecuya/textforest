@@ -14,7 +14,9 @@ define(['backbone'], function(Backbone) {
                     self.unset('username');
                     options.success();
                 },
-                error: function(xhr, err, ex) { options.failure(xhr, err, ex) }
+                error: function(xhr, err, ex) {
+                    options.failure(xhr, err, ex);
+                }
             });
         },
 

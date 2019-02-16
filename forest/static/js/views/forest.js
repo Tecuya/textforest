@@ -1,9 +1,6 @@
 define(
     ['jquery', 'underscore', 'backbone', 'models/user', 'models/node', 'models/relation',
-        'collections/relations',
-        'views/statusbar',
-        'views/user', 'views/relations',
-        'views/node', 'views/node_edit',
+        'collections/relations', 'views/statusbar', 'views/user', 'views/relations', 'views/node', 'views/node_edit',
         'util/fetch_completions', 'tpl!templates/forest', 'tpl!templates/command_history'],
     function($, _, Backbone, User, Node, Relation, Relations, StatusBarView, UserView, RelationsView,
         NodeView, NodeEditView, fetch_completions, foresttpl, commandhistorytpl) {
@@ -40,7 +37,6 @@ define(
                 this.statusbar_view = new StatusBarView({ forest_view: this, user: this.user });
 
                 this.node_counter = 0;
-
             },
 
             render: function() {
@@ -131,24 +127,24 @@ define(
 
                     // enter
                     if (prompt_contents == '/edit') {
-                        self.log_command(prompt_contents);
-                        self.node_edit();
+                        this.log_command(prompt_contents);
+                        this.node_edit();
 
                     } else if (prompt_contents == '/delete') {
-                        self.log_command(prompt_contents);
-                        self.delete_node();
+                        this.log_command(prompt_contents);
+                        this.delete_node();
 
                     } else if (prompt_contents.slice(0, 3) == '/go') {
-                        self.log_command(prompt_contents);
+                        this.log_command(prompt_contents);
                         Backbone.history.navigate('/f/' + prompt_contents.slice(4), true);
 
                     } else if (prompt_contents == '/help') {
-                        self.log_command(prompt_contents);
+                        this.log_command(prompt_contents);
                         Backbone.history.navigate('/f/help', true);
 
                     } else if (prompt_contents[0] == '/') {
-                        self.log_command(prompt_contents);
-                        self.add_error('Invalid command: ' + prompt_contents);
+                        this.log_command(prompt_contents);
+                        this.add_error('Invalid command: ' + prompt_contents);
                         this.$el.find(this.elements.prompt).val('');
 
                     } else {
@@ -180,14 +176,15 @@ define(
             },
 
             delete_node: function() {
-                self.requires_login(
+                var self = this;
+                this.requires_login(
                     function() {
                         if (self.current_node.get('author') != self.user.get('username')) {
                             self.add_error('You cannot delete this because you do not own it.');
                             return;
                         }
 
-                        this.current_node.destroy({
+                        self.current_node.destroy({
                             wait: true,
                             success: function() { history.back(); },
                             error: function(node, resp) {
@@ -354,7 +351,6 @@ define(
 
                 // clear prompt
                 this.$el.find(this.elements.prompt).val('').focus();
-
             },
 
             ////////////
@@ -364,24 +360,20 @@ define(
                 var self = this;
 
                 this.current_node = new Node({ relation_slug: relation_slug });
-                this.current_node.fetch(
-                    {
-                        success: function() { self.update_current_node(); },
-                        error: function(col, resp) { self.add_error(resp.responseText); }
-                    }
-                );
+                this.current_node.fetch({
+                    success: function() { self.update_current_node(); },
+                    error: function(col, resp) { self.add_error(resp.responseText); }
+                });
             },
 
             node_view: function(slug) {
                 var self = this;
 
                 this.current_node = new Node({ slug: slug });
-                this.current_node.fetch(
-                    {
-                        success: function() { self.update_current_node(); },
-                        error: function(col, resp) { self.add_error(resp.responseText); }
-                    }
-                );
+                this.current_node.fetch({
+                    success: function() { self.update_current_node(); },
+                    error: function(col, resp) { self.add_error(resp.responseText); }
+                });
             },
 
             node_edit: function(slug) {
