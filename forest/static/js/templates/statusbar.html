@@ -1,6 +1,6 @@
 
 <div id="status_title">
-  <img src="/static/favicon.ico" height=16>TextForest
+  <img src="/static/favicon.ico" height=16 id="status_img">TextForest
 </div>
 
 <div id="status_sort_prefs">
@@ -21,7 +21,12 @@
   <div class="status_info clickable" id="logout_link">Logout</div>
   <div class="status_info clickable" id="user_settings_link">Settings</div>
 
-  <div class="status_info">Logged in as <%= user.get('username') %></div>
+  <div class="status_info">
+    Logged in as
+    <span class="clickable" id="user_page_link">
+      <%= user.get('username') %>
+    </div>
+  </div>
 
   <% } else { %>
 

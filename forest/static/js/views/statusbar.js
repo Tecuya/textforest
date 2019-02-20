@@ -7,6 +7,7 @@ define(
             events: {
                 'click div#login_link': 'user_link',
                 'click div#user_settings_link': 'user_link',
+                'click span#user_page_link': 'user_page_link',
                 'click div#logout_link': 'logout_link',
                 'click div#status_title': 'home',
                 'click div.sort_pref': 'sort'
@@ -25,6 +26,10 @@ define(
                             sort: this.forest_view.sort,
                             sortdir: this.forest_view.sortdir
                         }));
+            },
+
+            user_page_link: function() {
+                Backbone.history.navigate('/f/~' + this.user.get('username'), true);
             },
 
             user_link: function() {

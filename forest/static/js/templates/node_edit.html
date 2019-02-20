@@ -1,7 +1,7 @@
 
 <div class="editbox">
   Name<br>
-  <input name=name type=text size=100 value="<%= node.get('name') %>">
+  <input name=name type=text size=100 value="<%= node.get('name') %>" <% if(node.get('slug').substring(0, 1) == '~') { %>disabled<% } %>>
 </div>
 
 <div class="editbox">

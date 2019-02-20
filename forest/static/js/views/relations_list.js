@@ -11,8 +11,8 @@ define(
             template: relationslisttpl,
 
             events: {
-                'click .relation_list_item': 'click_relation',
-                'keyup .relation_list_item': 'keypress_relation',
+                'click .list_item': 'click_relation',
+                'keyup .list_item': 'keypress_relation',
                 'keyup input#relation_link_dest': 'keypress_destination',
                 'click .voteup': 'vote_up',
                 'click .votedown': 'vote_down'
@@ -25,7 +25,7 @@ define(
 
             render: function(relations_collection) {
                 // we will restore the users focused tabindex after rendering
-                var focused_tabindex = $('div.relation_list_item:focus').attr('tabindex');
+                var focused_tabindex = $('div.list_item:focus').attr('tabindex');
 
                 this.$el.html(this.template({ relations: relations_collection, user: this.forest_view.user }));
 
@@ -33,7 +33,7 @@ define(
                 this.node_list_view.render();
 
                 if (focused_tabindex) {
-                    $('div.relation_list_item[tabindex=' + focused_tabindex + ']').focus();
+                    $('div.list_item[tabindex=' + focused_tabindex + ']').focus();
                 }
             },
 
@@ -62,7 +62,7 @@ define(
 
             click_relation: function(evt) {
 
-                var clicked_item = $(evt.target).closest('.relation_list_item');
+                var clicked_item = $(evt.target).closest('.list_item');
                 var clicked_item_id = clicked_item.attr('id');
 
                 if ($(evt.target).hasClass('delete_relation')) {

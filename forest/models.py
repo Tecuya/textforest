@@ -24,6 +24,16 @@ class Node(models.Model):
             'author': self.author.username,
             'created': self.created.strftime('%Y-%m-%d')}
 
+    def find_last_branching_node(self):
+        node = self
+        while True:
+            rqs = Relation.objects.filter(child=node)
+            if len(rqs) > 1:
+                return rqs[0].parent
+            else:
+                node = rqs[0].parent
+        return node
+
 
 class Relation(models.Model):
     author = models.ForeignKey(User, on_delete=models.PROTECT)

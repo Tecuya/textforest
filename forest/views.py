@@ -21,6 +21,24 @@ def make_safe(s):
     return re.sub('<\/?[^>]+(>|$)', '', s)
 
 
+def uniqueify(model, slug):
+    uniqueifier = 0
+    new_slug = slug
+
+    while True:
+
+        if uniqueifier != 0:
+            new_slug = slug + '-' + str(uniqueifier)
+
+        nqs = model.objects.filter(slug=new_slug)
+        if len(nqs) == 0:
+            break
+
+        uniqueifier += 1
+
+    return new_slug
+
+
 def xhr_delete_relation(request, slug):
 
     if request.method == 'DELETE':
@@ -46,8 +64,6 @@ def xhr_create_relation(request):
 
     doc = ujson.loads(request.body)
 
-    new_relation_slug = slugify(doc['text'])
-
     # resolve parent node
     nqs = Node.objects.filter(slug=doc['parent'])
     if len(nqs) == 0:
@@ -67,28 +83,14 @@ def xhr_create_relation(request):
         # if client did NOT specify a child slug we generate one
         # which MUST be unique, if we collide we try again
 
-        uniqueifier = 0
-        new_slug = new_relation_slug
-
-        while True:
-
-            if uniqueifier != 0:
-                new_slug = new_relation_slug + '-' + str(uniqueifier)
-
-            nqs = Node.objects.filter(slug=new_slug)
-            if len(nqs) == 0:
-                break
-
-            uniqueifier += 1
-
         child = Node.objects.create(
             author=request.user,
             name=make_safe(doc['text']),
-            slug=new_slug)
+            slug=uniqueify(Node, make_safe(slugify(doc['text']))))
 
-    relation, created = Relation.objects.get_or_create(
+    relation = Relation.objects.create(
         author=request.user,
-        slug=slugify(make_safe(doc['text'])),
+        slug=uniqueify(Relation, make_safe(slugify(doc['text']))),
         parent=parent,
         child=child,
         text=make_safe(doc['text']))
@@ -118,29 +120,59 @@ def xhr_node_by_relation_slug(request, slug):
 
 def xhr_node_by_slug(request, slug):
 
-    nqs = Node.objects.filter(slug=slug)
-    if nqs is None or len(nqs) == 0:
-        return HttpResponseNotFound('No such node')
+    if len(slug) and slug[0] == '~':
 
-    node = nqs[0]
+        try:
+            user = User.objects.get(username=slug[1:])
+        except User.DoesNotExist as e:
+            return HttpResponseNotFound('No such user')
 
-    if request.method == 'POST' or request.method == 'PUT':
-        doc = ujson.loads(request.body)
+        node, created = Node.objects.get_or_create(slug=slug, author=user)
 
-        if node.author != request.user:
-            return HttpResponseForbidden('This node does not belong to you')
+        if created:
+            node.name = ('User: ' + user.username)
+            node.text = 'This is the user page for '+user.username
+            node.save()
 
-        node.name = make_safe(doc['name'])
-        node.slug = slugify(doc['name'])
-        node.text = make_safe(doc['text'])
-        node.save()
+        if request.method == 'POST' or request.method == 'PUT':
+            doc = ujson.loads(request.body)
 
-    elif request.method == 'DELETE':
+            if node.author != request.user:
+                return HttpResponseForbidden('This node does not belong to you')
 
-        if node.author != request.user:
-            return HttpResponseForbidden('This node does not belong to you')
+            node.text = make_safe(doc['text'])
+            node.save()
 
-        node.delete()
+        elif request.method == 'DELETE':
+            return HttpResponseForbidden('User pages cannot be deleted.')
+
+    else:
+
+        nqs = Node.objects.filter(slug=slug)
+        if nqs is None or len(nqs) == 0:
+
+            # special handling for user pages
+            return HttpResponseNotFound('No such node')
+
+        node = nqs[0]
+
+        if request.method == 'POST' or request.method == 'PUT':
+            doc = ujson.loads(request.body)
+
+            if node.author != request.user:
+                return HttpResponseForbidden('This node does not belong to you')
+
+            node.name = make_safe(doc['name'])
+            node.slug = slugify(doc['name'])
+            node.text = make_safe(doc['text'])
+            node.save()
+
+        elif request.method == 'DELETE':
+
+            if node.author != request.user:
+                return HttpResponseForbidden('This node does not belong to you')
+
+            node.delete()
 
     return JsonResponse(
         node.make_json_response_dict(),
@@ -177,10 +209,17 @@ def xhr_relations(request, slug, text=None):
     if sort in sortmap:
         orderby.append(modifier + sortmap[sort])
 
-    return JsonResponse(
-        [r.make_json_response_dict()
-         for r in Relation.objects.filter(**filters).order_by(*orderby)],
-        safe=False)
+    resp = []
+    for r in Relation.objects.filter(**filters).order_by(*orderby).prefetch_related('userrelation_set')[:30]:
+
+        reldict = r.make_json_response_dict()
+
+        if request.user.is_active:
+            reldict['visited'] = len(r.userrelation_set.filter(user=request.user)) > 0
+
+        resp.append(reldict)
+
+    return JsonResponse(resp, safe=False)
 
 
 def xhr_nodes_for_text(request, text):

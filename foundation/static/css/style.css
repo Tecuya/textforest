@@ -45,6 +45,11 @@ input {
   padding-left: 4px;
 }
 
+input:disabled {
+  background-color: #222;
+  color: #555;
+}
+
 input#prompt {
   width: 100%;
   background-image: url('/static/greater-than.png');
@@ -68,10 +73,6 @@ div.list_item {
   margin-bottom: 2px;
 }
 
-div.relation_create {
-  background-color: #000;
-}
-
 div.list_item:hover {
   background-color: #777;
   cursor: pointer;
@@ -82,8 +83,17 @@ div.list_item:focus {
   cursor: pointer;
 }
 
+div.visited_relation {
+  background-color: #1e1e1e;
+  color: #888;
+}
+
 div.creation_title {
   font-size: 14pt;
+}
+
+div.relation_create {
+  background-color: #000;
 }
 
 div.actionlink {
@@ -116,15 +126,6 @@ button {
   background-color: #222;
   padding: 3px;
   padding-left: 10px; padding-right: 10px;
-}
-
-div#relation_creation {
-  border: 2px solid white;
-  border-radius: 7px;
-  background-color: #444;
-  padding: 5px;
-  margin-bottom: 2px;
-  display: none;
 }
 
 div.command_history {
@@ -186,10 +187,6 @@ div.node_attribution {
   margin: 4px;
   border: dashed #333 1px;
   border-radius: 7px;
-}
-
-input#relation_creation_text {
-  font-family: monospace;
 }
 
 div.relation_link {
@@ -279,6 +276,11 @@ div#status_title {
   font-size: 14pt;
   text-decoration: underline;
   cursor: pointer;
+}
+
+img#status_img {
+  padding-left: 6px;
+  padding-right: 6px;
 }
 
 div#status_sort_prefs {

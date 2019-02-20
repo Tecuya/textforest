@@ -158,15 +158,16 @@ define(
                 // before jquerys val could get the updated text
                 window.setTimeout(
                     function() {
-                        if (prompt_contents.length == 0 || prompt_contents[0] == '/') {
-                            return;
-                        }
-
                         fetch_completions(
                             self.lastfetch,
                             function() {
                                 self.lastfetch = new Date().getTime();
                                 self.relations_collection.set_search_text(prompt_contents);
+
+                                if (prompt_contents[0] == '/') {
+                                    return;
+                                }
+
                                 self.relations_collection.fetch({
                                     success: function() { self.relations_view.render_list(); },
                                     error: function(col, err) { self.add_error(err.responseText); }
@@ -200,7 +201,7 @@ define(
 
                 if (selected_relation) {
                     this.$el.find(this.elements.text_area).append(commandhistorytpl({ command: selected_relation.get('text') }));
-                    Backbone.history.navigate('/r/' + selected_relation.get('slug'), true);
+                    this.node_view_for_relation(selected_relation.get('slug'));
                 }
             },
 
@@ -361,7 +362,10 @@ define(
 
                 this.current_node = new Node({ relation_slug: relation_slug });
                 this.current_node.fetch({
-                    success: function() { self.update_current_node(); },
+                    success: function() {
+                        self.update_current_node();
+                        Backbone.history.navigate('/f/' + self.current_node.get('slug'));
+                    },
                     error: function(col, resp) { self.add_error(resp.responseText); }
                 });
             },

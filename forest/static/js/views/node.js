@@ -33,7 +33,7 @@ define(
             actionlink: function(evt) {
                 var action = $(evt.target).data('action');
                 if (action == 'edit') {
-                    this.forest_view.log_command('[Edit link clicked]');
+                    this.forest_view.log_command('[Edit ' + this.forest_view.current_node.get('slug') + ']');
                     this.forest_view.node_edit(this.node.get('slug'));
 
                 } else if (action == 'delete') {
@@ -44,7 +44,7 @@ define(
                     this.$el.find(this.elements.delete_confirm_div).hide();
 
                 } else if (action == 'delete-yes') {
-                    this.forest_view.log_command('[Post deleted]');
+                    this.forest_view.log_command('[Delete ' + this.forest_view.current_node.get('slug') + ']');
                     this.forest_view.delete_node();
                 }
             }
