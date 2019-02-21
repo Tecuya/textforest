@@ -18,6 +18,7 @@ urlpatterns = [
     path('xhr/login', forest.views.xhr_login, name='xhr_login'),
     path('xhr/user', forest.views.xhr_user, name='xhr_user'),
 
+    path('xhr/notifications', forest.views.xhr_notifications, name='xhr_notifications'),
     path('xhr/delete_relation/<slug>', forest.views.xhr_delete_relation, name='xhr_delete_relation'),
     path('xhr/create_relation', forest.views.xhr_create_relation, name='xhr_create_relation'),
     path('xhr/node_by_relation_slug/<slug>', forest.views.xhr_node_by_relation_slug, name='xhr_node_by_relation_slug'),
@@ -27,6 +28,9 @@ urlpatterns = [
     path('xhr/relations/<slug>', forest.views.xhr_relations, name='xhr_relations_for_slug'),
     path('xhr/relations/<slug>/<text>', forest.views.xhr_relations, name='xhr_relations_for_text'),
     path('xhr/relation/vote/<slug>/<direction>', forest.views.xhr_vote, name='xhr_vote'),
+
+    path('xhr/subscribe/<slug>', forest.views.xhr_subscribe, name='xhr_subscribe'),
+    path('xhr/unsubscribe/<slug>', forest.views.xhr_unsubscribe, name='xhr_unsubscribe'),
 
     re_path(r'^oauth/', include('social_django.urls', namespace='social')),
 

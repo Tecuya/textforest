@@ -1,4 +1,8 @@
 <div class="node_attribution">
+
+  <span id="star_full" <% if(!node.get('subscribed')) { %>style="display: none;"<% } %>>★</span>
+  <span id="star_empty" <% if(node.get('subscribed')) { %>style="display: none;"<% } %>>☆</span>
+
   <b><a href="/f/<%= node.get('slug') %>"><%= node.get('name') %></a></b><br>
   Created <%= node.get('created') %> by <%= node.get('author') %><br>
   <% if(node.get('author') == user.get('username')) { %>

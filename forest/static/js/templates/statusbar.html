@@ -28,6 +28,10 @@
     </div>
   </div>
 
+  <% if(notifications.models.length > 0) { %>
+  <div class="status_info clickable">Notifications (<%= notifications.models.length %>)</div>
+  <% } %>
+
   <% } else { %>
 
   <div class="status_info clickable" id="login_link">Log in</div>

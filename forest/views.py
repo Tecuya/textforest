@@ -12,7 +12,7 @@ from django.conf import settings
 from django_registration.backends.activation.views import RegistrationView
 from social_django.models import UserSocialAuth
 
-from .models import Node, Relation, UserRelation
+from .models import Node, Relation, UserRelation, Subscription, Notification
 
 from slugify import slugify
 
@@ -95,6 +95,15 @@ def xhr_create_relation(request):
         child=child,
         text=make_safe(doc['text']))
 
+    for subscription in parent.subscription_set.all():
+        Notification.objects.create(
+            user=subscription.user,
+            subscription=subscription,
+            actor=request.user,
+            node=parent,
+            relation=relation,
+            action=Notification.ACTION_CREATE)
+
     return JsonResponse(
         relation.make_json_response_dict(),
         safe=False)
@@ -143,6 +152,14 @@ def xhr_node_by_slug(request, slug):
             node.text = make_safe(doc['text'])
             node.save()
 
+            for subscription in node.subscription_set.all():
+                Notification.objects.create(
+                    user=subscription.user,
+                    subscription=subscription,
+                    actor=request.user,
+                    node=node,
+                    action=Notification.ACTION_MODIFY)
+
         elif request.method == 'DELETE':
             return HttpResponseForbidden('User pages cannot be deleted.')
 
@@ -167,6 +184,14 @@ def xhr_node_by_slug(request, slug):
             node.text = make_safe(doc['text'])
             node.save()
 
+            for subscription in node.subscription_set.all():
+                Notification.objects.create(
+                    user=subscription.user,
+                    subscription=subscription,
+                    actor=request.user,
+                    node=node,
+                    action=(Notification.ACTION_CREATE if request.method == 'POST' else Notification.ACTION_MODIFY))
+
         elif request.method == 'DELETE':
 
             if node.author != request.user:
@@ -174,9 +199,36 @@ def xhr_node_by_slug(request, slug):
 
             node.delete()
 
-    return JsonResponse(
-        node.make_json_response_dict(),
-        safe=False)
+    rdict = node.make_json_response_dict()
+    if request.user.is_active:
+        rdict['subscribed'] = len(node.subscription_set.filter(user=request.user)) > 0
+
+    return JsonResponse(rdict, safe=False)
+
+
+def xhr_unsubscribe(request, slug):
+    return xhr_subscribe(request, slug, False)
+
+
+def xhr_subscribe(request, slug, subscribe=True):
+
+    nqs = Node.objects.filter(slug=slug)
+    if nqs is None or len(nqs) == 0:
+        return HttpResponseNotFound('No such node')
+
+    node = nqs[0]
+
+    filters = {
+        'node': node,
+        'user': request.user
+    }
+
+    if subscribe:
+        sub, created = Subscription.objects.get_or_create(**filters)
+    else:
+        Subscription.objects.filter(**filters).delete()
+
+    return JsonResponse({}, safe=False)
 
 
 def xhr_relations_for_parent_node(request, slug):
@@ -379,6 +431,16 @@ def xhr_vote(request, slug, direction):
     user_relation.save()
 
     return JsonResponse({'success': True}, safe=False)
+
+
+def xhr_notifications(request):
+
+    if not request.user.is_active:
+        return JsonResponse([], safe=False)
+
+    notifications = Notification.objects.filter(user=request.user).order_by('-created')[:30]
+
+    return JsonResponse([n.make_json_response_dict() for n in notifications], safe=False)
 
 
 def xhr_logout(request):

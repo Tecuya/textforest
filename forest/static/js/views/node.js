@@ -16,7 +16,9 @@ define(
             },
 
             events: {
-                'click div.actionlink': 'actionlink'
+                'click div.actionlink': 'actionlink',
+                'click span#star_full': 'click_subscribe',
+                'click span#star_empty': 'click_subscribe'
             },
 
             initialize: function(options) {
@@ -47,8 +49,31 @@ define(
                     this.forest_view.log_command('[Delete ' + this.forest_view.current_node.get('slug') + ']');
                     this.forest_view.delete_node();
                 }
-            }
+            },
 
+            click_subscribe: function(evt) {
+                var subscribe = $(evt.target).attr('id') == 'star_empty';
+                if (!this.forest_view.user.get('username')) {
+                    this.forest_view.add_error('You must be logged in to subscribe');
+                    return;
+                }
+                var self = this;
+                this.forest_view.current_node.subscribe({
+                    subscribe: subscribe,
+                    success: function() {
+                        if (subscribe) {
+                            $('span#star_empty').hide();
+                            $('span#star_full').show();
+                        } else {
+                            $('span#star_empty').show();
+                            $('span#star_full').hide();
+                        }
+                    },
+                    error: function(errText) {
+                        self.forest_view.add_error('Failed to change subscription setting: ' + errText);
+                    }
+                });
+            }
         });
     }
 );

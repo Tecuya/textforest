@@ -440,3 +440,11 @@ div.delete_confirm_choice {
   padding-left: 10px;
   color: #eee;
 }
+
+span#star_empty {
+  cursor: pointer;
+}
+
+span#star_full {
+  cursor: pointer;
+}

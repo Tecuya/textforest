@@ -24,7 +24,8 @@ define(
                         {
                             user: this.user,
                             sort: this.forest_view.sort,
-                            sortdir: this.forest_view.sortdir
+                            sortdir: this.forest_view.sortdir,
+                            notifications: this.forest_view.notifications_collection
                         }));
             },
 

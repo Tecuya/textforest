@@ -16,14 +16,6 @@ class Node(models.Model):
     def __str__(self):
         return self.name
 
-    def make_json_response_dict(self):
-        return {
-            'name': self.name,
-            'slug': self.slug,
-            'text': self.text,
-            'author': self.author.username,
-            'created': self.created.strftime('%Y-%m-%d')}
-
     def find_last_branching_node(self):
         node = self
         while True:
@@ -33,6 +25,14 @@ class Node(models.Model):
             else:
                 node = rqs[0].parent
         return node
+
+    def make_json_response_dict(self):
+        return {
+            'name': self.name,
+            'slug': self.slug,
+            'text': self.text,
+            'author': self.author.username,
+            'created': self.created.strftime('%Y-%m-%d')}
 
 
 class Relation(models.Model):
@@ -76,7 +76,7 @@ class UserRelation(models.Model):
     vote = models.SmallIntegerField(default=0)
 
     def __str__(self):
-        return '%s %s - %s' % (self.user, self.relation, self.vote)
+        return '{} {} - {}'.format(self.user, self.relation, self.vote)
 
     @staticmethod
     def handle_user_action(user, relation, vote=None):
@@ -88,3 +88,54 @@ class UserRelation(models.Model):
             user_relation.save()
 
         relation.update_user_relations()
+
+
+class Subscription(models.Model):
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    node = models.ForeignKey(Node, on_delete=models.CASCADE)
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return '{} {}'.format(self.user, self.node)
+
+
+class Notification(models.Model):
+
+    ACTION_CREATE = 'create'
+    ACTION_DELETE = 'delete'
+    ACTION_MODIFY = 'modify'
+
+    ACTIONS = ((ACTION_CREATE, 'Created'),
+               (ACTION_DELETE, 'Deleted'),
+               (ACTION_MODIFY, 'Modified'))
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    subscription = models.ForeignKey(Subscription, on_delete=models.CASCADE)
+
+    actor = models.ForeignKey(User, on_delete=models.PROTECT, related_name='notification_actor')
+    node = models.ForeignKey(Node, on_delete=models.CASCADE)
+    relation = models.ForeignKey(Relation, on_delete=models.CASCADE, blank=True, null=True)
+
+    action = models.CharField(choices=ACTIONS, default=ACTION_MODIFY, max_length=100)
+
+    read = models.BooleanField(default=False)
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return '{} {} {} {} {}'.format(self.user, self.actor, self.action, self.node, self.relation)
+
+    def make_json_response_dict(self):
+        return {
+            'id': self.id,
+            'user': self.user.username,
+            'node_slug': self.node.slug,
+            'relation_slug': self.relation.slug if self.relation is not None else '',
+            'actor': self.actor.username,
+            'action': self.action,
+            'read': self.read,
+            'created': self.created.strftime('%Y-%m-%d')}

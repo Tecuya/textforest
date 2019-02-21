@@ -1,8 +1,9 @@
 define(
     ['jquery', 'underscore', 'backbone', 'models/user', 'models/node', 'models/relation',
-        'collections/relations', 'views/statusbar', 'views/user', 'views/relations', 'views/node', 'views/node_edit',
+        'collections/notifications', 'collections/relations',
+        'views/statusbar', 'views/user', 'views/relations', 'views/node', 'views/node_edit',
         'util/fetch_completions', 'tpl!templates/forest', 'tpl!templates/command_history'],
-    function($, _, Backbone, User, Node, Relation, Relations, StatusBarView, UserView, RelationsView,
+    function($, _, Backbone, User, Node, Relation, Notifications, Relations, StatusBarView, UserView, RelationsView,
         NodeView, NodeEditView, fetch_completions, foresttpl, commandhistorytpl) {
 
         var global = this;
@@ -27,6 +28,7 @@ define(
                 this.sortdir = 'desc';
 
                 this.relations_collection = new Relations({ 'sort': this.sort, 'sortdir': this.sortdir });
+                this.notifications_collection = new Notifications();
 
                 this.user = new User({ 'username': options.username });
 
@@ -49,6 +51,13 @@ define(
 
                 this.statusbar_view.setElement(this.$el.find('div#status_bar'));
                 this.statusbar_view.render();
+
+                var self = this;
+                this.notifications_collection.fetch({
+                    success: function() {
+                        self.statusbar_view.render();
+                    }
+                });
 
                 this.$el.find(this.elements.prompt).focus();
             },
