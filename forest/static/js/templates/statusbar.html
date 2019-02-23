@@ -11,7 +11,6 @@
   <div class="sort_pref <% if(sort != 'date') { %>clickable<% } %>" data-sort="date">Date</div>
   <div class="sort_pref <% if(sortdir != 'asc') { %>clickable<% } %>" data-sortdir="asc">(asc</div> or
   <div class="sort_pref <% if(sortdir != 'desc') { %>clickable<% } %>" data-sortdir="desc">desc)</div>
-
 </div>
 
 <div id="login_status_info">
@@ -29,7 +28,7 @@
   </div>
 
   <% if(notifications.models.length > 0) { %>
-  <div class="status_info clickable">Notifications (<%= notifications.models.length %>)</div>
+  <div id="notifications_link" class="status_info clickable">Notifications (<%= notifications.models.length %>)</div>
   <% } %>
 
   <% } else { %>

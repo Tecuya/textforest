@@ -108,9 +108,11 @@ class Notification(models.Model):
     ACTION_DELETE = 'delete'
     ACTION_MODIFY = 'modify'
 
-    ACTIONS = ((ACTION_CREATE, 'Created'),
-               (ACTION_DELETE, 'Deleted'),
-               (ACTION_MODIFY, 'Modified'))
+    ACTIONS = ((ACTION_CREATE, 'created'),
+               (ACTION_DELETE, 'deleted'),
+               (ACTION_MODIFY, 'modified'))
+
+    ACTIONMAP = dict(ACTIONS)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     subscription = models.ForeignKey(Subscription, on_delete=models.CASCADE)
@@ -134,8 +136,10 @@ class Notification(models.Model):
             'id': self.id,
             'user': self.user.username,
             'node_slug': self.node.slug,
+            'node_name': self.node.text,
             'relation_slug': self.relation.slug if self.relation is not None else '',
+            'relation_name': self.relation.text,
             'actor': self.actor.username,
-            'action': self.action,
+            'action': self.ACTIONMAP.get(self.action),
             'read': self.read,
-            'created': self.created.strftime('%Y-%m-%d')}
+            'created': self.created.strftime('%Y-%m-%d %H:%M:%S')}

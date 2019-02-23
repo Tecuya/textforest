@@ -19,6 +19,7 @@ urlpatterns = [
     path('xhr/user', forest.views.xhr_user, name='xhr_user'),
 
     path('xhr/notifications', forest.views.xhr_notifications, name='xhr_notifications'),
+    path('xhr/notification/<notification_id>', forest.views.xhr_notification, name='xhr_notifications'),
     path('xhr/delete_relation/<slug>', forest.views.xhr_delete_relation, name='xhr_delete_relation'),
     path('xhr/create_relation', forest.views.xhr_create_relation, name='xhr_create_relation'),
     path('xhr/node_by_relation_slug/<slug>', forest.views.xhr_node_by_relation_slug, name='xhr_node_by_relation_slug'),

@@ -438,9 +438,18 @@ def xhr_notifications(request):
     if not request.user.is_active:
         return JsonResponse([], safe=False)
 
-    notifications = Notification.objects.filter(user=request.user).order_by('-created')[:30]
+    notifications = Notification.objects.filter(user=request.user).order_by('-created')
 
     return JsonResponse([n.make_json_response_dict() for n in notifications], safe=False)
+
+
+def xhr_notification(request, notification_id):
+
+    if request.method == 'DELETE':
+        Notification.objects.filter(user=request.user, id=notification_id).delete()
+        return JsonResponse({}, safe=False)
+
+    return JsonResponse({}, safe=False)
 
 
 def xhr_logout(request):

@@ -1,10 +1,11 @@
 define(
-    ['jquery', 'underscore', 'backbone', 'models/user', 'models/node', 'models/relation',
+    ['jquery', 'underscore', 'backbone',
+        'models/user', 'models/node', 'models/relation',
         'collections/notifications', 'collections/relations',
-        'views/statusbar', 'views/user', 'views/relations', 'views/node', 'views/node_edit',
+        'views/statusbar', 'views/user', 'views/relations', 'views/node', 'views/node_edit', 'views/notifications',
         'util/fetch_completions', 'tpl!templates/forest', 'tpl!templates/command_history'],
     function($, _, Backbone, User, Node, Relation, Notifications, Relations, StatusBarView, UserView, RelationsView,
-        NodeView, NodeEditView, fetch_completions, foresttpl, commandhistorytpl) {
+        NodeView, NodeEditView, NotificationsView, fetch_completions, foresttpl, commandhistorytpl) {
 
         var global = this;
 
@@ -20,7 +21,8 @@ define(
             elements: {
                 'prompt': 'input#prompt',
                 'text_area': 'div#text_area',
-                'divmodal': 'div#modal'
+                'divmodal': 'div#modal',
+                'notifications': 'div#notifications'
             },
 
             initialize: function(options) {
@@ -37,6 +39,7 @@ define(
 
                 this.user_view = new UserView({ forest_view: this, user: this.user });
                 this.statusbar_view = new StatusBarView({ forest_view: this, user: this.user });
+                this.notifications_view = new NotificationsView({ forest_view: this, user: this.user, notifications_collection: this.notifications_collection });
 
                 this.node_counter = 0;
             },
@@ -52,14 +55,21 @@ define(
                 this.statusbar_view.setElement(this.$el.find('div#status_bar'));
                 this.statusbar_view.render();
 
+                this.notifications_view.setElement(this.$el.find('div#notifications'));
+
+                this.refresh_notifications();
+
+                this.$el.find(this.elements.prompt).focus();
+            },
+
+            refresh_notifications: function() {
                 var self = this;
                 this.notifications_collection.fetch({
                     success: function() {
                         self.statusbar_view.render();
+                        self.notifications_view.render();
                     }
                 });
-
-                this.$el.find(this.elements.prompt).focus();
             },
 
             user_link: function() {
@@ -384,7 +394,10 @@ define(
 
                 this.current_node = new Node({ slug: slug });
                 this.current_node.fetch({
-                    success: function() { self.update_current_node(); },
+                    success: function() {
+                        self.update_current_node();
+                        self.refresh_notifications();
+                    },
                     error: function(col, resp) { self.add_error(resp.responseText); }
                 });
             },

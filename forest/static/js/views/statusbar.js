@@ -10,7 +10,9 @@ define(
                 'click span#user_page_link': 'user_page_link',
                 'click div#logout_link': 'logout_link',
                 'click div#status_title': 'home',
-                'click div.sort_pref': 'sort'
+                'click div.sort_pref': 'sort',
+                'click div#notifications_link': 'notification_link',
+                'click div#notification_clear_all': 'notification_clear_all'
             },
 
             initialize: function(options) {
@@ -68,6 +70,15 @@ define(
                 }
 
                 this.forest_view.update_sort(sort, sortdir);
+            },
+
+            notification_link: function() {
+                var notification_area = this.forest_view.$el.find('div#notifications');
+                if (notification_area.is(':visible')) {
+                    this.forest_view.$el.find('div#notifications').hide();
+                } else {
+                    this.forest_view.$el.find('div#notifications').show();
+                }
             }
 
         });

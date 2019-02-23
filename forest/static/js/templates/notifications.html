@@ -1,0 +1,44 @@
+<div class="title">Notifications</div>
+
+<% if(notifications_collection.models.length == 0) { %>
+<div class="notification">
+  (No notifications)
+</div>
+<% } %>
+
+<% _.each(notifications_collection.models, function(n) { %>
+
+<div class="notification">
+  <%= n.get('created') %>
+
+  <span class="clickable actor_link" data-actor-link="<%= n.get('actor') %>"><%= n.get('actor') %></span>
+
+  <%= n.get('action') %>
+
+  <% if(n.get('relation_slug')) { %>
+  relation
+
+  "
+  <span class="clickable relation_link" data-relation-link="<%= n.get('relation_slug') %>">
+    <%= n.get('relation_name').substring(0,15) %>
+  </span>
+  "
+
+  on
+
+  <% } %>
+
+  node
+
+  "
+  <span class="clickable node_link" data-node-link="<%= n.get('node_slug') %>">
+    <%= n.get('node_name').substring(0,15) %>
+  </span>
+  "
+
+  <span class="notification_clear" data-notification-id="<%= n.get('id') %>">❌</span>
+</div>
+
+<% }) %>
+
+<div class="clickable" id="notification_clear_all">Clear all</div>

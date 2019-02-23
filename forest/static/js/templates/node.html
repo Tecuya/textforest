@@ -4,7 +4,9 @@
   <span id="star_empty" <% if(node.get('subscribed')) { %>style="display: none;"<% } %>>☆</span>
 
   <b><a href="/f/<%= node.get('slug') %>"><%= node.get('name') %></a></b><br>
+
   Created <%= node.get('created') %> by <%= node.get('author') %><br>
+
   <% if(node.get('author') == user.get('username')) { %>
   <div class="actionlink" data-action="edit">Edit</div>
   <div class="actionlink" data-action="delete">Delete</div>
@@ -14,6 +16,7 @@
     <div class="delete_confirm_choice actionlink" data-action="delete-yes">Yes</div>
   </div>
   <% } %>
+
 </div>
 
 <%= node.get('text_presentation') %>

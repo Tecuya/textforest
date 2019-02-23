@@ -62,11 +62,11 @@ define(
                     subscribe: subscribe,
                     success: function() {
                         if (subscribe) {
-                            $('span#star_empty').hide();
-                            $('span#star_full').show();
+                            self.$el.find('span#star_empty').hide();
+                            self.$el.find('span#star_full').show();
                         } else {
-                            $('span#star_empty').show();
-                            $('span#star_full').hide();
+                            self.$el.find('span#star_empty').show();
+                            self.$el.find('span#star_full').hide();
                         }
                     },
                     error: function(errText) {

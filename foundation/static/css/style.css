@@ -23,8 +23,7 @@ a:active {
 
 div.title {
   text-align: center;
-  font-size: 33pt;
-  padding-bottom: 19px;
+  font-size: 15pt;
 }
 
 textarea {
@@ -441,10 +440,39 @@ div.delete_confirm_choice {
   color: #eee;
 }
 
+div#notifications {
+  position: fixed;
+  z-index: 100;
+  bottom: 24;
+  left: 65%;
+  width: 35%;
+  background-color: black;
+  border-top: solid #444 2px;
+  display: none;
+}
+
+div.notification {
+  border: solid #444 1px;
+  padding: 2px;
+  margin: 5px;
+}
+
 span#star_empty {
   cursor: pointer;
 }
 
 span#star_full {
   cursor: pointer;
+}
+
+span.notification_clear {
+  cursor: pointer;
+  float: right;
+  padding-right: 8px;
+}
+
+div#notification_clear_all {
+  cursor: pointer;
+  text-decoration: underline;
+  float: right;
 }
