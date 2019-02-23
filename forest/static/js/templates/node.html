@@ -5,7 +5,8 @@
 
   <b><a href="/f/<%= node.get('slug') %>"><%= node.get('name') %></a></b><br>
 
-  Created <%= node.get('created') %> by <%= node.get('author') %><br>
+  Created <%= node.get('created') %> by
+  <span class="clickable user_link" data-user-link="<%= node.get('author') %>"><%= node.get('author') %></span><br>
 
   <% if(node.get('author') == user.get('username')) { %>
   <div class="actionlink" data-action="edit">Edit</div>

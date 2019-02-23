@@ -15,7 +15,10 @@ define(
 
             events: {
                 'keyup input#prompt': 'keypress_prompt',
-                'click div#modal': 'click_divmodal'
+                'click div#modal': 'click_divmodal',
+                'click span.user_link': 'user_page_link',
+                'click span.node_link': 'node_link',
+                'click span.relation_link': 'relation_link'
             },
 
             elements: {
@@ -73,6 +76,12 @@ define(
             },
 
             user_link: function() {
+
+                if (this.$el.find(this.elements.divmodal).is(':visible')) {
+                    this.hide_divmodal();
+                    return;
+                }
+
                 var self = this;
                 if (this.user.get('username')) {
                     this.user.fetch({
@@ -321,6 +330,18 @@ define(
             scroll_bottom: function() {
                 var text_area = this.$el.find(this.elements.text_area);
                 text_area.scrollTop(text_area[0].scrollHeight);
+            },
+
+            user_page_link: function(evt) {
+                Backbone.history.navigate('/f/~' + $(evt.target).data('user-link'), true);
+            },
+
+            node_link: function(evt) {
+                Backbone.history.navigate('/f/' + $(evt.target).data('node-link'), true);
+            },
+
+            relation_link: function(evt) {
+                Backbone.history.navigate('/r/' + $(evt.target).data('relation-link'), true);
             },
 
             requires_login: function(callable) {

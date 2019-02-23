@@ -3,6 +3,7 @@ body {
   background-color: #333;
   color: #fff;
   font-size: 13pt;
+  overflow: hidden;
 }
 
 a:link {
@@ -62,6 +63,7 @@ input#prompt {
 
 div.existing_relation {
   font-family: monospace;
+  vertical-align: top;
 }
 
 div.list_item {
@@ -110,6 +112,7 @@ small {
 
 div.node_text {
   padding-top: 3px;
+  border-top: dashed #444 2px;
 }
 
 div.editbox {
@@ -132,7 +135,6 @@ div.command_history {
   padding-bottom: 8px;
   margin-bottom: 8px;
   padding-top: 8px;
-  border-bottom: dashed #444 2px;
 }
 
 div.chosen_link_existing {

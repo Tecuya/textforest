@@ -10,9 +10,6 @@ define(
             template: notificationtpl,
 
             events: {
-                'click span.actor_link': 'actor_link',
-                'click span.node_link': 'node_link',
-                'click span.relation_link': 'relation_link',
                 'click span.notification_clear': 'notification_clear',
                 'click div#notification_clear_all': 'notification_clear_all'
             },
@@ -24,18 +21,6 @@ define(
 
             render: function() {
                 this.$el.html(this.template({ notifications_collection: this.notifications_collection }));
-            },
-
-            actor_link: function(evt) {
-                Backbone.history.navigate('/f/~' + $(evt.target).data('actor-link'), true);
-            },
-
-            node_link: function(evt) {
-                Backbone.history.navigate('/f/' + $(evt.target).data('node-link'), true);
-            },
-
-            relation_link: function(evt) {
-                Backbone.history.navigate('/r/' + $(evt.target).data('relation-link'), true);
             },
 
             notification_clear: function(evt) {

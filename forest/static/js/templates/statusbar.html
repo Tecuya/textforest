@@ -22,9 +22,7 @@
 
   <div class="status_info">
     Logged in as
-    <span class="clickable" id="user_page_link">
-      <%= user.get('username') %>
-    </div>
+    <span class="clickable user_link" data-user-link="<%= user.get('username') %>" id="user_link"><%= user.get('username') %></span>
   </div>
 
   <% if(notifications.models.length > 0) { %>
