@@ -62,6 +62,7 @@ class Relation(models.Model):
         return {'text': self.text,
                 'slug': self.slug,
                 'parent': self.parent.slug,
+                'parent_name': self.parent.name,
                 'child': self.child.slug,
                 'author': self.author.username,
                 'views': self.views,

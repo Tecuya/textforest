@@ -75,7 +75,9 @@ define(
                     this.$el.find('input#relation_link_dest').focus();
 
                 } else {
-                    this.forest_view.go_to_relation(clicked_item.data('relation-slug'));
+                    this.forest_view.go_to_relation(
+                        clicked_item.data('relation-slug'),
+                        clicked_item.hasClass('list_item_backwards'));
                 }
             },
 

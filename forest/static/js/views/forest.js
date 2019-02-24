@@ -224,12 +224,12 @@ define(
                 );
             },
 
-            go_to_relation: function(slug) {
+            go_to_relation: function(slug, backwards) {
                 var selected_relation = this.relations_collection.findWhere({ 'slug': slug });
 
                 if (selected_relation) {
                     this.$el.find(this.elements.text_area).append(commandhistorytpl({ command: selected_relation.get('text') }));
-                    this.node_view_for_relation(selected_relation.get('slug'));
+                    this.node_view_for_relation(selected_relation.get('slug'), backwards);
                 }
             },
 
@@ -397,10 +397,13 @@ define(
             ////////////
             // routes
 
-            node_view_for_relation: function(relation_slug) {
+            node_view_for_relation: function(relation_slug, backwards) {
                 var self = this;
 
-                this.current_node = new Node({ relation_slug: relation_slug });
+                this.current_node = new Node({
+                    direction: backwards ? 'backwards' : 'forwards',
+                    relation_slug: relation_slug
+                });
                 this.current_node.fetch({
                     success: function() {
                         self.update_current_node();

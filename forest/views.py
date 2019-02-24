@@ -109,15 +109,29 @@ def xhr_create_relation(request):
         safe=False)
 
 
-def xhr_node_by_relation_slug(request, slug):
+def xhr_node_by_forward_relation_slug(request, slug):
+    return xhr_node_by_relation_slug(request, slug, 'forward')
+
+
+def xhr_node_by_backward_relation_slug(request, slug):
+    return xhr_node_by_relation_slug(request, slug, 'backward')
+
+
+def xhr_node_by_relation_slug(request, slug, direction):
 
     if request.user.is_active:
         r = Relation.objects.get(slug=slug)
         UserRelation.handle_user_action(request.user, r)
-        nqs = Node.objects.filter(inbound_relations=r)
+        if direction == 'forward':
+            nqs = Node.objects.filter(inbound_relations=r)
+        else:
+            nqs = Node.objects.filter(outbound_relations=r)
 
     else:
-        nqs = Node.objects.filter(inbound_relations__slug=slug)
+        if direction == 'forward':
+            nqs = Node.objects.filter(inbound_relations__slug=slug)
+        else:
+            nqs = Node.objects.filter(outbound_relations__slug=slug)
 
     if nqs is None or len(nqs) == 0:
         return HttpResponseNotFound('No such node')
@@ -240,10 +254,12 @@ def xhr_relations_for_parent_node(request, slug):
 
 def xhr_relations(request, slug, text=None):
 
-    filters = {'parent__slug': slug}
+    forward_filters = {'parent__slug': slug}
+    backward_filters = {'child__slug': slug}
 
     if text:
-        filters['text__contains'] = text
+        forward_filters['text__contains'] = text
+        backward_filters['text__contains'] = text
 
     orderby = []
 
@@ -262,12 +278,23 @@ def xhr_relations(request, slug, text=None):
         orderby.append(modifier + sortmap[sort])
 
     resp = []
-    for r in Relation.objects.filter(**filters).order_by(*orderby).prefetch_related('userrelation_set')[:30]:
+    for r in Relation.objects.filter(**forward_filters).order_by(*orderby).prefetch_related('userrelation_set')[:30]:
 
         reldict = r.make_json_response_dict()
 
         if request.user.is_active:
             reldict['visited'] = len(r.userrelation_set.filter(user=request.user)) > 0
+            reldict['direction'] = 'forward'
+
+        resp.append(reldict)
+
+    for r in Relation.objects.filter(**backward_filters).order_by(*orderby).prefetch_related('userrelation_set')[:30]:
+
+        reldict = r.make_json_response_dict()
+
+        if request.user.is_active:
+            reldict['visited'] = len(r.userrelation_set.filter(user=request.user)) > 0
+            reldict['direction'] = 'backwards'
 
         resp.append(reldict)
 

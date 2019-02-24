@@ -8,8 +8,11 @@ define(['backbone'], function(Backbone) {
             if (this.get('slug')) {
                 return '/xhr/node_by_slug/' + escape(this.get('slug'));
             } else {
-                // if (this.get('relation_slug')) {
-                return '/xhr/node_by_relation_slug/' + escape(this.get('relation_slug'));
+                if (this.get('direction') == 'backwards') {
+                    return '/xhr/node_by_backward_relation_slug/' + escape(this.get('relation_slug'));
+                } else {
+                    return '/xhr/node_by_forward_relation_slug/' + escape(this.get('relation_slug'));
+                }
             }
         },
 

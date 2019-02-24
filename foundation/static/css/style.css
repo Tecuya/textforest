@@ -89,6 +89,10 @@ div.visited_relation {
   color: #888;
 }
 
+div.list_item_backwards {
+  background-color: #111;
+}
+
 div.creation_title {
   font-size: 14pt;
 }

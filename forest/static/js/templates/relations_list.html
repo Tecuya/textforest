@@ -1,6 +1,18 @@
 <% _.each(relations.models, function(relation, idx) { %>
-<div class="existing_relation list_item <% if(relation.get('visited')) { %>visited_relation<% } %>" data-relation-slug="<%= relation.get('slug') %>" tabindex=<%= idx %>>
-  <div class="relation_list_item_left"><%= relation.get('text') %></div>
+<div class="existing_relation list_item
+<% if(relation.get('direction') == 'backwards') { %> list_item_backwards <% } %>
+<% if(relation.get('visited')) { %>visited_relation<% } %>"
+data-relation-slug="<%= relation.get('slug') %>"
+tabindex=<%= idx %>>
+
+  <div class="relation_list_item_left">
+    <% if(relation.get('direction') == 'backwards') { %>
+    ←
+    <%= relation.get('parent_name') %>
+    <% } else { %>
+    <%= relation.get('text') %>
+    <% } %>
+  </div>
   <div class="relation_list_item_right">
     Created by <%= relation.get('author') %> <%= relation.get('created') %><br>
     <% if(relation.get('author') == user.get('username')) { %>
