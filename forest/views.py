@@ -281,20 +281,20 @@ def xhr_relations(request, slug, text=None):
     for r in Relation.objects.filter(**forward_filters).order_by(*orderby).prefetch_related('userrelation_set')[:30]:
 
         reldict = r.make_json_response_dict()
+        reldict['direction'] = 'forward'
 
         if request.user.is_active:
             reldict['visited'] = len(r.userrelation_set.filter(user=request.user)) > 0
-            reldict['direction'] = 'forward'
 
         resp.append(reldict)
 
     for r in Relation.objects.filter(**backward_filters).order_by(*orderby).prefetch_related('userrelation_set')[:30]:
 
         reldict = r.make_json_response_dict()
+        reldict['direction'] = 'backwards'
 
         if request.user.is_active:
             reldict['visited'] = len(r.userrelation_set.filter(user=request.user)) > 0
-            reldict['direction'] = 'backwards'
 
         resp.append(reldict)
 
