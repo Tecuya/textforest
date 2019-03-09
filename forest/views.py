@@ -254,6 +254,18 @@ def xhr_relations_for_parent_node(request, slug):
 
 def xhr_relations(request, slug, text=None):
 
+    # unpack sorting prefs
+    sortdir = request.GET.get('sortdir')
+    sort = request.GET.get('sort')
+    sortpriop = request.GET.get('sortpriop') == 'true'
+
+    # find parent node
+    nqs = Node.objects.filter(slug=slug)
+    if len(nqs) == 0:
+        return HttpResponseNotFound('No such parent')
+    node = nqs[0]
+
+    # calc forward/backward filters
     forward_filters = {'parent__slug': slug}
     backward_filters = {'child__slug': slug}
 
@@ -261,10 +273,8 @@ def xhr_relations(request, slug, text=None):
         forward_filters['text__contains'] = text
         backward_filters['text__contains'] = text
 
+    # calc orderbys
     orderby = []
-
-    sortdir = request.GET.get('sortdir')
-    sort = request.GET.get('sort')
 
     sortmap = {
         'views': Relation.views.field_name,
@@ -278,25 +288,39 @@ def xhr_relations(request, slug, text=None):
         orderby.append(modifier + sortmap[sort])
 
     resp = []
-    for r in Relation.objects.filter(**forward_filters).order_by(*orderby).prefetch_related('userrelation_set')[:30]:
 
-        reldict = r.make_json_response_dict()
-        reldict['direction'] = 'forward'
+    def fetch(direction, filters, excludes=None):
 
-        if request.user.is_active:
-            reldict['visited'] = len(r.userrelation_set.filter(user=request.user)) > 0
+        rqs = Relation.objects.filter(**filters)
 
-        resp.append(reldict)
+        if excludes is not None:
+            rqs = rqs.exclude(**excludes)
 
-    for r in Relation.objects.filter(**backward_filters).order_by(*orderby).prefetch_related('userrelation_set')[:30]:
+        rqs = rqs.order_by(*orderby).prefetch_related('userrelation_set')
 
-        reldict = r.make_json_response_dict()
-        reldict['direction'] = 'backwards'
+        for r in rqs:
 
-        if request.user.is_active:
-            reldict['visited'] = len(r.userrelation_set.filter(user=request.user)) > 0
+            reldict = r.make_json_response_dict()
+            reldict['direction'] = direction
 
-        resp.append(reldict)
+            if request.user.is_active:
+                reldict['visited'] = len(r.userrelation_set.filter(user=request.user)) > 0
+
+            resp.append(reldict)
+
+    if sortpriop:
+        # in priop mode, we first filter for results specifically for author, add those
+        # then for resutls specifically not for author, and add those
+
+        fetch('forward', {**forward_filters, 'author': node.author})
+        fetch('forward', forward_filters, {'author': node.author})
+
+        fetch('backwards', {**backward_filters, 'author': node.author})
+        fetch('backwards', backward_filters, {'author': node.author})
+
+    else:
+        fetch('forward', forward_filters)
+        fetch('backwards', backward_filters)
 
     return JsonResponse(resp, safe=False)
 

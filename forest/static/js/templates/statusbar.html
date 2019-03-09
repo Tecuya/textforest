@@ -11,6 +11,10 @@
   <div class="sort_pref <% if(sort != 'date') { %>clickable<% } %>" data-sort="date">Date</div>
   <div class="sort_pref <% if(sortdir != 'asc') { %>clickable<% } %>" data-sortdir="asc">(asc</div> or
   <div class="sort_pref <% if(sortdir != 'desc') { %>clickable<% } %>" data-sortdir="desc">desc)</div>
+
+  <div class="sort_pref" id="sort_prioritize_op" data-sortpriop="1">
+    <input type=checkbox name=priop <% if(sortpriop) { %>checked<% } %>>Prioritize OP
+  </div>
 </div>
 
 <div id="login_status_info">

@@ -31,8 +31,9 @@ define(
             initialize: function(options) {
                 this.sort = 'views';
                 this.sortdir = 'desc';
+                this.sortpriop = true;
 
-                this.relations_collection = new Relations({ 'sort': this.sort, 'sortdir': this.sortdir });
+                this.relations_collection = new Relations({ 'sort': this.sort, 'sortdir': this.sortdir, 'sortpriop': this.sortpriop });
                 this.notifications_collection = new Notifications();
 
                 this.user = new User({ 'username': options.username });
@@ -361,10 +362,11 @@ define(
                 });
             },
 
-            update_sort: function(sort, sortdir) {
+            update_sort: function(sort, sortdir, sortpriop) {
                 this.sort = sort;
                 this.sortdir = sortdir;
-                this.relations_collection.update_sort(sort, sortdir);
+                this.sortpriop = sortpriop;
+                this.relations_collection.update_sort(sort, sortdir, sortpriop);
                 this.statusbar_view.render();
                 this.fetch_relations_collection();
             },

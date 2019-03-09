@@ -4,6 +4,7 @@ define(['backbone', 'models/relation'], function(Backbone, relation) {
         initialize: function(options) {
             this.sort = options.sort;
             this.sortdir = options.sortdir;
+            this.sortpriop = options.sortpriop;
         },
 
         set_parent_node: function(node) {
@@ -14,16 +15,17 @@ define(['backbone', 'models/relation'], function(Backbone, relation) {
             this.text = text;
         },
 
-        update_sort: function(sort, sortdir) {
+        update_sort: function(sort, sortdir, sortpriop) {
             this.sort = sort;
             this.sortdir = sortdir;
+            this.sortpriop = sortpriop;
         },
 
         url: function() {
             if (this.text) {
-                return '/xhr/relations/' + escape(this.parent_node.get('slug')) + '/' + escape(this.text) + '?sort=' + this.sort + '&sortdir=' + this.sortdir;
+                return '/xhr/relations/' + escape(this.parent_node.get('slug')) + '/' + escape(this.text) + '?sort=' + this.sort + '&sortdir=' + this.sortdir + '&sortpriop=' + this.sortpriop;
             } else {
-                return '/xhr/relations/' + escape(this.parent_node.get('slug')) + '?sort=' + this.sort + '&sortdir=' + this.sortdir;;
+                return '/xhr/relations/' + escape(this.parent_node.get('slug')) + '?sort=' + this.sort + '&sortdir=' + this.sortdir + '&sortpriop=' + this.sortpriop;
             }
         }
     });

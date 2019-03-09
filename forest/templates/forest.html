@@ -29,7 +29,7 @@
             'disconnect_google': "{% url 'social:disconnect' 'google-oauth2' %}",
             'disconnect_facebook': "{% url 'social:disconnect' 'facebook' %}"
         };
-        
+
         fglobals.forest = new Forest({username: username});
         fglobals.forest.setElement('div#forest');
         fglobals.forest.render();
@@ -47,5 +47,5 @@
     {% csrf_token %}
 
     <div id="forest"></div>
-    
+
 {% endblock %}

@@ -139,7 +139,7 @@ class Notification(models.Model):
             'node_slug': self.node.slug,
             'node_name': self.node.text,
             'relation_slug': self.relation.slug if self.relation is not None else '',
-            'relation_name': self.relation.text,
+            'relation_name': self.relation.text if self.relation is not None else '',
             'actor': self.actor.username,
             'action': self.ACTIONMAP.get(self.action),
             'read': self.read,

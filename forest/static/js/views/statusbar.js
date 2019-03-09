@@ -27,6 +27,7 @@ define(
                             user: this.user,
                             sort: this.forest_view.sort,
                             sortdir: this.forest_view.sortdir,
+                            sortpriop: this.forest_view.sortpriop,
                             notifications: this.forest_view.notifications_collection
                         }));
             },
@@ -52,6 +53,7 @@ define(
 
                 var sort = this.forest_view.sort;
                 var sortdir = this.forest_view.sortdir;
+                var sortpriop = this.forest_view.sortpriop;
 
                 if (targ.data('sort') == 'views') {
                     sort = 'views';
@@ -67,9 +69,12 @@ define(
 
                 } else if (targ.data('sortdir') == 'desc') {
                     sortdir = 'desc';
+
+                } else if (targ.data('sortpriop') == '1') {
+                    sortpriop = !sortpriop;
                 }
 
-                this.forest_view.update_sort(sort, sortdir);
+                this.forest_view.update_sort(sort, sortdir, sortpriop);
             },
 
             notification_link: function() {

@@ -295,6 +295,11 @@ div#status_sort_prefs {
 
 div.sort_pref {
   display: inline-block;
+  cursor: pointer;
+}
+
+div#sort_prioritize_op {
+  padding-left: 10px;
 }
 
 div.status_info {
