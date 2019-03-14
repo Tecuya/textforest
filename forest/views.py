@@ -495,7 +495,7 @@ def xhr_notifications(request):
 
     notifications = Notification.objects.filter(user=request.user).order_by('-created')
 
-    return JsonResponse([n.make_json_response_dict(request.user) for n in notifications], safe=False)
+    return JsonResponse([n.make_json_response_dict() for n in notifications], safe=False)
 
 
 def xhr_notification(request, notification_id):

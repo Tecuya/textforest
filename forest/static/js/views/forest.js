@@ -257,7 +257,12 @@ define(
                             {
                                 success: function() {
                                     self.relations_collection.add(relation);
-                                    self.go_to_relation(relation.get('slug'));
+
+                                    if (creating) {
+                                        self.node_edit(relation.get('slug'));
+                                    } else {
+                                        self.go_to_relation(relation.get('slug'));
+                                    }
                                 },
                                 error: function(err, resp) {
                                     self.add_error(resp.responseText);
@@ -334,15 +339,15 @@ define(
             },
 
             user_page_link: function(evt) {
-                Backbone.history.navigate('/f/~' + $(evt.target).data('user-link'), true);
+                Backbone.history.navigate('/f/~' + encodeURIComponent($(evt.target).data('user-link')), true);
             },
 
             node_link: function(evt) {
-                Backbone.history.navigate('/f/' + $(evt.target).data('node-link'), true);
+                Backbone.history.navigate('/f/' + encodeURIComponent($(evt.target).data('node-link')), true);
             },
 
             relation_link: function(evt) {
-                Backbone.history.navigate('/r/' + $(evt.target).data('relation-link'), true);
+                Backbone.history.navigate('/r/' + encodeURIComponent($(evt.target).data('relation-link')), true);
             },
 
             requires_login: function(callable) {

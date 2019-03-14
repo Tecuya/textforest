@@ -34,7 +34,7 @@ class Node(models.Model):
             'author': self.author.username,
             'created': self.created.strftime('%Y-%m-%d')}
 
-        if user is not None:
+        if user.is_active:
             rdict['subscribed'] = len(self.subscription_set.filter(user=user)) > 0
 
         return rdict

@@ -89,7 +89,7 @@ define(
                     {
                         success: function() {
                             self.set_user_create_form_result(
-                                'Check your email for an activation email, and click the activation link within.');
+                                'Check your email for an activation email, and click the activation link within.  Check your spam folder.');
                         },
                         error: function(err, resp) {
                             self.set_user_create_form_result(
