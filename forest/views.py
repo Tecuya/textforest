@@ -88,6 +88,10 @@ def xhr_create_relation(request):
             name=make_safe(doc['text']),
             slug=uniqueify(Node, make_safe(slugify(doc['text']))))
 
+        Subscription.objects.create(
+            user=request.user,
+            node=child)
+
     relation = Relation.objects.create(
         author=request.user,
         slug=uniqueify(Relation, make_safe(slugify(doc['text']))),
@@ -138,7 +142,7 @@ def xhr_node_by_relation_slug(request, slug, direction):
 
     node = nqs[0]
 
-    return JsonResponse(node.make_json_response_dict(), safe=False)
+    return JsonResponse(node.make_json_response_dict(request.user), safe=False)
 
 
 def xhr_node_by_slug(request, slug):
@@ -156,6 +160,8 @@ def xhr_node_by_slug(request, slug):
             node.name = ('User: ' + user.username)
             node.text = 'This is the user page for '+user.username
             node.save()
+
+            Subscription.objects.create(user=user, node=node)
 
         if request.method == 'POST' or request.method == 'PUT':
             doc = ujson.loads(request.body)
@@ -213,9 +219,7 @@ def xhr_node_by_slug(request, slug):
 
             node.delete()
 
-    rdict = node.make_json_response_dict()
-    if request.user.is_active:
-        rdict['subscribed'] = len(node.subscription_set.filter(user=request.user)) > 0
+    rdict = node.make_json_response_dict(request.user)
 
     return JsonResponse(rdict, safe=False)
 
@@ -327,7 +331,7 @@ def xhr_relations(request, slug, text=None):
 
 def xhr_nodes_for_text(request, text):
     return JsonResponse(
-        [n.make_json_response_dict()
+        [n.make_json_response_dict(request.user)
          for n in Node.objects.filter(name__contains=text)],
         safe=False)
 
@@ -491,7 +495,7 @@ def xhr_notifications(request):
 
     notifications = Notification.objects.filter(user=request.user).order_by('-created')
 
-    return JsonResponse([n.make_json_response_dict() for n in notifications], safe=False)
+    return JsonResponse([n.make_json_response_dict(request.user) for n in notifications], safe=False)
 
 
 def xhr_notification(request, notification_id):

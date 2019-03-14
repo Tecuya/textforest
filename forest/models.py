@@ -26,13 +26,18 @@ class Node(models.Model):
                 node = rqs[0].parent
         return node
 
-    def make_json_response_dict(self):
-        return {
+    def make_json_response_dict(self, user=None):
+        rdict = {
             'name': self.name,
             'slug': self.slug,
             'text': self.text,
             'author': self.author.username,
             'created': self.created.strftime('%Y-%m-%d')}
+
+        if user is not None:
+            rdict['subscribed'] = len(self.subscription_set.filter(user=user)) > 0
+
+        return rdict
 
 
 class Relation(models.Model):
