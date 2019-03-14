@@ -99,7 +99,7 @@ def xhr_create_relation(request):
         child=child,
         text=make_safe(doc['text']))
 
-    for subscription in parent.subscription_set.all():
+    for subscription in parent.subscription_set.exclude(user=request.user):
         Notification.objects.create(
             user=subscription.user,
             subscription=subscription,
@@ -172,7 +172,7 @@ def xhr_node_by_slug(request, slug):
             node.text = make_safe(doc['text'])
             node.save()
 
-            for subscription in node.subscription_set.all():
+            for subscription in node.subscription_set.exclude(user=request.user):
                 Notification.objects.create(
                     user=subscription.user,
                     subscription=subscription,
@@ -204,7 +204,8 @@ def xhr_node_by_slug(request, slug):
             node.text = make_safe(doc['text'])
             node.save()
 
-            for subscription in node.subscription_set.all():
+            for subscription in node.subscription_set.exclude(user=request.user):
+
                 Notification.objects.create(
                     user=subscription.user,
                     subscription=subscription,
