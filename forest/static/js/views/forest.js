@@ -141,10 +141,14 @@ define(
                 this.$el.find(this.elements.text_area).append(commandhistorytpl({ command: prompt_contents }));
             },
 
+            prompt_contents: function() {
+                return this.$el.find(this.elements.prompt).val();
+            },
+
             keypress_prompt: function(evt) {
                 var self = this;
 
-                var prompt_contents = this.$el.find(this.elements.prompt).val();
+                var prompt_contents = this.prompt_contents();
 
                 if (evt.which == 40) {
 
@@ -234,17 +238,17 @@ define(
                 }
             },
 
-            create_relation_to_node: function(node) {
+            create_relation_to_node: function(existing_node) {
 
                 var relation = new Relation();
-                relation.set('text', this.$el.find(this.elements.prompt).val());
+                relation.set('text', this.prompt_contents());
                 relation.set('parent', this.current_node.get('slug'));
 
                 // if we do not pass in child slug, django will create a new node automatically.  this allows this method
                 // to pass in node to link to existing, or undefined to create new.
                 var creating = true;
-                if (node) {
-                    relation.set('child', node.get('slug'));
+                if (existing_node) {
+                    relation.set('child', existing_node.get('slug'));
                     creating = false;
                 }
 

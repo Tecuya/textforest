@@ -36,18 +36,34 @@ tabindex=<%= idx %>>
   Create new branch with this text
 </div>
 
-<div class="relation_link list_item" id="create_relation_link" tabindex=<%= relations.models.length + 1 %>>
+<div id="create_relation_form" tabindex=<%= relations.models.length + 1 %>>
 
-  <div class="relation_link_text">
-    Link this text to existing branch:
+  <div id="create_relation_form_title">Create new branch</div>
+
+  <div class="relation_create_text">
+    Destination:
   </div>
 
-  <div class="relation_link_input">
-    <input id="relation_link_dest" name=destination type=text placeholder="(Type here to search for existing branch)" size=80>
+  <div class="relation_create_input_div" id="relation_create_dest_select">
+    <input class="relation_create_input" id="relation_create_dest" name=destination type=text size=80>
     <div id="existing_list"></div>
   </div>
 
   <div class="cleardiv"></div>
+
+  <div class="relation_create_text">
+    Require item:
+  </div>
+
+  <div class="relation_create_input_div">
+    <input class="relation_create_input" id="relation_create_require_item" name=require_item type=text placeholder=" (No item required)" size=80>
+    <div id="require_item_list"></div>
+  </div>
+
+  <div class="cleardiv"></div>
+
+  <button id="create_branch_cancel">Cancel</button>
+  <button id="create_branch_create">Create this branch</button>
 </div>
 
 <% } %>

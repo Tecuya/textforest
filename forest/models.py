@@ -13,9 +13,6 @@ class Node(models.Model):
     slug = models.CharField(max_length=255, default='')
     text = models.TextField(default='')
 
-    def __str__(self):
-        return self.name
-
     def find_last_branching_node(self):
         node = self
         while True:
@@ -39,11 +36,14 @@ class Node(models.Model):
 
         return rdict
 
+    def __str__(self):
+        return '{} by {}'.format(self.name, self.author)
+
 
 class Relation(models.Model):
     author = models.ForeignKey(User, on_delete=models.PROTECT)
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
+
+    require_item = models.ForeignKey('Item', on_delete=models.CASCADE, blank=True, null=True, default=None)
 
     views = models.IntegerField(default=0)
     vote = models.IntegerField(default=0)
@@ -54,8 +54,8 @@ class Relation(models.Model):
     parent = models.ForeignKey('Node', related_name='outbound_relations', on_delete=models.CASCADE)
     child = models.ForeignKey('Node', related_name='inbound_relations', on_delete=models.CASCADE)
 
-    def __str__(self):
-        return '%s > %s (%s)' % (self.parent, self.child, self.text[:20])
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
     def update_user_relations(self):
         stats = UserRelation.objects.filter(relation=self).aggregate(vote=Sum('vote'), views=Count('*'))
@@ -74,15 +74,15 @@ class Relation(models.Model):
                 'vote': self.vote,
                 'created': self.created.strftime('%Y-%m-%d')}
 
+    def __str__(self):
+        return '%s > %s (%s)' % (self.parent, self.child, self.text[:20])
+
 
 class UserRelation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     relation = models.ForeignKey(Relation, on_delete=models.CASCADE)
 
     vote = models.SmallIntegerField(default=0)
-
-    def __str__(self):
-        return '{} {} - {}'.format(self.user, self.relation, self.vote)
 
     @staticmethod
     def handle_user_action(user, relation, vote=None):
@@ -94,6 +94,9 @@ class UserRelation(models.Model):
             user_relation.save()
 
         relation.update_user_relations()
+
+    def __str__(self):
+        return '{} {} - {}'.format(self.user, self.relation, self.vote)
 
 
 class Subscription(models.Model):
@@ -134,9 +137,6 @@ class Notification(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return '{} {} {} {} {}'.format(self.user, self.actor, self.action, self.node, self.relation)
-
     def make_json_response_dict(self):
         return {
             'id': self.id,
@@ -149,3 +149,50 @@ class Notification(models.Model):
             'action': self.ACTIONMAP.get(self.action),
             'read': self.read,
             'created': self.created.strftime('%Y-%m-%d %H:%M:%S')}
+
+    def __str__(self):
+        return '{} {} {} {} {}'.format(self.user, self.actor, self.action, self.node, self.relation)
+
+
+class NodeItem(models.Model):
+    node = models.ForeignKey('Node', on_delete=models.CASCADE)
+    item = models.ForeignKey('Item', on_delete=models.CASCADE)
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('node', 'item')
+
+    def __str__(self):
+        return '{} {}'.format(self.node, self.item)
+
+
+class Item(models.Model):
+
+    author = models.ForeignKey(User, on_delete=models.PROTECT)
+    name = models.CharField(max_length=255)
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('author', 'name')
+
+    def __str__(self):
+        return '{} {}'.format(self.author, self.name)
+
+
+class UserItem(models.Model):
+
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    item = models.ForeignKey('Item', on_delete=models.CASCADE)
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('user', 'item')
+
+    def __str__(self):
+        return '{} {}'.format(self.author, self.name)

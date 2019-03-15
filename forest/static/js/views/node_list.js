@@ -18,12 +18,20 @@ define(
             },
 
             initialize: function(options) {
+                this.relations_list_view = options.relations_list_view;
                 this.forest_view = options.forest_view;
                 this.nodes = new Nodes();
             },
 
             render: function() {
+
+                var focused_tabindex = this.$el.find('div.node_list_item:focus').attr('tabindex');
+
                 this.$el.html(this.template({ nodes: this.nodes }));
+
+                if (focused_tabindex) {
+                    this.$el.find('div.node_list_item[tabindex=' + focused_tabindex + ']').focus();
+                }
             },
 
             update_text: function(text) {
@@ -32,7 +40,7 @@ define(
                     return;
                 }
 
-                if (text.length < 3) {
+                if (text.length < 2) {
                     return;
                 }
 
@@ -73,7 +81,7 @@ define(
             },
 
             click_list: function(evt) {
-                this.forest_view.create_relation_to_node(this.nodes.findWhere({ slug: $(evt.target).data('slug') }));
+                this.relations_list_view.create_branch_existing_node_select(this.nodes.findWhere({ slug: $(evt.target).data('slug') }));
             }
 
         });

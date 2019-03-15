@@ -4,6 +4,10 @@ define(['backbone'], function(Backbone) {
 
         idAttribute: 'slug',
 
+        to_string: function() {
+            return '"' + this.get('name') + '" created by ' + this.get('author') + ' ' + this.get('created');
+        },
+
         url: function() {
             if (this.get('slug')) {
                 return '/xhr/node_by_slug/' + escape(this.get('slug'));
