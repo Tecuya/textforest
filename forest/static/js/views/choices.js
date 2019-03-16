@@ -24,8 +24,8 @@ define(
                 'click button#create_item_give_cancel': 'create_cancel',
                 'click button#create_item_give_create': 'create_item_create',
 
-                'keyup .list_item': 'keypress_relation',
-                'click .list_item': 'click_relation',
+                'keyup .list_item': 'keypress_list_item',
+                'click .list_item': 'click_list_item',
 
                 'click .voteup': 'vote_up',
                 'click .votedown': 'vote_down'
@@ -43,7 +43,7 @@ define(
                 this.create_to_existing_node = undefined;
                 this.create_to_existing_item = undefined;
 
-                if(autocomplete_render_cycle) {
+                if (autocomplete_render_cycle) {
                     // if this is trying to refresh the relations list
                     // when the create form is visible, dont let it
                     // because that would interrupt the user.  we
@@ -59,7 +59,7 @@ define(
                 // we will restore the users focused tabindex after rendering
                 var focused_tabindex = this.$el.find('div.list_item:focus').attr('tabindex');
 
-                this.$el.html(this.template({ relations: this.relations_collection, user: this.forest_view.user }));
+                this.$el.html(this.template({ node: this.forest_view.current_node, relations: this.relations_collection, user: this.forest_view.user }));
 
                 this.node_list_view.setElement('div#existing_list');
                 this.node_list_view.render();
@@ -69,7 +69,7 @@ define(
                 }
             },
 
-            keypress_relation: function(evt) {
+            keypress_list_item: function(evt) {
                 var target = $(evt.target);
 
                 var tabindex = parseInt(target.attr('tabindex'));
@@ -88,39 +88,43 @@ define(
                     this.$el.find('div[tabindex=' + (tabindex + 1) + ']').focus();
 
                 } else if (evt.which == 13) { // enter
-                    this.click_relation(evt);
+                    this.click_list_item(evt);
                 }
             },
 
-            click_relation: function(evt) {
+            click_list_item: function(evt) {
 
                 var clicked_item = $(evt.target).closest('.list_item');
                 var clicked_item_id = clicked_item.attr('id');
 
-                if ($(evt.target).hasClass('delete_relation')) {
+                if ($(evt.target).hasClass('delete_relation')) { // little delete link
                     this.forest_view.delete_relation(clicked_item.data('relation-slug'));
 
                 } else if (clicked_item_id == 'create_relation') {
 
                     this.$el.find('div.existing_relation').hide();
-                    this.$el.find('div#give_item').hide();
-                    this.$el.find('div#give_item_form').hide();
+                    this.$el.find('div#create_give_item').hide();
+                    this.$el.find('div#create_give_item_form').hide();
                     this.$el.find('div#create_relation').hide();
                     this.$el.find('div#create_relation_form').show();
 
                     this.$el.find('input#relation_create_dest').val(this.forest_view.prompt_contents()).focus();
                     this.update_dest_node_list();
 
-                } else if (clicked_item_id == 'give_item') {
+                } else if (clicked_item_id == 'create_give_item') {
 
                     this.$el.find('div.existing_relation').hide();
                     this.$el.find('div#create_relation').hide();
                     this.$el.find('div#create_relation_form').hide();
-                    this.$el.find('div#give_item').hide();
-                    this.$el.find('div#give_item_form').show();
+                    this.$el.find('div#create_give_item').hide();
+                    this.$el.find('div#create_give_item_form').show();
 
                     this.$el.find('input#relation_give_item').val(this.forest_view.prompt_contents()).focus();
                     this.update_item_list();
+
+                } else if (clicked_item.hasClass('item_list_item') && !clicked_item.hasClass('item_owned')) {
+
+                    this.forest_view.take_item(clicked_item.data('item-slug'));
 
                 } else {
                     this.forest_view.go_to_relation(

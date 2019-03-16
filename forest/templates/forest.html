@@ -10,18 +10,13 @@
         ipaddr: "{{ ipaddr }}"
     };
 
-    require(['jquery', 'backbone', 'router', 'views/forest'], function($, Backbone, Router, Forest) {
+require(['jquery', 'backbone', 'router', 'views/forest', 'models/user'], function($, Backbone, Router, Forest, User) {
 
         fglobals.csrf_token = $('input[name=csrfmiddlewaretoken]').val();
         $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
             options.xhrFields = { withCredentials: true };
             return jqXHR.setRequestHeader('X-CSRFToken', fglobals.csrf_token);
         });
-
-        var username;
-        {% if user and not user.is_anonymous %}
-        username = "{{ user.username }}";
-        {% endif %}
 
         fglobals.social_oauth_links = {
             'connect_google': "{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}",
@@ -30,7 +25,11 @@
             'disconnect_facebook': "{% url 'social:disconnect' 'facebook' %}"
         };
 
-        fglobals.forest = new Forest({username: username});
+        fglobals.forest = new Forest(
+            {
+                user: new User({{ userobj|safe }})
+            }
+        );
         fglobals.forest.setElement('div#forest');
         fglobals.forest.render();
 

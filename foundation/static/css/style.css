@@ -523,3 +523,16 @@ div.node_list_item {
 div.footnote {
   font-size: 10pt;
 }
+
+div.item_list_item {
+  color: #ada;
+}
+
+div.item_owned {
+  color: #595;
+  text-decoration: line-through;
+}
+
+div.info_message {
+  color: #ada;
+}

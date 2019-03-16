@@ -45,7 +45,5 @@ define(['backbone'], function(Backbone) {
             });
         }
 
-
-
     });
 });

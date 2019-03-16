@@ -12,7 +12,7 @@ from django.conf import settings
 from django_registration.backends.activation.views import RegistrationView
 from social_django.models import UserSocialAuth
 
-from .models import Item, Node, Relation, UserRelation, Subscription, Notification
+from .models import UserItem, Item, Node, NodeItem, Relation, UserRelation, Subscription, Notification
 
 from slugify import slugify
 
@@ -147,7 +147,9 @@ def xhr_node_by_relation_slug(request, slug, direction):
 
 def xhr_node_by_slug(request, slug):
 
-    if len(slug) and slug[0] == '~':
+    is_user_page = len(slug) and slug[0] == '~'
+
+    if is_user_page:
 
         try:
             user = User.objects.get(username=slug[1:])
@@ -163,26 +165,6 @@ def xhr_node_by_slug(request, slug):
 
             Subscription.objects.create(user=user, node=node)
 
-        if request.method == 'POST' or request.method == 'PUT':
-            doc = ujson.loads(request.body)
-
-            if node.author != request.user:
-                return HttpResponseForbidden('This node does not belong to you')
-
-            node.text = make_safe(doc['text'])
-            node.save()
-
-            for subscription in node.subscription_set.exclude(user=request.user):
-                Notification.objects.create(
-                    user=subscription.user,
-                    subscription=subscription,
-                    actor=request.user,
-                    node=node,
-                    action=Notification.ACTION_MODIFY)
-
-        elif request.method == 'DELETE':
-            return HttpResponseForbidden('User pages cannot be deleted.')
-
     else:
 
         nqs = Node.objects.filter(slug=slug)
@@ -193,32 +175,48 @@ def xhr_node_by_slug(request, slug):
 
         node = nqs[0]
 
-        if request.method == 'POST' or request.method == 'PUT':
-            doc = ujson.loads(request.body)
+    if request.method == 'POST' or request.method == 'PUT':
+        doc = ujson.loads(request.body)
 
-            if node.author != request.user:
-                return HttpResponseForbidden('This node does not belong to you')
+        if node.author != request.user:
+            return HttpResponseForbidden('This node does not belong to you')
 
+        if not is_user_page:
             node.name = make_safe(doc['name'])
             node.slug = slugify(doc['name'])
-            node.text = make_safe(doc['text'])
-            node.save()
 
-            for subscription in node.subscription_set.exclude(user=request.user):
+        node.text = make_safe(doc['text'])
+        node.save()
 
-                Notification.objects.create(
-                    user=subscription.user,
-                    subscription=subscription,
-                    actor=request.user,
-                    node=node,
-                    action=(Notification.ACTION_CREATE if request.method == 'POST' else Notification.ACTION_MODIFY))
+        if 'items' in doc:
+            current_nodeitem_slugs = set(ni.item.slug for ni in node.nodeitem_set.all())
+            desired_nodeitem_slugs = set(i['slug'] for i in doc['items'])
 
-        elif request.method == 'DELETE':
+            delete_slugs = current_nodeitem_slugs - desired_nodeitem_slugs
+            add_slugs = desired_nodeitem_slugs - current_nodeitem_slugs
 
-            if node.author != request.user:
-                return HttpResponseForbidden('This node does not belong to you')
+            NodeItem.objects.filter(node=node, item__slug__in=delete_slugs).delete()
 
-            node.delete()
+            for i in add_slugs:
+                NodeItem.objects.create(node=node, item=Item.objects.get(author=request.user, slug=i))
+
+        for subscription in node.subscription_set.exclude(user=request.user):
+            Notification.objects.create(
+                user=subscription.user,
+                subscription=subscription,
+                actor=request.user,
+                node=node,
+                action=(Notification.ACTION_CREATE if request.method == 'POST' else Notification.ACTION_MODIFY))
+
+    elif request.method == 'DELETE':
+
+        if is_user_page:
+            return HttpResponseForbidden('User pages cannot be deleted.')
+
+        if node.author != request.user:
+            return HttpResponseForbidden('This node does not belong to you')
+
+        node.delete()
 
     rdict = node.make_json_response_dict(request.user)
 
@@ -347,6 +345,42 @@ def xhr_items_for_text(request, text):
         safe=False)
 
 
+def xhr_item_by_slug(request, slug=None):
+
+    if not request.user.is_active:
+        return HttpResponseForbidden('You are not logged in')
+
+    if request.method == 'POST':
+        doc = ujson.loads(request.body)
+
+        item, created = Item.objects.get_or_create(
+            author=request.user,
+            name=doc['name'])
+
+        if not created:
+            return HttpResponseForbidden('An item by this name already exists.')
+
+        item.slug = uniqueify(Item, make_safe(slugify('{} {}'.format(request.user.username, doc['name']))))
+        item.save()
+
+    else:
+        return HttpResponseForbidden('unimp')
+
+    return JsonResponse(item.make_json_response_dict(), safe=False)
+
+
+def make_user_obj(user):
+    return {
+        'last_login': user.last_login.strftime('%Y-%m-%d'),
+        'is_superuser': user.is_superuser,
+        'email': user.email,
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'username': user.username,
+        'items': [ui.item.make_json_response_dict(user) for ui in user.useritem_set.all()]
+    }
+
+
 def xhr_user(request):
 
     doc = False
@@ -407,19 +441,24 @@ def xhr_user(request):
         return JsonResponse(userobj, safe=False)
 
     user = request.user
-    userobj = {
-        'last_login': request.user.last_login.strftime('%Y-%m-%d'),
-        'is_superuser': request.user.is_superuser,
-        'email': request.user.email,
-        'first_name': request.user.first_name,
-        'last_name': request.user.last_name,
-        'username': request.user.username,
-    }
+    userobj = make_user_obj(user)
 
     if request.method == 'PUT':
         doc = ujson.loads(request.body)
 
         reauth = False
+
+        if 'items' in doc:
+            current_useritem_slugs = set(ui.item.slug for ui in user.useritem_set.all())
+            desired_useritem_slugs = set(i['slug'] for i in doc['items'])
+
+            delete_slugs = current_useritem_slugs - desired_useritem_slugs
+            add_slugs = desired_useritem_slugs - current_useritem_slugs
+
+            UserItem.objects.filter(user=user, item__slug__in=delete_slugs).delete()
+
+            for i in add_slugs:
+                UserItem.objects.create(user=user, item=Item.objects.get(slug=i))
 
         if 'email' in doc:
             if not re.match('[^@]+@[^@]+\.[^@]+', doc['email']):
@@ -538,13 +577,16 @@ def xhr_login(request):
 
 
 def node(request, slug=None):
-    response = render(
-        request,
-        'forest.html',
-        {
-            'user': request.user,
-            'ipaddr': request.META['REMOTE_ADDR'],
-            'recaptcha_site_key': settings.RECAPTCHAV3_SITE_KEY
-        })
 
-    return response
+    ctx = {
+        'user': request.user,
+        'ipaddr': request.META['REMOTE_ADDR'],
+        'recaptcha_site_key': settings.RECAPTCHAV3_SITE_KEY
+    }
+
+    if request.user and not request.user.is_anonymous:
+        ctx['userobj'] = ujson.dumps(make_user_obj(request.user))
+    else:
+        ctx['userobj'] = '{}'
+
+    return render(request, 'forest.html', ctx)

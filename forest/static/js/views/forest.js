@@ -1,10 +1,10 @@
 define(
     ['jquery', 'underscore', 'backbone',
-        'models/user', 'models/node', 'models/relation',
+        'models/user', 'models/node', 'models/relation', 'models/item',
         'collections/notifications', 'collections/relations',
         'views/statusbar', 'views/user', 'views/choices', 'views/node', 'views/node_edit', 'views/notifications',
         'util/fetch_completions', 'tpl!templates/forest', 'tpl!templates/command_history'],
-    function($, _, Backbone, User, Node, Relation, Notifications, Relations, StatusBarView, UserView, ChoicesView,
+    function($, _, Backbone, User, Node, Relation, Item, Notifications, Relations, StatusBarView, UserView, ChoicesView,
         NodeView, NodeEditView, NotificationsView, fetch_completions, foresttpl, commandhistorytpl) {
 
         var global = this;
@@ -36,7 +36,7 @@ define(
                 this.relations_collection = new Relations({ 'sort': this.sort, 'sortdir': this.sortdir, 'sortpriop': this.sortpriop });
                 this.notifications_collection = new Notifications();
 
-                this.user = new User({ 'username': options.username });
+                this.user = options.user;
 
                 this.choices_view = new ChoicesView({ forest_view: this, relations_collection: this.relations_collection });
                 this.user_view = new UserView({ forest_view: this, user: this.user });
@@ -52,13 +52,11 @@ define(
                 this.user_view.setElement(this.$el.find('div#modal'));
 
                 this.choices_view.setElement(this.$el.find('div#choices'));
-                this.choices_view.render();
 
                 this.statusbar_view.setElement(this.$el.find('div#status_bar'));
                 this.statusbar_view.render();
 
                 this.notifications_view.setElement(this.$el.find('div#notifications'));
-
                 this.refresh_notifications();
 
                 this.focus_prompt();
@@ -251,8 +249,92 @@ define(
                 }
             },
 
+            take_item: function(slug) {
+
+                var self = this;
+
+                this.requires_login(
+                    function() {
+
+                        var taken_item;
+                        _.each(self.current_node.get('items'), function(item, idx) {
+                            if (item.get('slug') == slug) {
+                                taken_item = item;
+                                return;
+                            }
+                        });
+
+                        if (!taken_item) {
+                            self.add_error('The item you tried to take does not exist.');
+                            return;
+                        }
+
+                        var items = [];
+                        if (self.user.has('items')) {
+                            items = self.user.get('items');
+                        }
+
+                        items.push(taken_item);
+
+                        self.user.set('items', items);
+                        self.user.save(
+                            {},
+                            {
+                                success: function() {
+                                    self.log_command('Pick up ' + taken_item.get('name') + '.');
+                                    self.add_info_message('You picked up item: ' + taken_item.get('name') + '.');
+
+                                    self.current_node.fetch(
+                                        {
+                                            success: function() {
+                                                self.update_choices();
+                                            },
+                                            error: function(col, err) { self.add_error(err.responseText); }
+                                        });
+                                },
+                                error: function(xhr, err, ex) {
+                                    self.add_error('Node save failed: ' + err.responseText);
+                                }
+                            });
+                    });
+            },
+
             create_item_giver: function(existing_item, new_item_name) {
 
+                var self = this;
+
+                function add_item_to_current_node(item) {
+
+                    var current_item_gives = self.current_node.get('items');
+                    current_item_gives.push(item);
+
+                    self.current_node.save(
+                        {},
+                        {
+                            success: function() {
+                                self.update_current_node();
+                            },
+                            error: function(xhr, err, ex) {
+                                self.add_error('Node save failed: ' + err.responseText);
+                            }
+                        });
+                };
+
+                if (existing_item) {
+                    add_item_to_current_node(existing_item);
+                } else {
+                    existing_item = new Item({ 'name': new_item_name });
+                    existing_item.save(
+                        {},
+                        {
+                            success: function() {
+                                add_item_to_current_node(existing_item);
+                            },
+                            error: function(xhr, err, ex) {
+                                self.add_error('Item creation failed: ' + err.responseText);
+                            }
+                        });
+                }
             },
 
             create_relation_to_node: function(existing_node, new_node_name, existing_required_item, new_required_item_name) {
@@ -366,6 +448,10 @@ define(
                 this.$el.find(this.elements.text_area).append('<div class="error">Error: ' + err + '</div>');
             },
 
+            add_info_message: function(message) {
+                this.$el.find(this.elements.text_area).append('<div class="info_message">' + message + '</div>');
+            },
+
             scroll_bottom: function() {
                 var text_area = this.$el.find(this.elements.text_area);
                 text_area.scrollTop(text_area[0].scrollHeight);
@@ -429,6 +515,7 @@ define(
             update_current_node: function() {
                 this.view_current_node();
                 this.update_choices();
+                this.refresh_notifications();
             },
 
             update_choices: function() {
@@ -466,10 +553,7 @@ define(
 
                 this.current_node = new Node({ slug: slug });
                 this.current_node.fetch({
-                    success: function() {
-                        self.update_current_node();
-                        self.refresh_notifications();
-                    },
+                    success: function() { self.update_current_node(); },
                     error: function(col, resp) { self.add_error(resp.responseText); }
                 });
             },

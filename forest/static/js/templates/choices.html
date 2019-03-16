@@ -1,9 +1,11 @@
+<% _.each(node.get('items'), function(item, idx) { %>
+<div class="list_item item_list_item <% if(item.get('owned')) { %>item_owned<% } %>" data-item-slug=<%= item.get('slug') %> tabindex=<%= idx %>>
+  Pick up <%= item.get('name') %>
+</div>
+<% }) %>
+
 <% _.each(relations.models, function(relation, idx) { %>
-<div class="existing_relation list_item
-<% if(relation.get('direction') == 'backwards') { %> list_item_backwards <% } %>
-<% if(relation.get('visited')) { %>visited_relation<% } %>"
-data-relation-slug="<%= relation.get('slug') %>"
-tabindex=<%= idx %>>
+<div class="existing_relation list_item <% if(relation.get('direction') == 'backwards') { %> list_item_backwards <% } %> <% if(relation.get('visited')) { %>visited_relation<% } %>" data-relation-slug="<%= relation.get('slug') %>" tabindex=<%= node.get('items').length + idx %>>
 
   <div class="relation_list_item_left">
     <% if(relation.get('direction') == 'backwards') { %>
@@ -32,7 +34,7 @@ tabindex=<%= idx %>>
 
 <% if(relations.text && relations.text.length > 0) { %>
 
-<div class="branch_create list_item" id="create_relation" tabindex=<%= relations.models.length %>>
+<div class="branch_create list_item" id="create_relation" tabindex=<%= node.get('items').length + relations.models.length %>>
   Create new branch with this text
 </div>
 
@@ -66,11 +68,11 @@ tabindex=<%= idx %>>
   <button id="create_branch_create">Create this branch</button>
 </div>
 
-<div class="branch_create list_item" id="give_item" tabindex=<%= relations.models.length + 1 %>>
+<div class="branch_create list_item" id="create_give_item" tabindex=<%= node.get('items').length + relations.models.length + 1 %>>
   Create item give
 </div>
 
-<div id="give_item_form" class="create_form">
+<div id="create_give_item_form" class="create_form">
 
   <div class="relation_form_title">Create item give</div>
 

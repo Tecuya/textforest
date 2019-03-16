@@ -24,12 +24,15 @@ class Node(models.Model):
         return node
 
     def make_json_response_dict(self, user=None):
+
         rdict = {
             'name': self.name,
             'slug': self.slug,
             'text': self.text,
             'author': self.author.username,
-            'created': self.created.strftime('%Y-%m-%d')}
+            'created': self.created.strftime('%Y-%m-%d'),
+            'items': [ni.item.make_json_response_dict(user) for ni in self.nodeitem_set.all()]
+        }
 
         if user.is_active:
             rdict['subscribed'] = len(self.subscription_set.filter(user=user)) > 0
@@ -180,11 +183,16 @@ class Item(models.Model):
     class Meta:
         unique_together = ('author', 'name')
 
-    def make_json_response_dict(self):
-        return {'name': self.name,
-                'slug': self.slug,
-                'author': self.author.username,
-                'created': self.created.strftime('%Y-%m-%d')}
+    def make_json_response_dict(self, user=None):
+        rdict = {'name': self.name,
+                 'slug': self.slug,
+                 'author': self.author.username,
+                 'created': self.created.strftime('%Y-%m-%d')}
+
+        if user is not None and not user.is_anonymous and user.is_active:
+            rdict['owned'] = len(user.useritem_set.filter(item=self)) > 0
+
+        return rdict
 
     def __str__(self):
         return '{} by {} {}'.format(self.name, self.name, self.created.strftime('%Y-%m-%d'))

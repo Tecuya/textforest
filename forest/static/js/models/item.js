@@ -8,7 +8,11 @@ define(['backbone'], function(Backbone) {
         },
 
         url: function() {
-            return '/xhr/item_by_slug/' + escape(this.get('slug'));
+            if (this.has('slug')) {
+                return '/xhr/item_by_slug/' + escape(this.get('slug'));
+            } else {
+                return '/xhr/item_by_slug';
+            }
         }
     });
 
