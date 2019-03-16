@@ -12,7 +12,7 @@ from django.conf import settings
 from django_registration.backends.activation.views import RegistrationView
 from social_django.models import UserSocialAuth
 
-from .models import Node, Relation, UserRelation, Subscription, Notification
+from .models import Item, Node, Relation, UserRelation, Subscription, Notification
 
 from slugify import slugify
 
@@ -85,8 +85,8 @@ def xhr_create_relation(request):
 
         child = Node.objects.create(
             author=request.user,
-            name=make_safe(doc['text']),
-            slug=uniqueify(Node, make_safe(slugify(doc['text']))))
+            name=make_safe(doc['_new_node_name']),
+            slug=uniqueify(Node, make_safe(slugify(doc['_new_node_name']))))
 
         Subscription.objects.create(
             user=request.user,
@@ -294,7 +294,7 @@ def xhr_relations(request, slug, text=None):
 
     resp = []
 
-    def fetch(direction, filters, excludes=None):
+    def fetch(direction, filters, excludes=None, unique=False):
 
         rqs = Relation.objects.filter(**filters)
 
@@ -302,6 +302,9 @@ def xhr_relations(request, slug, text=None):
             rqs = rqs.exclude(**excludes)
 
         rqs = rqs.order_by(*orderby).prefetch_related('userrelation_set')
+
+        if unique:
+            rqs = rqs.distinct()
 
         for r in rqs:
 
@@ -334,6 +337,13 @@ def xhr_nodes_for_text(request, text):
     return JsonResponse(
         [n.make_json_response_dict(request.user)
          for n in Node.objects.filter(name__contains=text)],
+        safe=False)
+
+
+def xhr_items_for_text(request, text):
+    return JsonResponse(
+        [i.make_json_response_dict()
+         for i in Item.objects.filter(name__contains=text)],
         safe=False)
 
 

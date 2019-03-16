@@ -2,9 +2,9 @@ define(
     ['jquery', 'underscore', 'backbone',
         'models/user', 'models/node', 'models/relation',
         'collections/notifications', 'collections/relations',
-        'views/statusbar', 'views/user', 'views/relations', 'views/node', 'views/node_edit', 'views/notifications',
+        'views/statusbar', 'views/user', 'views/choices', 'views/node', 'views/node_edit', 'views/notifications',
         'util/fetch_completions', 'tpl!templates/forest', 'tpl!templates/command_history'],
-    function($, _, Backbone, User, Node, Relation, Notifications, Relations, StatusBarView, UserView, RelationsView,
+    function($, _, Backbone, User, Node, Relation, Notifications, Relations, StatusBarView, UserView, ChoicesView,
         NodeView, NodeEditView, NotificationsView, fetch_completions, foresttpl, commandhistorytpl) {
 
         var global = this;
@@ -38,9 +38,7 @@ define(
 
                 this.user = new User({ 'username': options.username });
 
-                this.relations_view = new RelationsView({ forest_view: this });
-                this.relations_view.set_relations_collection(this.relations_collection);
-
+                this.choices_view = new ChoicesView({ forest_view: this, relations_collection: this.relations_collection });
                 this.user_view = new UserView({ forest_view: this, user: this.user });
                 this.statusbar_view = new StatusBarView({ forest_view: this, user: this.user });
                 this.notifications_view = new NotificationsView({ forest_view: this, user: this.user, notifications_collection: this.notifications_collection });
@@ -53,8 +51,8 @@ define(
 
                 this.user_view.setElement(this.$el.find('div#modal'));
 
-                this.relations_view.setElement(this.$el.find('div#relations'));
-                this.relations_view.render();
+                this.choices_view.setElement(this.$el.find('div#choices'));
+                this.choices_view.render();
 
                 this.statusbar_view.setElement(this.$el.find('div#status_bar'));
                 this.statusbar_view.render();
@@ -63,7 +61,7 @@ define(
 
                 this.refresh_notifications();
 
-                this.$el.find(this.elements.prompt).focus();
+                this.focus_prompt();
             },
 
             refresh_notifications: function() {
@@ -141,6 +139,10 @@ define(
                 this.$el.find(this.elements.text_area).append(commandhistorytpl({ command: prompt_contents }));
             },
 
+            focus_prompt: function() {
+                this.$el.find(this.elements.prompt).focus();
+            },
+
             prompt_contents: function() {
                 return this.$el.find(this.elements.prompt).val();
             },
@@ -151,9 +153,20 @@ define(
                 var prompt_contents = this.prompt_contents();
 
                 if (evt.which == 40) {
-
                     // down arrow
-                    this.$el.find('div[tabindex=0]').focus();
+
+                    // jump to appropriate piece of creation form, if visible... (messy)
+                    if ($('div#create_relation_form').is(':visible')) {
+                        if ($('input#relation_create_dest').is(':visible')) {
+                            $('input#relation_create_dest').focus();
+                        } else if ($('input#relation_create_require_item').is(':visible')) {
+                            $('input#relation_create_require_item').focus();
+                        } else {
+                            $('button#create_branch_cancel').focus();
+                        }
+                    } else {
+                        this.$el.find('div.list_item[tabindex=0]').focus();
+                    }
                     return;
 
                 } else if (evt.which == 13) {
@@ -202,7 +215,7 @@ define(
                                 }
 
                                 self.relations_collection.fetch({
-                                    success: function() { self.relations_view.render_list(); },
+                                    success: function() { self.choices_view.render(true); },
                                     error: function(col, err) { self.add_error(err.responseText); }
                                 });
                             });
@@ -238,18 +251,33 @@ define(
                 }
             },
 
-            create_relation_to_node: function(existing_node) {
+            create_item_giver: function(existing_item, new_item_name) {
+
+            },
+
+            create_relation_to_node: function(existing_node, new_node_name, existing_required_item, new_required_item_name) {
 
                 var relation = new Relation();
                 relation.set('text', this.prompt_contents());
                 relation.set('parent', this.current_node.get('slug'));
 
+                if (existing_required_item) {
+                    relation.set('required_item', existing_required_item.get('slug'));
+                } else {
+                    relation.set('_new_required_item_name', new_required_item_name);
+                }
+
                 // if we do not pass in child slug, django will create a new node automatically.  this allows this method
                 // to pass in node to link to existing, or undefined to create new.
-                var creating = true;
+                var creating;
+
                 if (existing_node) {
-                    relation.set('child', existing_node.get('slug'));
                     creating = false;
+                    relation.set('child', existing_node.get('slug'));
+
+                } else {
+                    creating = true;
+                    relation.set('_new_node_name', new_node_name); // server knows to handle this special value to name created nodes
                 }
 
                 var self = this;
@@ -260,10 +288,11 @@ define(
                             {},
                             {
                                 success: function() {
+
                                     self.relations_collection.add(relation);
 
                                     if (creating) {
-                                        self.node_edit(relation.get('slug'));
+                                        self.node_edit(relation.get('child'));
                                     } else {
                                         self.go_to_relation(relation.get('slug'));
                                     }
@@ -291,11 +320,11 @@ define(
 
                                 if (dir == 'up') {
                                     relation.set('vote', relation.get('vote') + 1);
-                                    self.relations_view.render_list();
+                                    self.choices_view.render_list();
 
                                 } else if (dir == 'down') {
                                     relation.set('vote', relation.get('vote') - 1);
-                                    self.relations_view.render_list();
+                                    self.choices_view.render_list();
                                 }
 
                             } else {
@@ -366,7 +395,7 @@ define(
             fetch_relations_collection: function() {
                 var self = this;
                 this.relations_collection.fetch({
-                    success: function() { self.relations_view.render_list(); },
+                    success: function() { self.choices_view.render(true); },
                     error: function(col, resp) { self.add_error(resp.responseText); }
                 });
             },
@@ -380,8 +409,7 @@ define(
                 this.fetch_relations_collection();
             },
 
-            update_current_node: function() {
-
+            view_current_node: function() {
                 // each time will replace the old view with a new view
                 this.current_node_view = new NodeView({ node: this.current_node, forest_view: this });
 
@@ -395,14 +423,23 @@ define(
                 this.node_counter += 1;
                 this.current_node_view.render(this.node_counter);
                 this.scroll_bottom();
+                this.focus_prompt();
+            },
 
+            update_current_node: function() {
+                this.view_current_node();
+                this.update_choices();
+            },
+
+            update_choices: function() {
                 // update relations collection for new node and reset
                 this.relations_collection.set_parent_node(this.current_node);
                 this.relations_collection.set_search_text('');
                 this.fetch_relations_collection();
 
                 // clear prompt
-                this.$el.find(this.elements.prompt).val('').focus();
+                this.$el.find(this.elements.prompt).val('');
+                this.choices_view.render();
             },
 
             ////////////
@@ -458,23 +495,13 @@ define(
 
                                     // create new nodeview and render (appends to text_area)
                                     var node_edit = new NodeEditView({ node: self.current_node, forest_view: self });
-
                                     var node_div = $(document.createElement('DIV')).attr('class', 'node_edit');
                                     self.$el.find(self.elements.text_area).append(node_div);
-
                                     node_edit.setElement(node_div);
                                     node_edit.render();
-
                                     self.scroll_bottom();
 
-                                    // clear out relations collection
-                                    self.relations_collection.reset();
-
-                                    // clear prompt
-                                    self.$el.find(self.elements.prompt).val('');
-
-                                    // redraw relations view
-                                    self.relations_view.render();
+                                    self.update_choices();
                                 },
                                 error: function(col, resp) { self.add_error(resp.responseText); }
                             }

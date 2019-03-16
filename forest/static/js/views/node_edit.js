@@ -5,9 +5,8 @@ define(
         'showdown',
         'put_cursor_at_end',
         'models/node',
-        'views/relations',
         'tpl!templates/node_edit'],
-    function($, _, Backbone, showdown, put_cursor_at_end, Node, Relations, nodeedittpl) {
+    function($, _, Backbone, showdown, put_cursor_at_end, Node, nodeedittpl) {
 
         return Backbone.View.extend({
 

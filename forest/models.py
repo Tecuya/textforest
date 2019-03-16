@@ -37,7 +37,7 @@ class Node(models.Model):
         return rdict
 
     def __str__(self):
-        return '{} by {}'.format(self.name, self.author)
+        return '"{}" by {} {}'.format(self.name, self.author, self.created.strftime('%Y-%m-%d'))
 
 
 class Relation(models.Model):
@@ -75,7 +75,7 @@ class Relation(models.Model):
                 'created': self.created.strftime('%Y-%m-%d')}
 
     def __str__(self):
-        return '%s > %s (%s)' % (self.parent, self.child, self.text[:20])
+        return '{} > {} ({}) by {} {}'.format(self.parent, self.child, self.text[:20], self.author, self.created.strftime('%Y-%m-%d'))
 
 
 class UserRelation(models.Model):
@@ -96,7 +96,7 @@ class UserRelation(models.Model):
         relation.update_user_relations()
 
     def __str__(self):
-        return '{} {} - {}'.format(self.user, self.relation, self.vote)
+        return '{} followed {} and voted {}'.format(self.user, self.relation, self.vote)
 
 
 class Subscription(models.Model):
@@ -108,7 +108,7 @@ class Subscription(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return '{} {}'.format(self.user, self.node)
+        return '{} subscribed to {}'.format(self.user, self.node)
 
 
 class Notification(models.Model):
@@ -165,13 +165,14 @@ class NodeItem(models.Model):
         unique_together = ('node', 'item')
 
     def __str__(self):
-        return '{} {}'.format(self.node, self.item)
+        return '{} has item {}'.format(self.node, self.item)
 
 
 class Item(models.Model):
 
     author = models.ForeignKey(User, on_delete=models.PROTECT)
     name = models.CharField(max_length=255)
+    slug = models.CharField(max_length=255, default='')
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -179,8 +180,14 @@ class Item(models.Model):
     class Meta:
         unique_together = ('author', 'name')
 
+    def make_json_response_dict(self):
+        return {'name': self.name,
+                'slug': self.slug,
+                'author': self.author.username,
+                'created': self.created.strftime('%Y-%m-%d')}
+
     def __str__(self):
-        return '{} {}'.format(self.author, self.name)
+        return '{} by {} {}'.format(self.name, self.name, self.created.strftime('%Y-%m-%d'))
 
 
 class UserItem(models.Model):
@@ -195,4 +202,4 @@ class UserItem(models.Model):
         unique_together = ('user', 'item')
 
     def __str__(self):
-        return '{} {}'.format(self.author, self.name)
+        return '{} owns {}'.format(self.user, self.item)

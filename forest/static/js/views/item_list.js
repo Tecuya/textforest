@@ -4,33 +4,33 @@ define(
         'backbone',
         'put_cursor_at_end',
         'util/fetch_completions',
-        'collections/nodes',
-        'tpl!templates/node_list'],
-    function($, _, Backbone, put_cursor_at_end, fetch_completions, Nodes, nodelisttpl) {
+        'collections/items',
+        'tpl!templates/item_list'],
+    function($, _, Backbone, put_cursor_at_end, fetch_completions, Items, itemlisttpl) {
 
         return Backbone.View.extend({
 
-            template: nodelisttpl,
+            template: itemlisttpl,
 
             events: {
-                'keyup div.node_list_item': 'keypress_list',
-                'click div.node_list_item': 'click_list'
+                'keyup div.item_list_item': 'keypress_list',
+                'click div.item_list_item': 'click_list'
             },
 
             initialize: function(options) {
                 this.choices_view = options.choices_view;
                 this.forest_view = options.forest_view;
-                this.nodes = new Nodes();
+                this.items = new Items();
             },
 
             render: function() {
 
-                var focused_tabindex = this.$el.find('div.node_list_item:focus').attr('tabindex');
+                var focused_tabindex = this.$el.find('div.item_list_item:focus').attr('tabindex');
 
-                this.$el.html(this.template({ nodes: this.nodes }));
+                this.$el.html(this.template({ items: this.items }));
 
                 if (focused_tabindex) {
-                    this.$el.find('div.node_list_item[tabindex=' + focused_tabindex + ']').focus();
+                    this.$el.find('div.item_list_item[tabindex=' + focused_tabindex + ']').focus();
                 }
             },
 
@@ -51,8 +51,8 @@ define(
                             self.lastfetch,
                             function() {
                                 self.lastfetch = new Date().getTime();
-                                self.nodes.text = text;
-                                self.nodes.fetch({
+                                self.items.text = text;
+                                self.items.fetch({
                                     error: function() { self.$el.html('Server error...'); },
                                     success: function() { self.render(); }
                                 });
@@ -69,11 +69,11 @@ define(
                     if (tabindex == 0) {
                         $('input#relation_create_dest').focus();
                     } else {
-                        $('div.node_list_item[tabindex=' + (tabindex - 1) + ']').focus();
+                        $('div.item_list_item[tabindex=' + (tabindex - 1) + ']').focus();
                     }
 
                 } else if (evt.which == 40) { // down arrow
-                    var tryitem = $('div.node_list_item[tabindex=' + (tabindex + 1) + ']');
+                    var tryitem = $('div.item_list_item[tabindex=' + (tabindex + 1) + ']');
 
                     if (tryitem.is(':visible')) {
                         tryitem.focus();
@@ -89,9 +89,8 @@ define(
             },
 
             click_list: function(evt) {
-                this.choices_view.create_branch_existing_node_select(this.nodes.findWhere({ slug: $(evt.target).data('slug') }));
+                this.choices_view.create_branch_existing_item_select(this.items.findWhere({ slug: $(evt.target).data('slug') }));
             }
-
         });
-
-    });
+    }
+);

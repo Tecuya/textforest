@@ -93,11 +93,7 @@ div.list_item_backwards {
   background-color: #111;
 }
 
-div.creation_title {
-  font-size: 14pt;
-}
-
-div.relation_create {
+div.branch_create {
   background-color: #000;
 }
 
@@ -121,7 +117,22 @@ div.node_text {
 
 div.editbox {
   font-size: 13pt;
-  padding: 9px;
+  padding: 2px;
+}
+
+input.node_edit_title {
+  width: 1600px;
+  border-radius: 2px;
+  background-color: #181818;
+  border: solid #555 1px;
+}
+
+textarea.node_edit_text {
+  width: 1600px;
+  height: 300px;
+  border-radius: 2px;
+  background-color: #181818;
+  border: solid #555 1px;
 }
 
 button {
@@ -165,6 +176,11 @@ div#text_area {
 div#user_area {
   flex: 1 1 auto;
   height: 300px;
+}
+
+div#choices {
+  overflow: auto;
+  height: 270px;
 }
 
 div#relations_list {
@@ -465,12 +481,13 @@ div#notification_clear_all {
   float: right;
 }
 
-div#create_relation_form_title {
+div.relation_form_title {
   font-size: 14pt;
+  font-weight: bold;
   padding-bottom: 8px;
 }
 
-div#create_relation_form {
+div.create_form {
   display: none;
   border: solid #eee 2px;
   border-radius: 7px;
@@ -479,7 +496,7 @@ div#create_relation_form {
   background-color: #222
 }
 
-div.relation_create_text {
+div.relation_form_text {
   width: 8em;
   float: left;
 }
@@ -501,4 +518,8 @@ div.relation_createq_button {
 
 div.node_list_item {
   background-color: #111;
+}
+
+div.footnote {
+  font-size: 10pt;
 }

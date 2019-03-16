@@ -4,9 +4,8 @@ define(
         'backbone',
         'showdown',
         'models/node',
-        'views/relations',
         'tpl!templates/node'],
-    function($, _, Backbone, showdown, Node, Relations, nodetpl) {
+    function($, _, Backbone, showdown, Node, nodetpl) {
         return Backbone.View.extend({
 
             template: nodetpl,

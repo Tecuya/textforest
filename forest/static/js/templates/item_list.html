@@ -1,0 +1,9 @@
+<% if(items.models.length > 0) { %>
+Link to existing branch matching this title:
+<% } %>
+
+<% _.each(items.models, function(item, idx) { %>
+<div class="item_list_item list_item" data-slug="<%= item.get('slug') %>" tabindex=<%= idx %>>
+  <%= item.to_string() %>
+</div>
+<% }) %>

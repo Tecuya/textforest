@@ -30,6 +30,7 @@ urlpatterns = [
     path('xhr/relations/<slug>', forest.views.xhr_relations, name='xhr_relations_for_slug'),
     path('xhr/relations/<slug>/<text>', forest.views.xhr_relations, name='xhr_relations_for_text'),
     path('xhr/relation/vote/<slug>/<direction>', forest.views.xhr_vote, name='xhr_vote'),
+    path('xhr/items_for_text/<text>', forest.views.xhr_items_for_text, name='xhr_items_for_text'),
 
     path('xhr/subscribe/<slug>', forest.views.xhr_subscribe, name='xhr_subscribe'),
     path('xhr/unsubscribe/<slug>', forest.views.xhr_unsubscribe, name='xhr_unsubscribe'),
