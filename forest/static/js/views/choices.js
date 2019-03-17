@@ -269,16 +269,12 @@ define(
             keypress_item_give_create: function(evt) {
                 if (evt.which == 38) {
                     this.$el.find('button#create_item_give_cancel').focus();
-                } else if (evt.which == 13) {
-                    this.create_item_give_create();
                 }
             },
 
             keypress_button_create: function(evt) {
                 if (evt.which == 38) {
                     this.$el.find('button#create_branch_cancel').focus();
-                } else if (evt.which == 13) {
-                    this.create_branch_create();
                 }
             },
 
