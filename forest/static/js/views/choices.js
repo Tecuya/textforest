@@ -22,8 +22,11 @@ define(
                 'keyup button#create_branch_create': 'keypress_button_create',
                 'click button#create_branch_create': 'create_branch_create',
 
+                'keyup button#create_item_give_cancel': 'keypress_item_give_cancel',
                 'click button#create_item_give_cancel': 'create_cancel',
-                'click button#create_item_give_create': 'create_item_create',
+
+                'keyup button#create_item_give_create': 'keypress_item_give_create',
+                'click button#create_item_give_create': 'create_item_give_create',
 
                 'keyup .list_item': 'keypress_list_item',
                 'click .list_item': 'click_list_item',
@@ -33,17 +36,34 @@ define(
             },
 
             initialize: function(options) {
+                var self = this;
+
                 this.forest_view = options.forest_view;
                 this.relations_collection = options.relations_collection;
                 this.node_list_view = new NodeList({ forest_view: this.forest_view, choices_view: this });
-                this.require_item_list_view = new ItemList({ forest_view: this.forest_view, choices_view: this });
-                this.give_item_list_view = new ItemList({ forest_view: this.forest_view, choices_view: this });
+
+                this.require_item_list_view = new ItemList({
+                    forest_view: this.forest_view,
+                    choices_view: this,
+                    on_select: function(item) {
+                        self.create_branch_existing_item_select(item);
+                    }
+                });
+
+                this.give_item_list_view = new ItemList({
+                    forest_view: this.forest_view,
+                    choices_view: this,
+                    on_select: function(item) {
+                        self.item_give_existing_item_select(item);
+                    }
+                });
             },
 
             render: function(autocomplete_render_cycle) {
 
                 this.create_to_existing_node = undefined;
                 this.create_to_existing_item = undefined;
+                this.give_existing_item = undefined;
 
                 if (autocomplete_render_cycle) {
                     // if this is trying to refresh the relations list
@@ -61,7 +81,16 @@ define(
                 // we will restore the users focused tabindex after rendering
                 var focused_tabindex = this.$el.find('div.list_item:focus').attr('tabindex');
 
-                this.$el.html(this.template({ node: this.forest_view.current_node, relations: this.relations_collection, user: this.forest_view.user }));
+                this.$el.html(
+                    this.template(
+                        {
+                            prompt: this.forest_view.prompt_contents(),
+                            node: this.forest_view.current_node,
+                            relations: this.relations_collection,
+                            user: this.forest_view.user
+                        }
+                    )
+                );
 
                 this.node_list_view.setElement('div#existing_list');
                 this.node_list_view.render();
@@ -102,16 +131,19 @@ define(
                 var clicked_item = $(evt.target).closest('.list_item');
                 var clicked_item_id = clicked_item.attr('id');
 
-                if ($(evt.target).hasClass('delete_relation')) { // little delete link
-                    this.forest_view.delete_relation(clicked_item.data('relation-slug'));
+                if ($(evt.target).hasClass('delete_list_item')) { // little delete link
+
+                    if (clicked_item.data('relation-slug')) {
+                        this.forest_view.delete_relation(clicked_item.data('relation-slug'));
+                    }
+
+                    if (clicked_item.data('item-slug')) {
+                        this.forest_view.delete_item_giver(clicked_item.data('item-slug'));
+                    }
 
                 } else if (clicked_item_id == 'create_relation') {
 
                     this.$el.find('div.list_item').hide();
-                    // this.$el.find('div.existing_relation').hide();
-                    // this.$el.find('div#create_give_item').hide();
-                    // this.$el.find('div#create_relation').hide();
-
                     this.$el.find('div#create_give_item_form').hide();
                     this.$el.find('div#create_relation_form').show();
 
@@ -121,16 +153,11 @@ define(
                 } else if (clicked_item_id == 'create_give_item') {
 
                     this.$el.find('div.list_item').hide();
-
-                    // this.$el.find('div.existing_relation').hide();
-                    // this.$el.find('div#create_relation').hide();
-                    // this.$el.find('div#create_give_item').hide();
-
                     this.$el.find('div#create_relation_form').hide();
                     this.$el.find('div#create_give_item_form').show();
 
                     this.$el.find('input#relation_give_item').val(this.forest_view.prompt_contents()).focus();
-                    this.update_item_list();
+                    this.update_give_item_list();
 
                 } else if (clicked_item.hasClass('item_list_item') && !clicked_item.hasClass('item_owned')) {
 
@@ -140,7 +167,7 @@ define(
 
                     this.forest_view.go_to_relation(
                         clicked_item.data('relation-slug'),
-                        clicked_item.hasClass('list_item_backwards'));
+                        clicked_item.hasClass('list_item_backward'));
                 }
 
                 evt.stopPropagation();
@@ -158,14 +185,20 @@ define(
                 this.$el.find('button#create_branch_cancel').focus();
             },
 
+            item_give_existing_item_select: function(item) {
+                this.give_existing_item = item;
+                this.$el.find('div#relation_give_item_select').html(item.to_string());
+                this.$el.find('button#create_item_give_cancel').focus();
+            },
+
             create_cancel: function(evt) {
                 this.render();
                 this.forest_view.focus_prompt();
             },
 
-            create_item_create: function(evt) {
+            create_item_give_create: function(evt) {
                 this.forest_view.create_item_giver(
-                    this.create_to_existing_item,
+                    this.give_existing_item,
                     this.$el.find('input#relation_give_item').val());
             },
 
@@ -194,7 +227,13 @@ define(
             },
 
             keypress_give_item: function(evt) {
-                this.update_give_item_list();
+                if (evt.which == 38) {
+                    this.forest_view.focus_prompt();
+                } else if (evt.which == 40) {
+                    this.$el.find('button#create_item_give_cancel').focus();
+                } else {
+                    this.update_give_item_list();
+                }
             },
 
             keypress_create_require_item: function(evt) {
@@ -216,6 +255,22 @@ define(
                     this.$el.find('input#relation_create_require_item').focus();
                 } else if (evt.which == 40) {
                     this.$el.find('button#create_branch_create').focus();
+                }
+            },
+
+            keypress_item_give_cancel: function(evt) {
+                if (evt.which == 38) {
+                    this.$el.find('input#relation_give_item').focus();
+                } else if (evt.which == 40) {
+                    this.$el.find('button#create_item_give_create').focus();
+                }
+            },
+
+            keypress_item_give_create: function(evt) {
+                if (evt.which == 38) {
+                    this.$el.find('button#create_item_give_cancel').focus();
+                } else if (evt.which == 13) {
+                    this.create_item_give_create();
                 }
             },
 

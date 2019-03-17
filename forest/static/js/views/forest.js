@@ -166,8 +166,10 @@ define(
                         } else {
                             $('button#create_branch_cancel').focus();
                         }
+                    } else if ($('div#create_give_item_form').is(':visible')) {
+                        $('input#relation_give_item').focus();
                     } else {
-                        this.$el.find('div.list_item[tabindex=0]').focus();
+                        this.$el.find('div.list_item').first().focus();
                     }
                     return;
 
@@ -244,19 +246,19 @@ define(
                 );
             },
 
-            go_to_relation: function(slug, backwards) {
+            go_to_relation: function(slug, backward) {
                 var selected_relation = this.relations_collection.findWhere({ 'slug': slug });
 
                 if (selected_relation) {
 
-                    if (selected_relation.get('require_item') && !selected_relation.get('require_item').get('owned')) {
+                    if (selected_relation.get('direction') == 'forward' && selected_relation.get('require_item') && !selected_relation.get('require_item').get('owned')) {
                         this.log_command(selected_relation.get('text'));
                         this.add_error('You lack the required item "' + selected_relation.get('require_item').get('name') + '"');
                         return;
                     }
 
                     this.$el.find(this.elements.text_area).append(commandhistorytpl({ command: selected_relation.get('text') }));
-                    this.node_view_for_relation(selected_relation.get('slug'), backwards);
+                    this.node_view_for_relation(selected_relation.get('slug'), backward);
                 }
             },
 
@@ -433,6 +435,26 @@ define(
                 }
             },
 
+            delete_item_giver: function(slug) {
+                var self = this;
+
+                this.current_node.set(
+                    'items',
+                    _.filter(
+                        this.current_node.get('items'),
+                        function(item, idx) {
+                            return item.get('slug') != slug;
+                        }
+                    ));
+
+                this.current_node.save(
+                    {},
+                    {
+                        success: function() { self.update_current_node(); },
+                        error: function(xhr, err) { self.add_error(err.responseText); }
+                    });
+            },
+
             delete_relation: function(slug) {
                 var self = this;
 
@@ -459,10 +481,12 @@ define(
 
             add_error: function(err) {
                 this.$el.find(this.elements.text_area).append('<div class="error">Error: ' + err + '</div>');
+                this.scroll_bottom();
             },
 
             add_info_message: function(message) {
                 this.$el.find(this.elements.text_area).append('<div class="info_message">' + message + '</div>');
+                this.scroll_bottom();
             },
 
             scroll_bottom: function() {
@@ -554,11 +578,11 @@ define(
             ////////////
             // routes
 
-            node_view_for_relation: function(relation_slug, backwards) {
+            node_view_for_relation: function(relation_slug, backward) {
                 var self = this;
 
                 this.current_node = new Node({
-                    direction: backwards ? 'backwards' : 'forwards',
+                    direction: backward ? 'backward' : 'forward',
                     relation_slug: relation_slug
                 });
                 this.current_node.fetch({

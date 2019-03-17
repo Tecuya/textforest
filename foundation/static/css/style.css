@@ -61,17 +61,13 @@ input#prompt {
   font-family: monospace;
 }
 
-div.existing_relation {
-  font-family: monospace;
-  vertical-align: top;
-}
-
 div.list_item {
   border: 2px solid white;
   border-radius: 2px;
   background-color: #222;
   padding: 5px;
   margin-bottom: 2px;
+  font-family: monospace;
 }
 
 div.list_item:hover {
@@ -89,7 +85,7 @@ div.visited_relation {
   color: #888;
 }
 
-div.list_item_backwards {
+div.list_item_backward {
   background-color: #111;
 }
 
@@ -219,12 +215,13 @@ div.error {
   font-weight: bold;
 }
 
-div.delete_relation {
+div.delete_list_item {
   text-decoration: underline;
   cursor: pointer;
   font-weight: bold;
   float: right;
   padding-left: 10px;
+  color: white;
 }
 
 div.relation_stats {
@@ -576,4 +573,16 @@ div.drawer_close_button {
   display: inline-block;
   cursor: pointer;
   text-decoration: underline;
+}
+
+span.required_item {
+  font-size: 8pt;
+  color: #ada;
+  display: inline-block;
+  margin-left: 10px;
+}
+
+div.requires_unowned_item span.required_item {
+  text-decoration: none;
+  color: #d55;
 }

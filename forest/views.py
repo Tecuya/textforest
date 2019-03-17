@@ -327,12 +327,12 @@ def xhr_relations(request, slug, text=None):
         fetch('forward', {**forward_filters, 'author': node.author})
         fetch('forward', forward_filters, {'author': node.author})
 
-        fetch('backwards', {**backward_filters, 'author': node.author})
-        fetch('backwards', backward_filters, {'author': node.author})
+        fetch('backward', {**backward_filters, 'author': node.author})
+        fetch('backward', backward_filters, {'author': node.author})
 
     else:
         fetch('forward', forward_filters)
-        fetch('backwards', backward_filters)
+        fetch('backward', backward_filters)
 
     return JsonResponse(resp, safe=False)
 

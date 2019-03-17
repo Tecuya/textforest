@@ -20,6 +20,7 @@ define(
             initialize: function(options) {
                 this.choices_view = options.choices_view;
                 this.forest_view = options.forest_view;
+                this.on_select = options.on_select;
                 this.items = new Items();
             },
 
@@ -89,7 +90,9 @@ define(
             },
 
             click_list: function(evt) {
-                this.choices_view.create_branch_existing_item_select(this.items.findWhere({ slug: $(evt.target).data('slug') }));
+                var item = this.items.findWhere({ slug: $(evt.target).data('slug') });
+                this.on_select(item);
+                evt.stopPropagation();
             }
         });
     }
