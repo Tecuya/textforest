@@ -12,6 +12,7 @@ define(
                 'click div#status_title': 'home',
                 'click div.sort_pref': 'sort',
                 'click div#notifications_link': 'notification_link',
+                'click div#inventory_link': 'inventory_link',
                 'click div#notification_clear_all': 'notification_clear_all'
             },
 
@@ -80,9 +81,18 @@ define(
             notification_link: function() {
                 var notification_area = this.forest_view.$el.find('div#notifications');
                 if (notification_area.is(':visible')) {
-                    this.forest_view.$el.find('div#notifications').hide();
+                    notification_area.hide();
                 } else {
-                    this.forest_view.$el.find('div#notifications').show();
+                    notification_area.show();
+                }
+            },
+
+            inventory_link: function() {
+                var inventory_area = this.forest_view.$el.find('div#inventory');
+                if (inventory_area.is(':visible')) {
+                    inventory_area.hide();
+                } else {
+                    inventory_area.show();
                 }
             }
 

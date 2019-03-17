@@ -29,9 +29,9 @@
     <span class="clickable user_link" data-user-link="<%= user.get('username') %>" id="user_link"><%= user.get('username') %></span>
   </div>
 
-  <% if(notifications.models.length > 0) { %>
   <div id="notifications_link" class="status_info clickable">Notifications (<%= notifications.models.length %>)</div>
-  <% } %>
+
+  <div id="inventory_link" class="status_info clickable">Inventory (<%= user.get('items').length %>)</div>
 
   <% } else { %>
 

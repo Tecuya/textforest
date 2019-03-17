@@ -92,12 +92,18 @@ def xhr_create_relation(request):
             user=request.user,
             node=child)
 
-    relation = Relation.objects.create(
-        author=request.user,
-        slug=uniqueify(Relation, make_safe(slugify(doc['text']))),
-        parent=parent,
-        child=child,
-        text=make_safe(doc['text']))
+    robj = {
+        'author': request.user,
+        'slug': uniqueify(Relation, make_safe(slugify(doc['text']))),
+        'parent': parent,
+        'child': child,
+        'text': make_safe(doc['text'])
+    }
+
+    if 'required_item' in doc:
+        robj['require_item'] = Item.objects.get(slug=doc['required_item'])
+
+    relation = Relation.objects.create(**robj)
 
     for subscription in parent.subscription_set.exclude(user=request.user):
         Notification.objects.create(
@@ -109,7 +115,7 @@ def xhr_create_relation(request):
             action=Notification.ACTION_CREATE)
 
     return JsonResponse(
-        relation.make_json_response_dict(),
+        relation.make_json_response_dict(request.user),
         safe=False)
 
 
@@ -250,7 +256,7 @@ def xhr_subscribe(request, slug, subscribe=True):
 
 def xhr_relations_for_parent_node(request, slug):
     return JsonResponse(
-        [r.make_json_response_dict()
+        [r.make_json_response_dict(request.user)
          for r in Relation.objects.filter(parent__slug=slug).order_by('-created')],
         safe=False)
 
@@ -306,7 +312,7 @@ def xhr_relations(request, slug, text=None):
 
         for r in rqs:
 
-            reldict = r.make_json_response_dict()
+            reldict = r.make_json_response_dict(request.user)
             reldict['direction'] = direction
 
             if request.user.is_active:
@@ -441,8 +447,8 @@ def xhr_user(request):
         return JsonResponse(userobj, safe=False)
 
     user = request.user
-    userobj = make_user_obj(user)
 
+    userobj = {}
     if request.method == 'PUT':
         doc = ujson.loads(request.body)
 
@@ -488,6 +494,11 @@ def xhr_user(request):
 
     userobj['has_password'] = request.user.has_usable_password()
 
+    return_user = {
+        **make_user_obj(user),
+        **userobj
+    }
+
     try:
         google_login = user.social_auth.get(provider='google-oauth2')
         userobj['google_uid'] = google_login.uid
@@ -500,7 +511,7 @@ def xhr_user(request):
     except UserSocialAuth.DoesNotExist:
         pass
 
-    return JsonResponse(userobj, safe=False)
+    return JsonResponse(return_user, safe=False)
 
 
 def xhr_vote(request, slug, direction):

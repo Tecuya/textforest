@@ -2,10 +2,10 @@ define(
     ['jquery', 'underscore', 'backbone',
         'models/user', 'models/node', 'models/relation', 'models/item',
         'collections/notifications', 'collections/relations',
-        'views/statusbar', 'views/user', 'views/choices', 'views/node', 'views/node_edit', 'views/notifications',
+        'views/statusbar', 'views/user', 'views/choices', 'views/node', 'views/node_edit', 'views/notifications', 'views/inventory',
         'util/fetch_completions', 'tpl!templates/forest', 'tpl!templates/command_history'],
     function($, _, Backbone, User, Node, Relation, Item, Notifications, Relations, StatusBarView, UserView, ChoicesView,
-        NodeView, NodeEditView, NotificationsView, fetch_completions, foresttpl, commandhistorytpl) {
+        NodeView, NodeEditView, NotificationsView, InventoryView, fetch_completions, foresttpl, commandhistorytpl) {
 
         var global = this;
 
@@ -42,6 +42,7 @@ define(
                 this.user_view = new UserView({ forest_view: this, user: this.user });
                 this.statusbar_view = new StatusBarView({ forest_view: this, user: this.user });
                 this.notifications_view = new NotificationsView({ forest_view: this, user: this.user, notifications_collection: this.notifications_collection });
+                this.inventory_view = new InventoryView({ forest_view: this, user: this.user });
 
                 this.node_counter = 0;
             },
@@ -58,6 +59,9 @@ define(
 
                 this.notifications_view.setElement(this.$el.find('div#notifications'));
                 this.refresh_notifications();
+
+                this.inventory_view.setElement(this.$el.find('div#inventory'));
+                this.inventory_view.render();
 
                 this.focus_prompt();
             },
@@ -244,6 +248,13 @@ define(
                 var selected_relation = this.relations_collection.findWhere({ 'slug': slug });
 
                 if (selected_relation) {
+
+                    if (selected_relation.get('require_item') && !selected_relation.get('require_item').get('owned')) {
+                        this.log_command(selected_relation.get('text'));
+                        this.add_error('You lack the required item "' + selected_relation.get('require_item').get('name') + '"');
+                        return;
+                    }
+
                     this.$el.find(this.elements.text_area).append(commandhistorytpl({ command: selected_relation.get('text') }));
                     this.node_view_for_relation(selected_relation.get('slug'), backwards);
                 }
@@ -281,8 +292,10 @@ define(
                             {},
                             {
                                 success: function() {
-                                    self.log_command('Pick up ' + taken_item.get('name') + '.');
-                                    self.add_info_message('You picked up item: ' + taken_item.get('name') + '.');
+                                    self.log_command('Pick up ' + taken_item.get('name'));
+                                    self.add_info_message('You picked up item: ' + taken_item.get('name'));
+                                    self.inventory_view.render();
+                                    self.statusbar_view.render();
 
                                     self.current_node.fetch(
                                         {
@@ -516,6 +529,7 @@ define(
                 this.view_current_node();
                 this.update_choices();
                 this.refresh_notifications();
+                this.inventory_view.render();
             },
 
             update_choices: function() {
@@ -527,6 +541,14 @@ define(
                 // clear prompt
                 this.$el.find(this.elements.prompt).val('');
                 this.choices_view.render();
+            },
+
+            refresh_current_node: function() {
+                var self = this;
+                this.current_node.fetch({
+                    success: function() { self.update_current_node(); },
+                    error: function(col, resp) { self.add_error(resp.responseText); }
+                });
             },
 
             ////////////
@@ -549,13 +571,8 @@ define(
             },
 
             node_view: function(slug) {
-                var self = this;
-
                 this.current_node = new Node({ slug: slug });
-                this.current_node.fetch({
-                    success: function() { self.update_current_node(); },
-                    error: function(col, resp) { self.add_error(resp.responseText); }
-                });
+                this.refresh_current_node();
             },
 
             node_edit: function(slug) {

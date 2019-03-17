@@ -13,7 +13,8 @@ define(
 
             events: {
                 'keyup input#relation_create_dest': 'keypress_create_dest',
-                'keyup input#relation_create_require_item': 'keypress_create_item',
+                'keyup input#relation_create_require_item': 'keypress_create_require_item',
+                'keyup input#relation_give_item': 'keypress_give_item',
 
                 'keyup button#create_branch_cancel': 'keypress_button_cancel',
                 'click button#create_branch_cancel': 'create_cancel',
@@ -35,7 +36,8 @@ define(
                 this.forest_view = options.forest_view;
                 this.relations_collection = options.relations_collection;
                 this.node_list_view = new NodeList({ forest_view: this.forest_view, choices_view: this });
-                this.item_list_view = new ItemList({ forest_view: this.forest_view, choices_view: this });
+                this.require_item_list_view = new ItemList({ forest_view: this.forest_view, choices_view: this });
+                this.give_item_list_view = new ItemList({ forest_view: this.forest_view, choices_view: this });
             },
 
             render: function(autocomplete_render_cycle) {
@@ -63,6 +65,9 @@ define(
 
                 this.node_list_view.setElement('div#existing_list');
                 this.node_list_view.render();
+
+                this.require_item_list_view.setElement('div#require_item_list');
+                this.give_item_list_view.setElement('div#give_item_list');
 
                 if (focused_tabindex) {
                     this.$el.find('div.list_item[tabindex=' + focused_tabindex + ']').focus();
@@ -102,10 +107,12 @@ define(
 
                 } else if (clicked_item_id == 'create_relation') {
 
-                    this.$el.find('div.existing_relation').hide();
-                    this.$el.find('div#create_give_item').hide();
+                    this.$el.find('div.list_item').hide();
+                    // this.$el.find('div.existing_relation').hide();
+                    // this.$el.find('div#create_give_item').hide();
+                    // this.$el.find('div#create_relation').hide();
+
                     this.$el.find('div#create_give_item_form').hide();
-                    this.$el.find('div#create_relation').hide();
                     this.$el.find('div#create_relation_form').show();
 
                     this.$el.find('input#relation_create_dest').val(this.forest_view.prompt_contents()).focus();
@@ -113,10 +120,13 @@ define(
 
                 } else if (clicked_item_id == 'create_give_item') {
 
-                    this.$el.find('div.existing_relation').hide();
-                    this.$el.find('div#create_relation').hide();
+                    this.$el.find('div.list_item').hide();
+
+                    // this.$el.find('div.existing_relation').hide();
+                    // this.$el.find('div#create_relation').hide();
+                    // this.$el.find('div#create_give_item').hide();
+
                     this.$el.find('div#create_relation_form').hide();
-                    this.$el.find('div#create_give_item').hide();
                     this.$el.find('div#create_give_item_form').show();
 
                     this.$el.find('input#relation_give_item').val(this.forest_view.prompt_contents()).focus();
@@ -127,6 +137,7 @@ define(
                     this.forest_view.take_item(clicked_item.data('item-slug'));
 
                 } else {
+
                     this.forest_view.go_to_relation(
                         clicked_item.data('relation-slug'),
                         clicked_item.hasClass('list_item_backwards'));
@@ -182,7 +193,11 @@ define(
                 }
             },
 
-            keypress_create_item: function(evt) {
+            keypress_give_item: function(evt) {
+                this.update_give_item_list();
+            },
+
+            keypress_create_require_item: function(evt) {
                 if (evt.which == 38) {
                     if (this.$el.find('input#relation_create_dest').is(':visible')) {
                         this.$el.find('input#relation_create_dest').focus();
@@ -191,6 +206,8 @@ define(
                     }
                 } else if (evt.which == 40) {
                     this.$el.find('button#create_branch_cancel').focus();
+                } else {
+                    this.update_require_item_list();
                 }
             },
 
@@ -214,8 +231,12 @@ define(
                 this.node_list_view.update_text(this.$el.find('input#relation_create_dest').val());
             },
 
-            update_item_list: function() {
-                this.item_list_view.update_text(this.$el.find('input#relation_give_item').val());
+            update_require_item_list: function() {
+                this.require_item_list_view.update_text(this.$el.find('input#relation_create_require_item').val());
+            },
+
+            update_give_item_list: function() {
+                this.give_item_list_view.update_text(this.$el.find('input#relation_give_item').val());
             },
 
             vote_up: function(evt) {

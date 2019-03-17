@@ -1,4 +1,4 @@
-define(['backbone'], function(Backbone) {
+define(['backbone', 'models/item'], function(Backbone, Item) {
     return Backbone.Model.extend({
         idAttribute: 'username',
         url: function() {
@@ -43,6 +43,25 @@ define(['backbone'], function(Backbone) {
                     options.failure(err);
                 }
             });
+        },
+
+        parse: function(response, options) {
+            // convert the json items in to item models
+            var items = [];
+            _.each(response['items'], function(i, idx) {
+                items.push(
+                    new Item(
+                        {
+                            name: i['name'],
+                            slug: i['slug'],
+                            author: i['author'],
+                            created: i['created'],
+                            owned: i['owned']
+                        }));
+            });
+
+            response['items'] = items;
+            return response;
         }
 
     });

@@ -66,8 +66,8 @@ class Relation(models.Model):
         self.vote = stats['vote']
         self.save()
 
-    def make_json_response_dict(self):
-        return {'text': self.text,
+    def make_json_response_dict(self, user):
+        robj = {'text': self.text,
                 'slug': self.slug,
                 'parent': self.parent.slug,
                 'parent_name': self.parent.name,
@@ -77,8 +77,14 @@ class Relation(models.Model):
                 'vote': self.vote,
                 'created': self.created.strftime('%Y-%m-%d')}
 
+        if self.require_item is not None:
+            robj['require_item'] = self.require_item.make_json_response_dict(user)
+
+        return robj
+
     def __str__(self):
-        return '{} > {} ({}) by {} {}'.format(self.parent, self.child, self.text[:20], self.author, self.created.strftime('%Y-%m-%d'))
+        return '{} > {} ({}) by {} {}'.format(
+            self.parent, self.child, self.text[:20], self.author, self.created.strftime('%Y-%m-%d'))
 
 
 class UserRelation(models.Model):

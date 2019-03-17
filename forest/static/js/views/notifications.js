@@ -11,7 +11,8 @@ define(
 
             events: {
                 'click span.notification_clear': 'notification_clear',
-                'click div#notification_clear_all': 'notification_clear_all'
+                'click div#notification_clear_all': 'notification_clear_all',
+                'click div.drawer_close_button': 'close_notifications'
             },
 
             initialize: function(options) {
@@ -21,6 +22,10 @@ define(
 
             render: function() {
                 this.$el.html(this.template({ notifications_collection: this.notifications_collection }));
+            },
+
+            close_notifications: function(evt) {
+                this.$el.hide();
             },
 
             notification_clear: function(evt) {

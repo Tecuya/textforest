@@ -461,14 +461,6 @@ div.notification {
   margin: 5px;
 }
 
-span#star_empty {
-  cursor: pointer;
-}
-
-span#star_full {
-  cursor: pointer;
-}
-
 span.notification_clear {
   cursor: pointer;
   float: right;
@@ -479,6 +471,44 @@ div#notification_clear_all {
   cursor: pointer;
   text-decoration: underline;
   float: right;
+}
+
+div#inventory {
+  position: fixed;
+  z-index: 100;
+  bottom: 24;
+  left: 65%;
+  width: 35%;
+  background-color: black;
+  border-top: solid #444 2px;
+  display: none;
+}
+
+span.inventory_drop {
+  cursor: pointer;
+  float: right;
+  padding-right: 8px;
+}
+
+div#inventory_clear_all {
+  cursor: pointer;
+  text-decoration: underline;
+  float: right;
+}
+
+div.inventory_item {
+  border: solid #444 1px;
+  padding: 2px;
+  margin: 5px;
+}
+
+
+span#star_empty {
+  cursor: pointer;
+}
+
+span#star_full {
+  cursor: pointer;
 }
 
 div.relation_form_title {
@@ -535,4 +565,15 @@ div.item_owned {
 
 div.info_message {
   color: #ada;
+}
+
+div.requires_unowned_item {
+  text-decoration: line-through;
+}
+
+div.drawer_close_button {
+  float: left;
+  display: inline-block;
+  cursor: pointer;
+  text-decoration: underline;
 }

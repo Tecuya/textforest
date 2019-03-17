@@ -1,4 +1,4 @@
-define(['backbone'], function(Backbone) {
+define(['backbone', 'models/item'], function(Backbone, Item) {
 
     return Backbone.Model.extend({
         idAttribute: 'slug',
@@ -8,6 +8,21 @@ define(['backbone'], function(Backbone) {
             } else {
                 return '/xhr/create_relation';
             }
+        },
+
+        parse: function(response, options) {
+            if (response['require_item']) {
+                var i = response['require_item'];
+
+                response['require_item'] = new Item({
+                    name: i['name'],
+                    slug: i['slug'],
+                    author: i['author'],
+                    created: i['created'],
+                    owned: i['owned']
+                });
+            }
+            return response;
         }
     });
 
