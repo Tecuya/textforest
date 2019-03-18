@@ -4,9 +4,9 @@ define(
         'backbone',
         'showdown',
         'put_cursor_at_end',
-        'js/models/node',
-        'tpl!templates/node_edit'],
-    function($, _, Backbone, showdown, put_cursor_at_end, Node, nodeedittpl) {
+        'js/models/relation',
+        'tpl!templates/relation_edit'],
+    function($, _, Backbone, showdown, put_cursor_at_end, Relation, relationedittpl) {
 
         return Backbone.View.extend({
 
@@ -15,24 +15,23 @@ define(
             },
 
             events: {
-                'click button#node_edit_save': 'save',
-                'click button#node_edit_preview': 'preview',
-                'click button#node_edit_cancel': 'cancel'
+                'click button#relation_edit_save': 'save',
+                'click button#relation_edit_preview': 'preview',
+                'click button#relation_edit_cancel': 'cancel'
             },
 
-            template: nodeedittpl,
+            template: relationedittpl,
 
             initialize: function(options) {
                 this.forest_view = options.forest_view;
             },
 
-            set_node: function(node) {
-                this.node = node;
+            set_relation: function(relation) {
+                this.relation = relation;
             },
 
             render: function() {
-                this.$el.html(this.template({ node: this.node }));
-                this.$el.find('input[name=name]').focus();
+                this.$el.html(this.template({ relation: this.relation }));
             },
 
             cancel: function() {
@@ -60,11 +59,11 @@ define(
             },
 
             save: function() {
-                this.node.set('name', this.$el.find('input[name=name]').val());
-                this.node.set('text', this.$el.find('textarea[name=text]').val());
+                this.relation.set('name', this.$el.find('input[name=name]').val());
+                this.relation.set('text', this.$el.find('textarea[name=text]').val());
 
                 var self = this;
-                this.node.save(
+                this.relation.save(
                     {},
                     {
                         success: function() {

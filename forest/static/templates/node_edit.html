@@ -1,3 +1,5 @@
+<div class="modal_title dash_underline">Node Edit</div>
+
 <div class="editbox">
   <input class="node_edit_title" name=name type=text value="<%= node.get('name') %>" <% if(node.get('slug').substring(0, 1) == '~') { %>disabled<% } %>>
 </div>
@@ -12,9 +14,17 @@
 </div>
 
 <div class="editbox">
-  <button id="cancel">Cancel</button>
-  <button id="preview">Preview</button>
-  <button id="save">Save</button>
+  <input type=checkbox> Hide backwards relations
+</div>
+
+<div class="editbox">
+  <input type=checkbox> Allow public to link to this node
+</div>
+
+<div class="editbox">
+  <button id="node_edit_cancel">Cancel</button>
+  <button id="node_edit_preview">Preview</button>
+  <button id="node_edit_save">Save</button>
 </div>
 
 

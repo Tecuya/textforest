@@ -131,7 +131,7 @@ input.node_edit_title {
 
 textarea.node_edit_text {
   width: 1600px;
-  height: 300px;
+  height: 400px;
   border-radius: 2px;
   background-color: #181818;
   border: solid #555 1px;
@@ -246,13 +246,17 @@ div#modal {
   background-color: rgb(0,0,0);
   background-color: rgba(0,0,0,0.8);
   text-align: center;
+  vertical-align: center;
 }
 
 div.modal_content {
   border: 2px solid #000;
   border-radius: 7px;
   background-color: #333;
-  margin: 15% auto;
+  margin-top: 8%;
+  margin-right: auto;
+  margin-left: auto;
+  margin-right: auto;
   padding: 20px;
   text-align: left;
 }
@@ -263,6 +267,14 @@ div#modal_user {
 }
 
 div#modal_node_edit {
+  display: inline-block;
+}
+
+div#modal_relation_edit {
+  display: inline-block;
+}
+
+div#modal_item_edit {
   display: inline-block;
 }
 
@@ -382,13 +394,6 @@ div.disconnect_password_warning {
   color: red;
 }
 
-div#settings_title {
-  font-size: 19pt;
-  margin-bottom: 14px;
-  border-bottom: dashed #666 3px;
-  padding-bottom: 6px;
-}
-
 div#password_form_open {
   display: inline-block;
   color: #ddd;
@@ -417,7 +422,7 @@ div#user_form_result {
   margin-bottom: 10px;
 }
 
-div.settings_title {
+div.modal_title {
   font-size: 19pt;
   margin-bottom: 14px;
 }
@@ -533,19 +538,15 @@ div.relation_form_text {
   float: left;
 }
 
-div.relation_create_input_div {
+div.relation_edit_input_div {
   float: left;
   padding-bottom: 5px;
 }
 
-input.relation_create_input {
+input.relation_edit_input {
   font-size: 12pt;
   padding: 2px;
   background-color: #000;
-}
-
-div.relation_createq_button {
-  float: left;
 }
 
 div.node_list_item {

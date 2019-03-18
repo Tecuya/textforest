@@ -59,6 +59,11 @@ define(
             click_edit_relation: function(evt) {
                 evt.stopPropagation();
 
+                var slug = $(evt.target).closest('tr').data('slug').toString();
+
+                var relation = this.relations_collection.findWhere({ slug: slug });
+
+                this.forest_view.relation_edit(relation);
             },
 
             click_delete_relation: function(evt) {

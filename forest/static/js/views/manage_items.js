@@ -47,6 +47,12 @@ define(
             click_edit_item: function(evt) {
                 evt.stopPropagation();
 
+                var slug = $(evt.target).closest('tr').data('slug').toString();
+
+                var item = this.items_collection.findWhere({ slug: slug });
+
+                this.forest_view.item_edit(item);
+
             },
 
             click_delete_item: function(evt) {

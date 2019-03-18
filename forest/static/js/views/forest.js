@@ -2,10 +2,12 @@ define(
     ['jquery', 'underscore', 'backbone',
         'js/models/user', 'js/models/node', 'js/models/relation', 'js/models/item',
         'js/collections/notifications', 'js/collections/relations',
-        'js/views/statusbar', 'js/views/user', 'js/views/choices', 'js/views/node', 'js/views/node_edit', 'js/views/notifications', 'js/views/inventory', 'js/views/manage_content',
+        'js/views/statusbar', 'js/views/user', 'js/views/choices', 'js/views/node',
+        'js/views/node_edit', 'js/views/relation_edit', 'js/views/item_edit', 'js/views/notifications', 'js/views/inventory', 'js/views/manage_content',
         'js/util/fetch_completions', 'tpl!templates/forest', 'tpl!templates/command_history'],
     function($, _, Backbone, User, Node, Relation, Item, Notifications, Relations, StatusBarView, UserView, ChoicesView,
-        NodeView, NodeEditView, NotificationsView, InventoryView, ManageContentView, fetch_completions, foresttpl, commandhistorytpl) {
+        NodeView, NodeEditView, RelationEditView, ItemEditView, NotificationsView, InventoryView, ManageContentView,
+        fetch_completions, foresttpl, commandhistorytpl) {
 
         var global = this;
 
@@ -27,6 +29,8 @@ define(
                 'divmodal': 'div#modal',
                 'divmodal_user': 'div#modal_user',
                 'divmodal_node_edit': 'div#modal_node_edit',
+                'divmodal_relation_edit': 'div#modal_relation_edit',
+                'divmodal_item_edit': 'div#modal_item_edit',
                 'notifications': 'div#notifications'
             },
 
@@ -46,6 +50,10 @@ define(
                 this.notifications_view = new NotificationsView({ forest_view: this, user: this.user, notifications_collection: this.notifications_collection });
                 this.inventory_view = new InventoryView({ forest_view: this, user: this.user });
                 this.manage_content_view = new ManageContentView({ forest_view: this });
+
+                this.node_edit_view = new NodeEditView({ forest_view: this });
+                this.relation_edit_view = new RelationEditView({ forest_view: this });
+                this.item_edit_view = new ItemEditView({ forest_view: this });
 
                 this.node_counter = 0;
             },
@@ -70,8 +78,9 @@ define(
                     this.manage_content_view.setElement(this.$el.find('div#manage_content'));
                     this.manage_content_view.render();
 
-                    this.node_edit_view = new NodeEditView({ forest_view: this });
                     this.node_edit_view.setElement(this.$el.find(this.elements.divmodal_node_edit));
+                    this.relation_edit_view.setElement(this.$el.find(this.elements.divmodal_relation_edit));
+                    this.item_edit_view.setElement(this.$el.find(this.elements.divmodal_item_edit));
                 }
 
                 this.focus_prompt();
@@ -619,6 +628,18 @@ define(
                 this.node_edit_view.set_node(node);
                 this.node_edit_view.render();
                 this.show_divmodal(this.elements.divmodal_node_edit);
+            },
+
+            item_edit: function(item) {
+                this.item_edit_view.set_item(item);
+                this.item_edit_view.render();
+                this.show_divmodal(this.elements.divmodal_item_edit);
+            },
+
+            relation_edit: function(relation) {
+                this.relation_edit_view.set_relation(relation);
+                this.relation_edit_view.render();
+                this.show_divmodal(this.elements.divmodal_relation_edit);
             }
         });
     }

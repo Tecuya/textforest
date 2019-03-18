@@ -4,9 +4,9 @@ define(
         'backbone',
         'showdown',
         'put_cursor_at_end',
-        'js/models/node',
-        'tpl!templates/node_edit'],
-    function($, _, Backbone, showdown, put_cursor_at_end, Node, nodeedittpl) {
+        'js/models/item',
+        'tpl!templates/item_edit'],
+    function($, _, Backbone, showdown, put_cursor_at_end, Item, itemedittpl) {
 
         return Backbone.View.extend({
 
@@ -15,23 +15,23 @@ define(
             },
 
             events: {
-                'click button#node_edit_save': 'save',
-                'click button#node_edit_preview': 'preview',
-                'click button#node_edit_cancel': 'cancel'
+                'click button#item_edit_save': 'save',
+                'click button#item_edit_preview': 'preview',
+                'click button#item_edit_cancel': 'cancel'
             },
 
-            template: nodeedittpl,
+            template: itemedittpl,
 
             initialize: function(options) {
                 this.forest_view = options.forest_view;
             },
 
-            set_node: function(node) {
-                this.node = node;
+            set_item: function(item) {
+                this.item = item;
             },
 
             render: function() {
-                this.$el.html(this.template({ node: this.node }));
+                this.$el.html(this.template({ item: this.item }));
                 this.$el.find('input[name=name]').focus();
             },
 
@@ -60,11 +60,11 @@ define(
             },
 
             save: function() {
-                this.node.set('name', this.$el.find('input[name=name]').val());
-                this.node.set('text', this.$el.find('textarea[name=text]').val());
+                this.item.set('name', this.$el.find('input[name=name]').val());
+                this.item.set('text', this.$el.find('textarea[name=text]').val());
 
                 var self = this;
-                this.node.save(
+                this.item.save(
                     {},
                     {
                         success: function() {
