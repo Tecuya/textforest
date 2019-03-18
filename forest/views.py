@@ -224,8 +224,9 @@ def xhr_node_by_slug(request, slug):
 
         node.delete()
 
-    rdict = node.make_json_response_dict(request.user)
+        return JsonResponse({}, safe=False)
 
+    rdict = node.make_json_response_dict(request.user)
     return JsonResponse(rdict, safe=False)
 
 
@@ -351,6 +352,25 @@ def xhr_items_for_text(request, text):
         safe=False)
 
 
+def xhr_relation_by_slug(request, slug=None):
+
+    if not request.user.is_active:
+        return HttpResponseForbidden('You are not logged in')
+
+    if request.method == 'DELETE':
+
+        relation = Relation.objects.get(author=request.user, slug=slug)
+
+        if relation.author != request.user:
+            return HttpResponseForbidden('This item does not belong to you')
+
+        relation.delete()
+
+        return JsonResponse({}, safe=False)
+
+    return HttpResponseForbidden('unimp')
+
+
 def xhr_item_by_slug(request, slug=None):
 
     if not request.user.is_active:
@@ -368,6 +388,17 @@ def xhr_item_by_slug(request, slug=None):
 
         item.slug = uniqueify(Item, make_safe(slugify('{} {}'.format(request.user.username, doc['name']))))
         item.save()
+
+    elif request.method == 'DELETE':
+
+        item = Item.objects.get(author=request.user, slug=slug)
+
+        if item.author != request.user:
+            return HttpResponseForbidden('This item does not belong to you')
+
+        item.delete()
+
+        return JsonResponse({}, safe=False)
 
     else:
         return HttpResponseForbidden('unimp')

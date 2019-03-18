@@ -10,6 +10,13 @@ define(
 
             template: manageitemstpl,
 
+            events: {
+                'click tr': 'click_view_item',
+                'click span#manage_view_item': 'click_view_item',
+                'click span#manage_edit_item': 'click_edit_item',
+                'click span#manage_delete_item': 'click_delete_item'
+            },
+
             initialize: function(options) {
                 this.manage_content_view = options.manage_content_view;
                 this.forest_view = options.forest_view;
@@ -30,6 +37,38 @@ define(
                             self.add_error('Items fetch failed: ' + err.responseText);
                         }
                     });
+            },
+
+            click_view_item: function(evt) {
+
+            },
+
+            click_edit_item: function(evt) {
+
+            },
+
+            click_delete_item: function(evt) {
+                evt.stopPropagation();
+
+                var self = this;
+
+                var slug = $(evt.target).closest('tr').data('slug').toString();
+
+                if (!$(evt.target).hasClass('red')) {
+                    $(evt.target).addClass('red');
+                } else {
+                    var item = this.items_collection.findWhere({ slug: slug });
+                    item.destroy({
+                        wait: true,
+                        success: function() {
+                            self.items_collection.remove(item);
+                            $(evt.target).closest('tr').hide();
+                        },
+                        error: function(node, resp) {
+                            self.forest_view.add_error(resp.responseText);
+                        }
+                    });
+                }
             }
         });
     });

@@ -69,7 +69,7 @@ define(
                             self.nodes_collection.remove(node);
                             $(evt.target).closest('tr').hide();
                         },
-                        error: function(node, resp) {
+                        error: function(xhr, resp) {
                             self.forest_view.add_error(resp.responseText);
                         }
                     });

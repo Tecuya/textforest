@@ -10,17 +10,13 @@
 
   <tbody>
     <% _.each(items.models, function(item, idx) {  %>
-    <tr>
+    <tr data-slug="<%= item.get('slug') %>">
       <td><%= item.get('name') %></td>
       <td><%= item.get('created') %></td>
       <td>
-
-        👁
-
-        🖉
-
-        ❌
-
+        <span id="manage_view_item" class="clickable">👁</span>
+        <span id="manage_edit_item" class="clickable">🖉</span>
+        <span id="manage_delete_item" class="clickable">❌</span>
       </td>
     </tr>
     <% }) %>

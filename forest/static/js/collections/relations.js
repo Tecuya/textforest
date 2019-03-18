@@ -31,10 +31,10 @@ define(['backbone', 'js/models/relation'], function(Backbone, relation) {
             } else {
 
                 if (this.text) {
-                    return '/xhr/relations/' + escape(this.parent_node.get('slug')) +
+                    return '/xhr/relations_for_node_slug/' + escape(this.parent_node.get('slug')) +
                         '/' + escape(this.text) + '?sort=' + this.sort + '&sortdir=' + this.sortdir + '&sortpriop=' + this.sortpriop;
                 } else {
-                    return '/xhr/relations/' + escape(this.parent_node.get('slug')) +
+                    return '/xhr/relations_for_node_slug/' + escape(this.parent_node.get('slug')) +
                         '?sort=' + this.sort + '&sortdir=' + this.sortdir + '&sortpriop=' + this.sortpriop;
                 }
             }
