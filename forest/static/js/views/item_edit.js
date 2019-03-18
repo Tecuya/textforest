@@ -11,7 +11,12 @@ define(
         return Backbone.View.extend({
 
             elements: {
-                'preview': 'div#editpreview'
+                'preview': 'div#editpreview',
+                'name_input': 'input#item_name_input',
+                'dest_widget': 'div#item_dest_widget',
+                'max_quantity_input': 'input#item_max_quantity_input',
+                'droppable_checkbox': 'input#item_droppable_checkbox',
+                'public_can_give_checkbox': 'input#item_public_can_give_checkbox'
             },
 
             events: {
@@ -32,42 +37,40 @@ define(
 
             render: function() {
                 this.$el.html(this.template({ item: this.item }));
-                this.$el.find('input[name=name]').focus();
+
+                this.$el.find(this.elements.name_input).val(this.item.get('name')).focus();
+
+                if (this.item.get('description_node')) {
+
+                    // slug is a stand-in until it looks up the real node
+                    this.$el.find(this.elements.dest_widget).html(this.item.get('description_node'));
+
+                }
+
+                this.$el.find(this.elements.max_quantity_input).val(this.item.get('max_quantity'));
+                this.$el.find(this.elements.droppable_checkbox).prop('checked', this.item.get('droppable'));
+                this.$el.find(this.elements.public_can_give_checkbox).prop('checked', this.item.get('public_can_give'));
             },
 
             cancel: function() {
                 this.forest_view.hide_divmodal();
             },
 
-            preview: function(evt) {
-
-                var previewb = $(evt.target);
-                var textarea = this.$el.find('textarea[name=text]');
-                var previewdiv = this.$el.find(this.elements.preview);
-
-                if (previewb.html() == 'Preview') {
-                    textarea.hide();
-                    var converter = new showdown.Converter();
-                    var edit_contents = converter.makeHtml(textarea.val().replace(/<\/?[^>]+(>|$)/g, ""));
-                    previewdiv.html(edit_contents).show();
-                    previewb.html('Edit');
-
-                } else {
-                    textarea.show();
-                    previewdiv.hide();
-                    previewb.html('Preview');
-                }
-            },
-
             save: function() {
-                this.item.set('name', this.$el.find('input[name=name]').val());
-                this.item.set('text', this.$el.find('textarea[name=text]').val());
+                this.item.set('name', this.$el.find(this.elements.name_input).val());
+
+                // TODO description node here
+
+                this.item.set('max_quantity', this.$el.find(this.elements.max_quantity_input).val());
+                this.item.set('droppable', this.$el.find(this.elements.droppable_checkbox).is(':checked'));
+                this.item.set('public_can_give', this.$el.find(this.elements.public_can_give_checkbox).is(':checked'));
 
                 var self = this;
                 this.item.save(
                     {},
                     {
                         success: function() {
+                            self.forest_view.manage_content_view.manage_items_view.render();
                             self.forest_view.hide_divmodal();
                         },
                         error: function(xhr, resp) {

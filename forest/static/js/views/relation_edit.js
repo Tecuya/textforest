@@ -67,6 +67,7 @@ define(
                     {},
                     {
                         success: function() {
+                            self.forest_view.manage_content_view.manage_relations_view.render();
                             self.forest_view.hide_divmodal();
                         },
                         error: function(xhr, resp) {

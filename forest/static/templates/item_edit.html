@@ -1,13 +1,41 @@
-<div class="modal_title dash_underline">Item Edit</div>
+<div class="modal_title dash_underline">Edit Item</div>
 
-<div class="editbox">
-  <input class="item_edit_title" name=name type=text value="<%= item.get('name') %>">
+<div class="form_text">
+  Name:
+</div>
+<div class="form_widget">
+  <input type=text id="item_name_input">
 </div>
 
-<div class="editbox">
+<div class="form_text">
+  Destination Node:
+</div>
+<div class="form_widget" id="item_dest_widget">
+  <input type=text id="item_dest_input">
+</div>
+
+<div class="form_text">
+  Max Quantity:
+</div>
+<div class="form_widget">
+  <input type=text id="item_max_quantity_input">
+</div>
+
+<div class="form_text">
+  Droppable:
+</div>
+<div class="form_widget">
+  <input type=checkbox id="item_droppable_checkbox">
+</div>
+
+<div class="form_text">
+  Public can give:
+</div>
+<div class="form_widget">
+  <input type=checkbox id="item_public_can_give_checkbox">
+</div>
+
+<div class="cleardiv">
   <button id="item_edit_cancel">Cancel</button>
-  <button id="item_edit_preview">Preview</button>
   <button id="item_edit_save">Save</button>
 </div>
-
-

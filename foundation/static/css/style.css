@@ -533,8 +533,15 @@ div.create_form {
   background-color: #222
 }
 
-div.relation_form_text {
-  width: 8em;
+div.form_text {
+  clear: left;
+  width: 10em;
+  float: left;
+  height: 1.5em;
+}
+
+div.form_widget {
+  clear: right;
   float: left;
 }
 

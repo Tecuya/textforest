@@ -1,11 +1,11 @@
 <div class="modal_title dash_underline">Node Edit</div>
 
 <div class="editbox">
-  <input class="node_edit_title" name=name type=text value="<%= node.get('name') %>" <% if(node.get('slug').substring(0, 1) == '~') { %>disabled<% } %>>
+  <input class="node_edit_title" id="node_name_input" type=text <% if(node.get('slug').substring(0, 1) == '~') { %>disabled<% } %>>
 </div>
 
 <div class="editbox">
-  <textarea name=text class="node_edit_text"><%= node.get('text') %></textarea>
+  <textarea id="node_text_textarea" class="node_edit_text"></textarea>
   <div id="editpreview"></div>
 </div>
 
@@ -14,11 +14,11 @@
 </div>
 
 <div class="editbox">
-  <input type=checkbox> Hide backwards relations
+  <input type=checkbox id="node_show_backward_relations_checkbox"> Show backward relations
 </div>
 
 <div class="editbox">
-  <input type=checkbox> Allow public to link to this node
+  <input type=checkbox id="node_public_can_link_checkbox"> Allow public to link to this node
 </div>
 
 <div class="editbox">

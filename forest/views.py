@@ -192,6 +192,8 @@ def xhr_node_by_slug(request, slug):
             node.slug = slugify(doc['name'])
 
         node.text = make_safe(doc['text'])
+        node.show_backward_relations = bool(doc['show_backward_relations'])
+        node.public_can_link = bool(doc['public_can_link'])
         node.save()
 
         if 'items' in doc:

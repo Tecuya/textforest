@@ -9,6 +9,9 @@ class Node(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
+    show_backward_relations = models.BooleanField(default=True)
+    public_can_link = models.BooleanField(default=True)
+
     name = models.CharField(max_length=255)
     slug = models.CharField(max_length=255, default='')
     text = models.TextField(default='')
@@ -29,6 +32,8 @@ class Node(models.Model):
             'name': self.name,
             'slug': self.slug,
             'text': self.text,
+            'show_backward_relations': self.show_backward_relations,
+            'public_can_link': self.public_can_link,
             'author': self.author.username,
             'created': self.created.strftime('%Y-%m-%d'),
             'items': [ni.item.make_json_response_dict(user) for ni in self.nodeitem_set.all()]
@@ -209,6 +214,12 @@ class Item(models.Model):
     name = models.CharField(max_length=255)
     slug = models.CharField(max_length=255, default='')
 
+    description_node = models.ForeignKey(Node, blank=True, null=True, default=None, on_delete=models.PROTECT)
+
+    max_quantity = models.IntegerField(default=0)
+    droppable = models.BooleanField(default=True)
+    public_can_give = models.BooleanField(default=True)
+
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -219,6 +230,10 @@ class Item(models.Model):
         rdict = {'name': self.name,
                  'slug': self.slug,
                  'author': self.author.username,
+                 'description_node': self.description_node.slug if self.description_node is not None else None,
+                 'max_quantity': self.max_quantity,
+                 'droppable': self.droppable,
+                 'public_can_give': self.public_can_give,
                  'created': self.created.strftime('%Y-%m-%d')}
 
         if user is not None and not user.is_anonymous and user.is_active:
@@ -234,6 +249,8 @@ class UserItem(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     item = models.ForeignKey('Item', on_delete=models.CASCADE)
+
+    quantity = models.IntegerField(default=1)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

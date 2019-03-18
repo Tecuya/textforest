@@ -1,33 +1,31 @@
 <div class="modal_title dash_underline">Edit relation</div>
 
-<div class="relation_form_text">
+<div class="form_text">
   Text:
 </div>
 
-<div class="relation_edit_input_div">
+<div class="form_widget">
   <input class="relation_edit_input" type=text size=80 value="<%= relation.get('text') %>">
 </div>
 
-<div class="relation_form_text">
+<div class="form_text">
   Destination:
 </div>
 
-<div class="relation_create_input_div" id="relation_create_dest_select">
+<div class="form_widget">
   <input class="relation_edit_input" type=text size=80 value="<%= relation.get('') %>">
 </div>
 
-<div class="cleardiv"></div>
-
-<div class="relation_form_text">
+<div class="form_text">
   Require item:
 </div>
 
-<div class="relation_create_input_div" id="relation_create_item_select">
+<div class="form_widget">
   <input class="relation_create_input" id="relation_create_require_item" name=require_item type=text placeholder=" (No item required)" size=80>
   <div id="require_item_list"></div>
 </div>
 
-<div class="cleardiv"></div>
-
-<button id="relation_edit_cancel">Cancel</button>
-<button id="relation_edit_save">Save</button>
+<div class="cleardiv">
+  <button id="relation_edit_cancel">Cancel</button>
+  <button id="relation_edit_save">Save</button>
+</div>
