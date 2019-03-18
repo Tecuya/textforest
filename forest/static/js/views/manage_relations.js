@@ -3,9 +3,10 @@ define(
         'underscore',
         'backbone',
         'js/collections/relations',
+        'js/models/node',
         'tpl!templates/manage_relations'
     ],
-    function($, _, Backbone, Relations, managerelationstpl) {
+    function($, _, Backbone, Relations, Node, managerelationstpl) {
         return Backbone.View.extend({
 
             template: managerelationstpl,
@@ -25,7 +26,6 @@ define(
             },
 
             render: function() {
-
                 var self = this;
                 this.relations_collection.fetch(
                     {
@@ -40,10 +40,24 @@ define(
             },
 
             click_view_relation: function(evt) {
+                evt.stopPropagation();
 
+                var slug = $(evt.target).closest('tr').data('slug').toString();
+                var node = new Node();
+                node.set('relation_slug', slug);
+                node.set('direction', 'backward');
+                node.fetch({
+                    success: function() {
+                        Backbone.history.navigate('/f/' + node.get('slug'), true);
+                    },
+                    error: function(xhr, resp) {
+                        self.forest_view.add_error(resp.responseText);
+                    }
+                });
             },
 
             click_edit_relation: function(evt) {
+                evt.stopPropagation();
 
             },
 

@@ -245,6 +245,7 @@ div#modal {
   overflow: auto;
   background-color: rgb(0,0,0);
   background-color: rgba(0,0,0,0.8);
+  text-align: center;
 }
 
 div.modal_content {
@@ -253,8 +254,16 @@ div.modal_content {
   background-color: #333;
   margin: 15% auto;
   padding: 20px;
+  text-align: left;
+}
+
+div#modal_user {
   width: 500px;
   text-align: center;
+}
+
+div#modal_node_edit {
+  display: inline-block;
 }
 
 div#status_bar {
@@ -448,7 +457,7 @@ div.delete_confirm_choice {
 
 div.drawer {
   position: fixed;
-  z-index: 100;
+
   bottom: 21;
   left: 55%;
   width: 44%;

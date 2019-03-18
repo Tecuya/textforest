@@ -40,10 +40,12 @@ define(
             },
 
             click_view_item: function(evt) {
+                evt.stopPropagation();
 
             },
 
             click_edit_item: function(evt) {
+                evt.stopPropagation();
 
             },
 

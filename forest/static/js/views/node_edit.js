@@ -23,8 +23,11 @@ define(
             template: nodeedittpl,
 
             initialize: function(options) {
-                this.node = options.node;
                 this.forest_view = options.forest_view;
+            },
+
+            set_node: function(node) {
+                this.node = node;
             },
 
             render: function() {
@@ -37,7 +40,7 @@ define(
             },
 
             cancel: function() {
-                this.leave_editor();
+                this.forest_view.hide_divmodal();
             },
 
             preview: function(evt) {
@@ -60,10 +63,10 @@ define(
                 }
             },
 
-            leave_editor: function() {
-                this.$el.remove();
-                this.forest_view.node_view(this.node.get('slug'));
-            },
+            // leave_editor: function() {
+            //     this.$el.remove();
+            //     this.forest_view.node_view(this.node.get('slug'));
+            // },
 
             save: function() {
                 this.node.set('name', this.$el.find('input[name=name]').val());

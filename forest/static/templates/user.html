@@ -1,106 +1,105 @@
-<div class="modal_content">
 
-  <% if(user.get('username')) { %>
+<% if(user.get('username')) { %>
 
-  <div class="settings_title dash_underline">Settings</div>
+<div class="settings_title dash_underline">Settings</div>
 
-  <div class="user_info_row">
-    <div class="user_info_label">
-      Username
-    </div>
-    <div class="user_info_block">
-      <%= user.get('username') %>
-    </div>
+<div class="user_info_row">
+  <div class="user_info_label">
+    Username
   </div>
-
-  <div class="user_info_row">
-    <div class="user_info_label">
-      Last Login
-    </div>
-    <div class="user_info_block">
-      <%= user.get('last_login') %>
-    </div>
+  <div class="user_info_block">
+    <%= user.get('username') %>
   </div>
+</div>
 
-  <div class="user_info_row">
-    <div class="user_info_label">
-      Name
-    </div>
-    <div class="user_info_block">
-      <input type=text name=first_name value="<%= user.get('first_name') %>"><br>
-      <input type=text name=last_name value="<%= user.get('last_name') %>">
-    </div>
+<div class="user_info_row">
+  <div class="user_info_label">
+    Last Login
   </div>
-
-  <div class="user_info_row">
-    <div class="user_info_label">
-      Email
-    </div>
-    <div class="user_info_block">
-      <input type=text name=email value="<%= user.get('email') %>">
-    </div>
+  <div class="user_info_block">
+    <%= user.get('last_login') %>
   </div>
+</div>
 
-  <div class="user_info_row">
-    <div class="user_info_label">
-      Password
-    </div>
-    <div class="user_info_block">
-        <input type=password name=chg_password><br>
-        <input type=password name=chg_password_confirm><span id="pword_small">(confirm)</span>
-    </div>
+<div class="user_info_row">
+  <div class="user_info_label">
+    Name
   </div>
-
-  <div class="user_info_row">
-    <div class="user_info_label">
-      Connections
-    </div>
-    <div class="user_info_block">
-
-      <% if(user.get('google_uid')) { %>
-      Connected to Google user <%= user.get('google_uid') %>
-
-      <%  if(user.get('has_password')) { %>
-      <form method="post" action="<%= social_oauth_links.disconnect_google %>">
-        <input name=csrfmiddlewaretoken value="<%= fglobals.csrf_token %>" type=hidden>
-        <input type=submit value="Disconnect">
-      </form><br>
-      <%  } else { %>
-      <div class="disconnect_password_warning">You cannot disconnect until you set a password.</div>
-      <%  } %>
-
-      <% } else { %>
-
-      <a href="<%= social_oauth_links.connect_google %>">
-        Connect to Google
-      </a><br>
-
-      <% } %>
-
-      <% if(user.get('facebook_uid')) { %>
-      Connected to Facebook
-
-      <% if(user.get('has_password')) { %>
-      <form method="post" action="<%= social_oauth_links.disconnect_facebook %>">
-        <input name=csrfmiddlewaretoken value="<%= fglobals.csrf_token %>" type=hidden>
-        <input type=submit value="Disconnect">
-      </form><br>
-      <% } else { %>
-      <div class="disconnect_password_warning">You cannot disconnect until you set a password.</div>
-      <% } %>
-
-      <% } else { %>
-
-      <a href="<%= social_oauth_links.connect_facebook %>">
-        Connect to Facebook
-      </a><br>
-
-      <% } %>
-
-    </div>
+  <div class="user_info_block">
+    <input type=text name=first_name value="<%= user.get('first_name') %>"><br>
+    <input type=text name=last_name value="<%= user.get('last_name') %>">
   </div>
+</div>
 
-  <div class="cleardiv">
+<div class="user_info_row">
+  <div class="user_info_label">
+    Email
+  </div>
+  <div class="user_info_block">
+    <input type=text name=email value="<%= user.get('email') %>">
+  </div>
+</div>
+
+<div class="user_info_row">
+  <div class="user_info_label">
+    Password
+  </div>
+  <div class="user_info_block">
+    <input type=password name=chg_password><br>
+    <input type=password name=chg_password_confirm><span id="pword_small">(confirm)</span>
+  </div>
+</div>
+
+<div class="user_info_row">
+  <div class="user_info_label">
+    Connections
+  </div>
+  <div class="user_info_block">
+
+    <% if(user.get('google_uid')) { %>
+    Connected to Google user <%= user.get('google_uid') %>
+
+    <%  if(user.get('has_password')) { %>
+    <form method="post" action="<%= social_oauth_links.disconnect_google %>">
+      <input name=csrfmiddlewaretoken value="<%= fglobals.csrf_token %>" type=hidden>
+      <input type=submit value="Disconnect">
+    </form><br>
+    <%  } else { %>
+    <div class="disconnect_password_warning">You cannot disconnect until you set a password.</div>
+    <%  } %>
+
+    <% } else { %>
+
+    <a href="<%= social_oauth_links.connect_google %>">
+      Connect to Google
+    </a><br>
+
+    <% } %>
+
+    <% if(user.get('facebook_uid')) { %>
+    Connected to Facebook
+
+    <% if(user.get('has_password')) { %>
+    <form method="post" action="<%= social_oauth_links.disconnect_facebook %>">
+      <input name=csrfmiddlewaretoken value="<%= fglobals.csrf_token %>" type=hidden>
+      <input type=submit value="Disconnect">
+    </form><br>
+    <% } else { %>
+    <div class="disconnect_password_warning">You cannot disconnect until you set a password.</div>
+    <% } %>
+
+    <% } else { %>
+
+    <a href="<%= social_oauth_links.connect_facebook %>">
+      Connect to Facebook
+    </a><br>
+
+    <% } %>
+
+  </div>
+</div>
+
+<div class="cleardiv">
 
   <div class="user_info_row save_row">
     <div id="user_form_result" class="error"></div>
@@ -109,88 +108,87 @@
 
   <div class="cleardiv">
 
-  <% } else { %>
+    <% } else { %>
 
-  <div>In order to modify content, you must log in.</div>
+    <div>In order to modify content, you must log in.</div>
 
-  <div class="login_form">
-    Username / email<br>
-    <input type=text name=username class="login_input"><br>
-    Password<br>
-    <input type=password name=password class="login_input"><br>
-    <button id="login_button" class="wide_button">Login</button>
+    <div class="login_form">
+      Username / email<br>
+      <input type=text name=username class="login_input"><br>
+      Password<br>
+      <input type=password name=password class="login_input"><br>
+      <button id="login_button" class="wide_button">Login</button>
 
-    <div id="login_error"></div>
-  </div>
-
-  <div id="user_create">
-    Create new account
-  </div>
-
-  <div id="user_create_form">
-
-    <div class="settings_title">Create User</div>
-
-    <div id="create_form_instructions">
-      An email will be sent to the specified address to validate your account.  Check your spam folder.
+      <div id="login_error"></div>
     </div>
 
-    <div class="user_info_row">
-      <div class="user_info_label">
-        Username
-      </div>
-      <div class="user_info_block">
-        <input type=hidden name=create_recaptcha_token>
-        <input type=text name=create_username value="">
-      </div>
+    <div id="user_create">
+      Create new account
     </div>
 
-    <div class="user_info_row">
-      <div class="user_info_label">
-        Email
+    <div id="user_create_form">
+
+      <div class="settings_title">Create User</div>
+
+      <div id="create_form_instructions">
+        An email will be sent to the specified address to validate your account.  Check your spam folder.
       </div>
-      <div class="user_info_block">
-        <input type=text name=create_email value="">
+
+      <div class="user_info_row">
+        <div class="user_info_label">
+          Username
+        </div>
+        <div class="user_info_block">
+          <input type=hidden name=create_recaptcha_token>
+          <input type=text name=create_username value="">
+        </div>
       </div>
+
+      <div class="user_info_row">
+        <div class="user_info_label">
+          Email
+        </div>
+        <div class="user_info_block">
+          <input type=text name=create_email value="">
+        </div>
+      </div>
+
+      <div class="user_info_row">
+        <div class="user_info_label">
+          Password
+        </div>
+        <div class="user_info_block">
+          <input type=password name=create_password value=""><br>
+          <input type=password name=create_password_confirm value=""><span id="pword_small">(confirm)</span>
+        </div>
+      </div>
+
+      <div class="cleardiv"></div>
+
+      <div class="user_info_row save_row">
+        <div id="user_create_form_result"></div>
+        <button id="user_create_form_save">Create User</button>
+      </div>
+
     </div>
 
-    <div class="user_info_row">
-      <div class="user_info_label">
-        Password
-      </div>
-      <div class="user_info_block">
-        <input type=password name=create_password value=""><br>
-        <input type=password name=create_password_confirm value=""><span id="pword_small">(confirm)</span>
-      </div>
+    <div>
+      <p>You may also log in with these services:</p>
+    </div>
+
+    <div class="login_oauth_link">
+      <a href="<%= social_oauth_links.connect_google %>">
+        <img width=191 src="/static/btn_google_signin_dark_normal_web.png">
+      </a>
+    </div>
+
+    <div class="login_oauth_link">
+      <a href="<%= social_oauth_links.connect_facebook %>">
+        <img width=212 src="/static/facebook-sign-in-button-png-26.png">
+      </a>
     </div>
 
     <div class="cleardiv"></div>
 
-    <div class="user_info_row save_row">
-      <div id="user_create_form_result"></div>
-      <button id="user_create_form_save">Create User</button>
-    </div>
+    <% } %>
 
-  </div>
-
-  <div>
-    <p>You may also log in with these services:</p>
-  </div>
-
-  <div class="login_oauth_link">
-    <a href="<%= social_oauth_links.connect_google %>">
-      <img width=191 src="/static/btn_google_signin_dark_normal_web.png">
-    </a>
-  </div>
-
-  <div class="login_oauth_link">
-    <a href="<%= social_oauth_links.connect_facebook %>">
-      <img width=212 src="/static/facebook-sign-in-button-png-26.png">
-    </a>
-  </div>
-
-  <div class="cleardiv"></div>
-
-  <% } %>
-
-</div>

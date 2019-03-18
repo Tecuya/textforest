@@ -25,6 +25,8 @@ define(
                 'prompt': 'input#prompt',
                 'text_area': 'div#text_area',
                 'divmodal': 'div#modal',
+                'divmodal_user': 'div#modal_user',
+                'divmodal_node_edit': 'div#modal_node_edit',
                 'notifications': 'div#notifications'
             },
 
@@ -51,7 +53,7 @@ define(
             render: function() {
                 this.$el.html(this.template({ user: this.user }));
 
-                this.user_view.setElement(this.$el.find('div#modal'));
+                this.user_view.setElement(this.$el.find(this.elements.divmodal_user));
 
                 this.choices_view.setElement(this.$el.find('div#choices'));
 
@@ -67,6 +69,9 @@ define(
 
                     this.manage_content_view.setElement(this.$el.find('div#manage_content'));
                     this.manage_content_view.render();
+
+                    this.node_edit_view = new NodeEditView({ forest_view: this });
+                    this.node_edit_view.setElement(this.$el.find(this.elements.divmodal_node_edit));
                 }
 
                 this.focus_prompt();
@@ -88,22 +93,22 @@ define(
 
             user_link: function() {
 
-                if (this.$el.find(this.elements.divmodal).is(':visible')) {
-                    this.hide_divmodal();
-                    return;
-                }
+                // if (this.$el.find(this.elements.divmodal_user).is(':visible')) {
+                //     this.hide_divmodal(this.divmodal_user);
+                //     return;
+                // }
 
                 var self = this;
                 if (this.user.get('username')) {
                     this.user.fetch({
                         success: function() {
                             self.user_view.render();
-                            self.show_divmodal();
+                            self.show_divmodal(self.elements.divmodal_user);
                         }
                     });
                 } else {
                     this.user_view.render();
-                    this.show_divmodal();
+                    this.show_divmodal(this.elements.divmodal_user);
                 }
             },
 
@@ -119,8 +124,10 @@ define(
                 });
             },
 
-            show_divmodal: function() {
+            show_divmodal: function(innerdiv) {
                 this.$el.find(this.elements.divmodal).show();
+                this.$el.find(this.elements.divmodal).find('div.modal_content').hide();
+                this.$el.find(this.elements.divmodal).find(innerdiv).show();
             },
 
             hide_divmodal: function() {
@@ -140,8 +147,8 @@ define(
             },
 
             click_divmodal: function(evt) {
-                if ($(evt.target).attr('id') == 'modal') {
-                    this.hide_divmodal();
+                if ($(evt.target).hasClass('modal')) {
+                    this.hide_divmodal(this.divmodal_user);
                 }
             },
 
@@ -518,7 +525,7 @@ define(
             requires_login: function(callable) {
                 if (!this.user.get('username')) {
                     this.user_view.render();
-                    this.show_divmodal();
+                    this.show_divmodal(this.divmodal_user);
                 } else {
                     callable();
                 }
@@ -608,40 +615,10 @@ define(
                 this.refresh_current_node();
             },
 
-            node_edit: function(slug) {
-                var self = this;
-
-                this.requires_login(
-                    function() {
-
-                        if (slug) {
-                            self.current_node.set('slug', slug);
-                        }
-
-                        self.current_node.fetch(
-                            {
-                                success: function() {
-
-                                    if (self.current_node.get('author') != self.user.get('username')) {
-                                        self.add_error('You cannot edit this because you do not own it.');
-                                        return;
-                                    }
-
-                                    // create new nodeview and render (appends to text_area)
-                                    var node_edit = new NodeEditView({ node: self.current_node, forest_view: self });
-                                    var node_div = $(document.createElement('DIV')).attr('class', 'node_edit');
-                                    self.$el.find(self.elements.text_area).append(node_div);
-                                    node_edit.setElement(node_div);
-                                    node_edit.render();
-                                    self.scroll_bottom();
-
-                                    self.update_choices();
-                                },
-                                error: function(col, resp) { self.add_error(resp.responseText); }
-                            }
-                        );
-                    }
-                );
+            node_edit: function(node) {
+                this.node_edit_view.set_node(node);
+                this.node_edit_view.render();
+                this.show_divmodal(this.elements.divmodal_node_edit);
             }
         });
     }

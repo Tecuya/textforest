@@ -42,6 +42,8 @@ define(
             },
 
             click_view_node: function(evt) {
+                evt.stopPropagation();
+
                 var slug = $(evt.target).closest('tr').data('slug').toString();
                 Backbone.history.navigate('/f/' + slug, true);
             },
@@ -49,6 +51,11 @@ define(
             click_edit_node: function(evt) {
                 evt.stopPropagation();
 
+                var slug = $(evt.target).closest('tr').data('slug').toString();
+
+                var node = this.nodes_collection.findWhere({ slug: slug });
+
+                this.forest_view.node_edit(node);
             },
 
             click_delete_node: function(evt) {
