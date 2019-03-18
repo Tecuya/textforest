@@ -1,11 +1,11 @@
 define(
     ['jquery', 'underscore', 'backbone',
-        'models/user', 'models/node', 'models/relation', 'models/item',
-        'collections/notifications', 'collections/relations',
-        'views/statusbar', 'views/user', 'views/choices', 'views/node', 'views/node_edit', 'views/notifications', 'views/inventory',
-        'util/fetch_completions', 'tpl!templates/forest', 'tpl!templates/command_history'],
+        'js/models/user', 'js/models/node', 'js/models/relation', 'js/models/item',
+        'js/collections/notifications', 'js/collections/relations',
+        'js/views/statusbar', 'js/views/user', 'js/views/choices', 'js/views/node', 'js/views/node_edit', 'js/views/notifications', 'js/views/inventory', 'js/views/manage_content',
+        'js/util/fetch_completions', 'tpl!templates/forest', 'tpl!templates/command_history'],
     function($, _, Backbone, User, Node, Relation, Item, Notifications, Relations, StatusBarView, UserView, ChoicesView,
-        NodeView, NodeEditView, NotificationsView, InventoryView, fetch_completions, foresttpl, commandhistorytpl) {
+        NodeView, NodeEditView, NotificationsView, InventoryView, ManageContentView, fetch_completions, foresttpl, commandhistorytpl) {
 
         var global = this;
 
@@ -43,6 +43,7 @@ define(
                 this.statusbar_view = new StatusBarView({ forest_view: this, user: this.user });
                 this.notifications_view = new NotificationsView({ forest_view: this, user: this.user, notifications_collection: this.notifications_collection });
                 this.inventory_view = new InventoryView({ forest_view: this, user: this.user });
+                this.manage_content_view = new ManageContentView({ forest_view: this });
 
                 this.node_counter = 0;
             },
@@ -57,16 +58,25 @@ define(
                 this.statusbar_view.setElement(this.$el.find('div#status_bar'));
                 this.statusbar_view.render();
 
-                this.notifications_view.setElement(this.$el.find('div#notifications'));
-                this.refresh_notifications();
+                if (this.user.has('username')) {
+                    this.notifications_view.setElement(this.$el.find('div#notifications'));
+                    this.refresh_notifications();
 
-                this.inventory_view.setElement(this.$el.find('div#inventory'));
-                this.inventory_view.render();
+                    this.inventory_view.setElement(this.$el.find('div#inventory'));
+                    this.inventory_view.render();
+
+                    this.manage_content_view.setElement(this.$el.find('div#manage_content'));
+                    this.manage_content_view.render();
+                }
 
                 this.focus_prompt();
             },
 
             refresh_notifications: function() {
+                if (!this.user.has('username')) {
+                    return;
+                }
+
                 var self = this;
                 this.notifications_collection.fetch({
                     success: function() {
@@ -121,8 +131,7 @@ define(
                 var self = this;
                 this.user.login({
                     success: function() {
-                        self.statusbar_view.render();
-                        self.$el.find(this.elements.divmodal).hide();
+                        window.location.reload();
                     },
                     failure: function(error) {
                         self.user_view.set_error(error);

@@ -1,9 +1,13 @@
-define(['backbone', 'models/node'], function(Backbone, node) {
+define(['backbone', 'js/models/node'], function(Backbone, node) {
     return Backbone.Collection.extend({
         model: node,
 
         url: function() {
-            return '/xhr/nodes_for_text/' + escape(this.text);
+            if (this.text) {
+                return '/xhr/nodes_for_text/' + escape(this.text);
+            }
+
+            return '/xhr/nodes_for_user';
         }
     });
 });

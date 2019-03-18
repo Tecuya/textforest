@@ -36,6 +36,12 @@ textarea {
   padding: 8px;
 }
 
+select {
+  background-color: #777;
+  color: white;
+  font-size: 13pt;
+}
+
 input {
   background-color: #777;
   color: white;
@@ -258,7 +264,6 @@ div#status_bar {
   left: 0;
   width: 100%;
   background-color: black;
-  border-top: solid #444 2px;
 }
 
 div#login_status_info {
@@ -441,14 +446,16 @@ div.delete_confirm_choice {
   color: #eee;
 }
 
-div#notifications {
+div.drawer {
   position: fixed;
   z-index: 100;
-  bottom: 24;
-  left: 65%;
-  width: 35%;
+  bottom: 21;
+  left: 55%;
+  width: 44%;
+  right: 1%;
   background-color: black;
   border-top: solid #444 2px;
+  padding: 8px;
   display: none;
 }
 
@@ -468,17 +475,6 @@ div#notification_clear_all {
   cursor: pointer;
   text-decoration: underline;
   float: right;
-}
-
-div#inventory {
-  position: fixed;
-  z-index: 100;
-  bottom: 24;
-  left: 65%;
-  width: 35%;
-  background-color: black;
-  border-top: solid #444 2px;
-  display: none;
 }
 
 span.inventory_drop {
@@ -585,4 +581,46 @@ span.required_item {
 div.requires_unowned_item span.required_item {
   text-decoration: none;
   color: #d55;
+}
+
+div#manage_content {
+  border-top: solid #444 1px;
+  border-left: solid #444 1px;
+  border-right: solid #444 1px;
+  border-radius: 8px 8px 0px 0px;
+}
+
+div.drawer_tab {
+  float: left;
+  border-top: solid #444 1px;
+  border-left: solid #444 1px;
+  border-right: solid #444 1px;
+  border-radius: 8px 8px 0px 0px;
+  padding: 5px;
+  cursor: pointer;
+  color: #aaa;
+}
+
+div.drawer_tab_active {
+  background-color: #111;
+  color: white;
+}
+
+div.manage_content_tab_area {
+  border: solid #444 1px;
+  display: none;
+  padding: 5px;
+  margin-bottom: 5px;
+}
+
+td.align_right {
+  text-align: right;
+}
+
+.red {
+  color: red;
+}
+
+tbody tr {
+  cursor: pointer;
 }

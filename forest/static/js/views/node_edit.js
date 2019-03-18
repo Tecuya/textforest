@@ -4,7 +4,7 @@ define(
         'backbone',
         'showdown',
         'put_cursor_at_end',
-        'models/node',
+        'js/models/node',
         'tpl!templates/node_edit'],
     function($, _, Backbone, showdown, put_cursor_at_end, Node, nodeedittpl) {
 

@@ -13,6 +13,7 @@ define(
                 'click div.sort_pref': 'sort',
                 'click div#notifications_link': 'notification_link',
                 'click div#inventory_link': 'inventory_link',
+                'click div#manage_content_link': 'manage_content_link',
                 'click div#notification_clear_all': 'notification_clear_all'
             },
 
@@ -93,6 +94,19 @@ define(
                     inventory_area.hide();
                 } else {
                     inventory_area.show();
+                }
+            },
+
+            manage_content_link: function() {
+
+                var manage_content_area = this.forest_view.$el.find('div#manage_content');
+                if (manage_content_area.is(':visible')) {
+                    manage_content_area.hide();
+                } else {
+                    manage_content_area.show();
+
+                    // when a table is drawn hidden, the columns get borked.  this forces it to recalc columns
+                    $('table').DataTable().columns.adjust();
                 }
             }
 

@@ -34,7 +34,7 @@ class Node(models.Model):
             'items': [ni.item.make_json_response_dict(user) for ni in self.nodeitem_set.all()]
         }
 
-        if user.is_active:
+        if user is not None and user.is_active:
             rdict['subscribed'] = len(self.subscription_set.filter(user=user)) > 0
 
         return rdict
@@ -57,6 +57,9 @@ class Relation(models.Model):
     parent = models.ForeignKey('Node', related_name='outbound_relations', on_delete=models.CASCADE)
     child = models.ForeignKey('Node', related_name='inbound_relations', on_delete=models.CASCADE)
 
+    repeatable = models.BooleanField(default=True)
+    hide_when_requirements_unmet = models.BooleanField(default=False)
+
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -66,7 +69,7 @@ class Relation(models.Model):
         self.vote = stats['vote']
         self.save()
 
-    def make_json_response_dict(self, user):
+    def make_json_response_dict(self, user=None):
         robj = {'text': self.text,
                 'slug': self.slug,
                 'parent': self.parent.slug,
@@ -77,14 +80,37 @@ class Relation(models.Model):
                 'vote': self.vote,
                 'created': self.created.strftime('%Y-%m-%d')}
 
-        if self.require_item is not None:
+        if user is not None and self.require_item is not None:
             robj['require_item'] = self.require_item.make_json_response_dict(user)
 
         return robj
 
     def __str__(self):
+
         return '{} > {} ({}) by {} {}'.format(
             self.parent, self.child, self.text[:20], self.author, self.created.strftime('%Y-%m-%d'))
+
+
+class RelationItem(models.Model):
+
+    INTERACTION_REQUIRE = 'require'
+    INTERACTION_CONSUME = 'consume'
+    INTERACTION_GIVE = 'give'
+
+    INTERACTIONS = (
+        (INTERACTION_REQUIRE, 'requires'),
+        (INTERACTION_CONSUME, 'consumes'),
+        (INTERACTION_GIVE, 'gives')
+    )
+
+    relation = models.ForeignKey(Relation, on_delete=models.CASCADE)
+
+    interaction = models.CharField(choices=INTERACTIONS, max_length=100)
+    quantity = models.IntegerField()
+    item = models.ForeignKey('Item', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '{} {} {}'.format(self.relation, self.interaction, self.quantity, self.item)
 
 
 class UserRelation(models.Model):

@@ -1,5 +1,5 @@
 define(
-    ['jquery', 'underscore', 'backbone', 'models/user', 'tpl!templates/user'],
+    ['jquery', 'underscore', 'backbone', 'js/models/user', 'tpl!templates/user'],
     function($, _, Backbone, User, usertpl) {
         return Backbone.View.extend({
             template: usertpl,

@@ -1,0 +1,31 @@
+<table data-scroll-y="400px" data-paging="false" class="hover">
+
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th data-class-name="dt-right">Created</th>
+      <th data-orderable="false" data-class-name="dt-right">Actions</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% _.each(items.models, function(item, idx) {  %>
+    <tr>
+      <td><%= item.get('name') %></td>
+      <td><%= item.get('created') %></td>
+      <td>
+
+        👁
+
+        🖉
+
+        ❌
+
+      </td>
+    </tr>
+    <% }) %>
+  </tbody>
+
+</table>
+
+

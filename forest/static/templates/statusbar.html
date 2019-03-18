@@ -23,15 +23,15 @@
 
   <div class="status_info clickable" id="logout_link">Logout</div>
   <div class="status_info clickable" id="user_settings_link">Settings</div>
+  <div class="status_info clickable" id="manage_content_link">Manage Content</div>
 
   <div class="status_info">
-    Logged in as
+    | &nbsp; Logged in as
     <span class="clickable user_link" data-user-link="<%= user.get('username') %>" id="user_link"><%= user.get('username') %></span>
   </div>
 
-  <div id="notifications_link" class="status_info clickable">Notifications (<%= notifications.models.length %>)</div>
-
-  <div id="inventory_link" class="status_info clickable">Inventory (<%= user.get('items').length %>)</div>
+  <div class="status_info clickable" id="notifications_link" >Notifications (<%= notifications.models.length %>)</div>
+  <div class="status_info clickable" id="inventory_link">Inventory (<%= user.get('items').length %>)</div>
 
   <% } else { %>
 

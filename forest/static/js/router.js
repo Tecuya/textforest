@@ -1,5 +1,5 @@
 define(
-    ['jquery', 'underscore', 'backbone', 'views/node', 'views/node_edit'],
+    ['jquery', 'underscore', 'backbone', 'js/views/node', 'js/views/node_edit'],
     function($, _, Backbone, Node, NodeEdit) {
         return Backbone.Router.extend({
             routes: {

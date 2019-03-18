@@ -601,3 +601,33 @@ def node(request, slug=None):
         ctx['userobj'] = '{}'
 
     return render(request, 'forest.html', ctx)
+
+
+def xhr_nodes_for_user(request):
+
+    if not request.user.is_active:
+        return HttpResponseForbidden('You are not logged in')
+
+    return JsonResponse(
+        [n.make_json_response_dict() for n in Node.objects.filter(author=request.user)],
+        safe=False)
+
+
+def xhr_items_for_user(request):
+
+    if not request.user.is_active:
+        return HttpResponseForbidden('You are not logged in')
+
+    return JsonResponse(
+        [i.make_json_response_dict() for i in Item.objects.filter(author=request.user)],
+        safe=False)
+
+
+def xhr_relations_for_user(request):
+
+    if not request.user.is_active:
+        return HttpResponseForbidden('You are not logged in')
+
+    return JsonResponse(
+        [r.make_json_response_dict() for r in Relation.objects.filter(author=request.user)],
+        safe=False)

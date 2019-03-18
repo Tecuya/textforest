@@ -1,4 +1,4 @@
-define(['backbone', 'models/notification'], function(Backbone, notification) {
+define(['backbone', 'js/models/notification'], function(Backbone, notification) {
     return Backbone.Collection.extend({
 
         model: notification,

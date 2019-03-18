@@ -3,8 +3,8 @@ define(
         'underscore',
         'backbone',
         'put_cursor_at_end',
-        'views/node_list',
-        'views/item_list',
+        'js/views/node_list',
+        'js/views/item_list',
         'tpl!templates/choices'],
     function($, _, Backbone, put_cursor_at_end, NodeList, ItemList, relationslisttpl) {
         return Backbone.View.extend({

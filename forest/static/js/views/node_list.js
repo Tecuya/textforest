@@ -3,8 +3,8 @@ define(
         'underscore',
         'backbone',
         'put_cursor_at_end',
-        'util/fetch_completions',
-        'collections/nodes',
+        'js/util/fetch_completions',
+        'js/collections/nodes',
         'tpl!templates/node_list'],
     function($, _, Backbone, put_cursor_at_end, fetch_completions, Nodes, nodelisttpl) {
 

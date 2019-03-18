@@ -3,7 +3,7 @@ define(
         'underscore',
         'backbone',
         'showdown',
-        'models/node',
+        'js/models/node',
         'tpl!templates/node'],
     function($, _, Backbone, showdown, Node, nodetpl) {
         return Backbone.View.extend({

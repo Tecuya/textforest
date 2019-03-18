@@ -33,7 +33,9 @@ urlpatterns = [
     path('xhr/items_for_text/<text>', forest.views.xhr_items_for_text, name='xhr_items_for_text'),
     path('xhr/item_by_slug', forest.views.xhr_item_by_slug, name='xhr_item_by_slug'),
     path('xhr/item_by_slug/<slug>', forest.views.xhr_item_by_slug, name='xhr_item_by_slug'),
-
+    path('xhr/nodes_for_user', forest.views.xhr_nodes_for_user, name='xhr_nodes_for_user'),
+    path('xhr/items_for_user', forest.views.xhr_items_for_user, name='xhr_items_for_user'),
+    path('xhr/relations_for_user', forest.views.xhr_relations_for_user, name='xhr_relations_for_user'),
     path('xhr/subscribe/<slug>', forest.views.xhr_subscribe, name='xhr_subscribe'),
     path('xhr/unsubscribe/<slug>', forest.views.xhr_unsubscribe, name='xhr_unsubscribe'),
 

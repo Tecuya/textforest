@@ -1,4 +1,4 @@
-define(['backbone', 'models/item'], function(Backbone, Item) {
+define(['backbone', 'js/models/item'], function(Backbone, Item) {
     return Backbone.Model.extend({
         idAttribute: 'username',
         url: function() {

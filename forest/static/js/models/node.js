@@ -1,4 +1,4 @@
-define(['backbone', 'models/item'], function(Backbone, Item) {
+define(['backbone', 'js/models/item'], function(Backbone, Item) {
 
     return Backbone.Model.extend({
 
@@ -9,7 +9,7 @@ define(['backbone', 'models/item'], function(Backbone, Item) {
         },
 
         url: function() {
-            if (this.get('slug')) {
+            if (this.has('slug')) {
                 return '/xhr/node_by_slug/' + escape(this.get('slug'));
             } else {
                 if (this.get('direction') == 'backward') {
