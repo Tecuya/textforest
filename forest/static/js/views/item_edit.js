@@ -25,7 +25,7 @@ define(
             events: {
                 'click button#item_edit_save': 'save',
                 'click button#item_edit_preview': 'preview',
-                'click button#item_edit_cancel': 'cancel',
+                'click button#item_edit_cancel': 'cancel'
             },
 
             template: itemedittpl,
@@ -33,7 +33,9 @@ define(
             initialize: function(options) {
                 this.forest_view = options.forest_view;
                 this.nodes_collection = new Nodes();
-                this.node_selector = new NodeSelector({ forest_view: this.forest_view });
+                this.node_selector = new NodeSelector({
+                    forest_view: this.forest_view
+                });
             },
 
             set_item: function(item) {
@@ -41,27 +43,18 @@ define(
             },
 
             render: function() {
-                var self = this;
-
                 this.$el.html(this.template({ item: this.item }));
 
                 this.$el.find(this.elements.name_input).val(this.item.get('name')).focus();
 
                 this.node_selector.setElement(this.$el.find('div#item_dest_widget'));
-                this.node_selector.render();
+                this.node_selector.inline_create_options = {
+                    title: 'Create Description Node for Item "' + this.item.get('name') + '"',
+                    return_to_divmodal: this.forest_view.elements.divmodal_item_edit
+                };
 
-                var slug = this.item.get('description_node');
-                if (slug) {
-                    var node = new Node({ slug: slug });
-                    node.fetch({
-                        success: function() {
-                            self.node_selector.select_node(node);
-                        },
-                        error: function(xhr, err) {
-                            self.forest_view.add_error(err.responseText);
-                        }
-                    });
-                }
+                this.node_selector.render();
+                this.node_selector.prime_from_slug(this.item.get('description_node'));
 
                 this.$el.find(this.elements.max_quantity_input).val(this.item.get('max_quantity'));
                 this.$el.find(this.elements.droppable_checkbox).prop('checked', this.item.get('droppable'));
@@ -74,11 +67,10 @@ define(
 
             save: function() {
                 this.item.set('name', this.$el.find(this.elements.name_input).val());
-
-                if (this.node_selector.selected_node) {
-                    this.item.set('description_node', this.node_selector.selected_node_slug);
+                var description_node = this.node_selector.get_selected_node();
+                if (description_node) {
+                    this.item.set('description_node', description_node.get('slug'));
                 }
-
                 this.item.set('max_quantity', this.$el.find(this.elements.max_quantity_input).val());
                 this.item.set('droppable', this.$el.find(this.elements.droppable_checkbox).is(':checked'));
                 this.item.set('public_can_give', this.$el.find(this.elements.public_can_give_checkbox).is(':checked'));

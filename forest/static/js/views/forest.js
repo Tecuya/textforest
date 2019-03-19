@@ -9,8 +9,6 @@ define(
         NodeView, NodeEditView, RelationEditView, ItemEditView, NotificationsView, InventoryView, ManageContentView,
         fetch_completions, foresttpl, commandhistorytpl) {
 
-        var global = this;
-
         return Backbone.View.extend({
 
             template: foresttpl,
@@ -133,9 +131,11 @@ define(
                 });
             },
 
-            show_divmodal: function(innerdiv) {
+            show_divmodal: function(innerdiv, dont_hide_others) {
                 this.$el.find(this.elements.divmodal).show();
-                this.$el.find(this.elements.divmodal).find('div.modal_content').hide();
+                if (!dont_hide_others) {
+                    this.$el.find(this.elements.divmodal).find('div.modal_content').hide();
+                }
                 this.$el.find(this.elements.divmodal).find(innerdiv).show();
             },
 
@@ -626,8 +626,23 @@ define(
 
             node_edit: function(node) {
                 this.node_edit_view.set_node(node);
-                this.node_edit_view.render();
+                this.node_edit_view.render('edit');
                 this.show_divmodal(this.elements.divmodal_node_edit);
+            },
+
+            node_inline_create: function(inline_create_options) {
+                var self = this;
+
+                this.show_divmodal(this.elements.divmodal_node_edit);
+
+                // wrap the callback in our own code to handle modal visibility
+                var callback_on_save = inline_create_options.callback_on_save;
+                inline_create_options.callback_on_save = function(created_node) {
+                    self.show_divmodal(inline_create_options.return_to_divmodal);
+                    callback_on_save(created_node);
+                };
+
+                this.node_edit_view.render('create', inline_create_options);
             },
 
             item_edit: function(item) {

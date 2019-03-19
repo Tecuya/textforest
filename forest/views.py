@@ -40,84 +40,69 @@ def uniqueify(model, slug):
     return new_slug
 
 
-def xhr_delete_relation(request, slug):
+# def xhr_create_relation(request):
 
-    if request.method == 'DELETE':
-        rqs = Relation.objects.filter(slug=slug)
-        if len(rqs) == 0:
-            return HttpResponseNotFound('No such relation')
+#     if not request.method == 'POST':
+#         return HttpResponseNotAllowed('POST only on this endpoint')
 
-        if not request.user == rqs[0].author:
-            return HttpResponseForbidden('This relation does not belong to you')
+#     if not request.user.is_active:
+#         return HttpResponseForbidden('You are not logged in')
 
-        rqs[0].delete()
+#     doc = ujson.loads(request.body)
 
-    return JsonResponse({}, safe=False)
+#     # resolve parent node
+#     nqs = Node.objects.filter(slug=doc['parent'])
+#     if len(nqs) == 0:
+#         return HttpResponseNotFound('No such parent')
 
+#     parent = nqs[0]
 
-def xhr_create_relation(request):
+#     if 'child' in doc:
+#         # if client specified a child slug it MUST be found or we fail
+#         nqs = Node.objects.filter(slug=doc['child'])
+#         if len(nqs) == 0:
+#             return HttpResponseNotFound('No such child')
 
-    if not request.method == 'POST':
-        return HttpResponseNotAllowed('POST only on this endpoint')
+#         child = nqs[0]
 
-    if not request.user.is_active:
-        return HttpResponseForbidden('You are not logged in')
+#     else:
+#         # if client did NOT specify a child slug we generate one
+#         # which MUST be unique, if we collide we try again
 
-    doc = ujson.loads(request.body)
+#         child = Node.objects.create(
+#             author=request.user,
+#             name=make_safe(doc['_new_node_name']),
+#             slug=uniqueify(Node, make_safe(slugify(doc['_new_node_name']))))
 
-    # resolve parent node
-    nqs = Node.objects.filter(slug=doc['parent'])
-    if len(nqs) == 0:
-        return HttpResponseNotFound('No such parent')
+#         Subscription.objects.create(
+#             user=request.user,
+#             node=child)
 
-    parent = nqs[0]
+#     robj = {
+#         'author': request.user,
+#         'slug': uniqueify(Relation, make_safe(slugify(doc['text']))),
+#         'parent': parent,
+#         'child': child,
+#         'text': make_safe(doc['text'])
+#     }
 
-    if 'child' in doc:
-        # if client specified a child slug it MUST be found or we fail
-        nqs = Node.objects.filter(slug=doc['child'])
-        if len(nqs) == 0:
-            return HttpResponseNotFound('No such child')
+#     if 'required_item' in doc:
+#         robj['require_item'] = Item.objects.get(slug=doc['required_item'])
 
-        child = nqs[0]
+#     relation = Relation.objects.create(**robj)
 
-    else:
-        # if client did NOT specify a child slug we generate one
-        # which MUST be unique, if we collide we try again
+#     for subscription in parent.subscription_set.exclude(user=request.user):
+#         Notification.objects.create(
+#             user=subscription.user,
+#             subscription=subscription,
+#             actor=request.user,
+#             node=parent,
+#             relation=relation,
+#             action=Notification.ACTION_CREATE)
 
-        child = Node.objects.create(
-            author=request.user,
-            name=make_safe(doc['_new_node_name']),
-            slug=uniqueify(Node, make_safe(slugify(doc['_new_node_name']))))
-
-        Subscription.objects.create(
-            user=request.user,
-            node=child)
-
-    robj = {
-        'author': request.user,
-        'slug': uniqueify(Relation, make_safe(slugify(doc['text']))),
-        'parent': parent,
-        'child': child,
-        'text': make_safe(doc['text'])
-    }
-
-    if 'required_item' in doc:
-        robj['require_item'] = Item.objects.get(slug=doc['required_item'])
-
-    relation = Relation.objects.create(**robj)
-
-    for subscription in parent.subscription_set.exclude(user=request.user):
-        Notification.objects.create(
-            user=subscription.user,
-            subscription=subscription,
-            actor=request.user,
-            node=parent,
-            relation=relation,
-            action=Notification.ACTION_CREATE)
-
-    return JsonResponse(
-        relation.make_json_response_dict(request.user),
-        safe=False)
+#     return JsonResponse(
+#         relation.make_json_response_dict(request.user),
+#         safe=False)
 
 
 def xhr_node_by_forward_relation_slug(request, slug):
@@ -152,9 +137,9 @@ def xhr_node_by_relation_slug(request, slug, direction):
     return JsonResponse(node.make_json_response_dict(request.user), safe=False)
 
 
-def xhr_node_by_slug(request, slug):
+def xhr_node_by_slug(request, slug=None):
 
-    is_user_page = len(slug) and slug[0] == '~'
+    is_user_page = slug is not None and len(slug) and slug[0] == '~'
 
     if is_user_page:
 
@@ -172,7 +157,7 @@ def xhr_node_by_slug(request, slug):
 
             Subscription.objects.create(user=user, node=node)
 
-    else:
+    elif slug is not None:
 
         nqs = Node.objects.filter(slug=slug)
         if nqs is None or len(nqs) == 0:
@@ -182,11 +167,16 @@ def xhr_node_by_slug(request, slug):
 
         node = nqs[0]
 
+    else:
+        node = Node(author=request.user)
+
     if request.method == 'POST' or request.method == 'PUT':
         doc = ujson.loads(request.body)
 
-        if node.author != request.user:
+        if node.author is not None and node.author != request.user:
             return HttpResponseForbidden('This node does not belong to you')
+
+        node.author = request.user
 
         if not is_user_page:
             node.name = make_safe(doc['name'])
@@ -360,18 +350,44 @@ def xhr_relation_by_slug(request, slug=None):
     if not request.user.is_active:
         return HttpResponseForbidden('You are not logged in')
 
-    if request.method == 'DELETE':
+    if slug is not None:
+        relation = Relation.objects.get(slug=slug)
 
-        relation = Relation.objects.get(author=request.user, slug=slug)
+    if request.method in ('PUT', 'POST'):
+        doc = ujson.loads(request.body)
 
-        if relation.author != request.user:
-            return HttpResponseForbidden('This item does not belong to you')
+        if relation.author is not None and relation.author != request.user:
+            return HttpResponseForbidden('This node does not belong to you')
 
-        relation.delete()
+        relation.author = request.user
+        relation.text = make_safe(doc['text'])
 
+        if request.method == 'POST':
+            relation.slug = uniqueify(Relation, make_safe(slugify('{} {}'.format(request.user.username, doc['text']))))
+
+        relation.parent = Node.objects.get(
+            Q(author=request.user) | Q(public_can_link=True),
+            slug=doc['parent'])
+
+        relation.child = Node.objects.get(
+            Q(author=request.user) | Q(public_can_link=True),
+            slug=doc['child'])
+
+        relation.only_discoverable_via_ac_x_chars = int(doc['only_discoverable_via_ac_x_chars'])
+
+        relation.repeatable = bool(doc['repeatable'])
+        relation.hide_when_requirements_unmet = bool(doc['hide_when_requirements_unmet'])
+        relation.only_visible_to_node_owner = bool(doc['only_visible_to_node_owner'])
+        relation.save()
+
+    elif request.method == 'DELETE':
+        relation = Relation.objects.filter(author=request.user, slug=slug).delete()
         return JsonResponse({}, safe=False)
 
-    return HttpResponseForbidden('unimp')
+    else:
+        return HttpResponseForbidden('unimp')
+
+    return JsonResponse(relation.make_json_response_dict(), safe=False)
 
 
 def xhr_item_by_slug(request, slug=None):
@@ -386,14 +402,15 @@ def xhr_item_by_slug(request, slug=None):
             item, created = Item.objects.get_or_create(author=request.user, name=doc['name'])
 
             if not created:
-                return HttpResponseForbidden('An item by this name already exists.')
+                return HttpResponseForbidden('An item by this name already exists for this user')
+
+            item.slug = uniqueify(Item, make_safe(slugify('{} {}'.format(request.user.username, doc['name']))))
 
         else:
 
             item = Item.objects.get(slug=slug)
             item.name = make_safe(doc['name'])
 
-        item.slug = uniqueify(Item, make_safe(slugify('{} {}'.format(request.user.username, doc['name']))))
         item.max_quantity = doc['max_quantity']
         item.droppable = doc['droppable']
         item.public_can_give = doc['public_can_give']
@@ -406,14 +423,7 @@ def xhr_item_by_slug(request, slug=None):
         item.save()
 
     elif request.method == 'DELETE':
-
-        item = Item.objects.get(author=request.user, slug=slug)
-
-        if item.author != request.user:
-            return HttpResponseForbidden('This item does not belong to you')
-
-        item.delete()
-
+        item = Item.objects.filter(author=request.user, slug=slug).delete()
         return JsonResponse({}, safe=False)
 
     else:

@@ -4,7 +4,7 @@ define(['backbone', 'js/models/item'], function(Backbone, Item) {
         idAttribute: 'slug',
         url: function() {
             if (this.get('slug')) {
-                return '/xhr/delete_relation/' + escape(this.get('slug'));
+                return '/xhr/relation_by_slug/' + escape(this.get('slug'));
             } else {
                 return '/xhr/create_relation';
             }

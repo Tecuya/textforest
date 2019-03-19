@@ -10,7 +10,7 @@ define(
             template: nodelisttpl,
 
             events: {
-                'click div.node_list_item': 'click_list'
+                'click div.list_item': 'click_list'
             },
 
             initialize: function(options) {

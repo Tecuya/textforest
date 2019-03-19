@@ -20,10 +20,9 @@ urlpatterns = [
 
     path('xhr/notifications', forest.views.xhr_notifications, name='xhr_notifications'),
     path('xhr/notification/<notification_id>', forest.views.xhr_notification, name='xhr_notifications'),
-    path('xhr/delete_relation/<slug>', forest.views.xhr_delete_relation, name='xhr_delete_relation'),
-    path('xhr/create_relation', forest.views.xhr_create_relation, name='xhr_create_relation'),
     path('xhr/node_by_forward_relation_slug/<slug>', forest.views.xhr_node_by_forward_relation_slug, name='xhr_node_by_forward_relation_slug'),
     path('xhr/node_by_backward_relation_slug/<slug>', forest.views.xhr_node_by_backward_relation_slug, name='xhr_node_by_backward_relation_slug'),
+    path('xhr/node_by_slug', forest.views.xhr_node_by_slug, name='xhr_node_by_slug'),
     path('xhr/node_by_slug/<slug>', forest.views.xhr_node_by_slug, name='xhr_node_by_slug'),
     path('xhr/nodes_for_text/<text>', forest.views.xhr_nodes_for_text, name='xhr_nodes_for_text'),
     path('xhr/relations_for_parent_node/<slug>', forest.views.xhr_relations_for_parent_node, name='xhr_relations_for_parent_node'),

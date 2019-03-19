@@ -1,7 +1,13 @@
-<div class="modal_title dash_underline">Node Edit</div>
+<div class="modal_title dash_underline">
+  <% if(inline_options && inline_options.title) { %>
+  <%= inline_options.title %>
+  <% } else { %>
+  <% if(mode == 'edit') { %>Edit<% } else { %>Create<% } %> Node
+  <% } %>
+</div>
 
 <div class="editbox">
-  <input class="node_edit_title" id="node_name_input" type=text <% if(node.get('slug').substring(0, 1) == '~') { %>disabled<% } %>>
+  <input class="node_edit_title" id="node_name_input" type=text <% if(mode == 'edit' && node.get('slug').substring(0, 1) == '~') { %>disabled<% } %>>
 </div>
 
 <div class="editbox">

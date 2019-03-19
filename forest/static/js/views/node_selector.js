@@ -3,12 +3,13 @@ define(
         'underscore',
         'backbone',
         'put_cursor_at_end',
+        'js/models/node',
         'js/collections/nodes',
         'js/views/node_list',
         'js/util/fetch_completions',
         'tpl!templates/node_selector'],
 
-    function($, _, Backbone, put_cursor_at_end, Nodes, NodeList, fetch_completions, nodeselectortpl) {
+    function($, _, Backbone, put_cursor_at_end, Node, Nodes, NodeList, fetch_completions, nodeselectortpl) {
         return Backbone.View.extend({
 
             elements: {
@@ -24,7 +25,7 @@ define(
 
             events: {
                 'keyup input.node_selector_input': 'keyup_input_node',
-                'click div.node_selector_selection_string': 'click_change_selection'
+                'click div.node_selector_selection_string': 'click_change_selection',
             },
 
             template: nodeselectortpl,
@@ -37,6 +38,7 @@ define(
                     nodes_collection: this.nodes_collection,
                     on_click_list_item: function(slug) { self.click_list_item(slug); }
                 });
+                this.selected_node = undefined;
             },
 
             render: function() {
@@ -49,6 +51,7 @@ define(
 
                 var input_contents = this.$el.find(self.elements.input).val();
                 if (input_contents.length < 2) {
+                    this.$el.find(this.elements.node_selector_list).hide();
                     return;
                 }
 
@@ -71,6 +74,7 @@ define(
                                         if (self.$el.find(self.elements.selection_div).is(':visible')) {
                                             return;
                                         }
+                                        self.$el.find(self.elements.node_selector_list).show();
                                         self.node_list_view.render();
                                     },
                                     error: function(col, err) { self.forest_view.add_error(err.responseText); }
@@ -80,7 +84,23 @@ define(
             },
 
             click_list_item: function(slug) {
-                this.select_node(this.nodes_collection.findWhere({ 'slug': slug }));
+                var self = this;
+
+                if (slug) {
+                    this.select_node(this.nodes_collection.findWhere({ 'slug': slug }));
+                } else {
+                    this.$el.find(this.elements.node_selector_list).hide();
+
+                    Object.assign(
+                        this.inline_create_options,
+                        {
+                            callback_on_save: function(created_node) { self.select_node(created_node); },
+                            initial_name: this.$el.find(this.elements.input).val()
+                        }
+                    );
+
+                    this.forest_view.node_inline_create(this.inline_create_options);
+                }
             },
 
             select_node: function(node) {
@@ -94,11 +114,32 @@ define(
 
             click_change_selection: function() {
 
+                this.selected_node = undefined;
+
                 this.$el.find(this.elements.input).show().putCursorAtEnd().focus();
                 this.keyup_input_node();
 
                 this.$el.find(this.elements.node_selector_list).show();
                 this.$el.find(this.elements.selection_div).hide();
+            },
+
+            get_selected_node: function() {
+                return this.selected_node;
+            },
+
+            prime_from_slug: function(slug) {
+                var self = this;
+                if (slug) {
+                    var node = new Node({ slug: slug });
+                    node.fetch({
+                        success: function() {
+                            self.select_node(node);
+                        },
+                        error: function(xhr, err) {
+                            self.forest_view.add_error(err.responseText);
+                        }
+                    });
+                }
             }
         });
     }

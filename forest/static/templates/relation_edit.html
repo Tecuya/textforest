@@ -5,24 +5,50 @@
 </div>
 
 <div class="form_widget">
-  <input class="relation_edit_input" type=text size=80 value="<%= relation.get('text') %>">
+  <input id="relation_edit_text" class="relation_edit_input" type=text size=80>
+</div>
+
+<div class="form_text">
+  Source:
+</div>
+
+<div class="form_widget" id="relation_node_select_source">
 </div>
 
 <div class="form_text">
   Destination:
 </div>
 
-<div class="form_widget">
-  <input class="relation_edit_input" type=text size=80 value="<%= relation.get('') %>">
+<div class="form_widget" id="relation_node_select_dest">
 </div>
 
 <div class="form_text">
-  Require item:
+  Only discoverable with this many chars:<br>
+  <small>0 = unlimited</small>
+</div>
+<div class="form_widget">
+  <input id="relation_edit_only_discoverable_via_ac_x_chars" type=text>
 </div>
 
+<div class="form_text">
+  Repeatable:
+</div>
 <div class="form_widget">
-  <input class="relation_create_input" id="relation_create_require_item" name=require_item type=text placeholder=" (No item required)" size=80>
-  <div id="require_item_list"></div>
+  <input id="relation_edit_repeatable" type=checkbox>
+</div>
+
+<div class="form_text">
+  Hide when requirements unmet:
+</div>
+<div class="form_widget">
+  <input id="relation_edit_hide_when_requirements_unmet" type=checkbox>
+</div>
+
+<div class="form_text">
+  Only visible to node owner:
+</div>
+<div class="form_widget">
+  <input id="relation_edit_only_visible_to_node_owner" type=checkbox>
 </div>
 
 <div class="cleardiv">

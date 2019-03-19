@@ -95,10 +95,6 @@ div.list_item_backward {
   background-color: #111;
 }
 
-div.branch_create {
-  background-color: #000;
-}
-
 div.actionlink {
   font-size: 11pt;
   text-decoration: underline;
@@ -536,9 +532,9 @@ div.create_form {
 
 div.form_text {
   clear: left;
-  width: 10em;
+  width: 20em;
   float: left;
-  height: 1.5em;
+  padding: 4px;
 }
 
 div.form_widget {
@@ -650,4 +646,12 @@ div.node_selector_list {
 
 div.node_selector_selection {
   display: none;
+}
+
+input.bigger {
+  width: 300px;
+}
+
+div.node_create {
+  background-color: #000;
 }

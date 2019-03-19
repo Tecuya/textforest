@@ -51,8 +51,6 @@ class Node(models.Model):
 class Relation(models.Model):
     author = models.ForeignKey(User, on_delete=models.PROTECT)
 
-    require_item = models.ForeignKey('Item', on_delete=models.CASCADE, blank=True, null=True, default=None)
-
     views = models.IntegerField(default=0)
     vote = models.IntegerField(default=0)
 
@@ -62,8 +60,11 @@ class Relation(models.Model):
     parent = models.ForeignKey('Node', related_name='outbound_relations', on_delete=models.CASCADE)
     child = models.ForeignKey('Node', related_name='inbound_relations', on_delete=models.CASCADE)
 
-    repeatable = models.BooleanField(default=True)
+    only_discoverable_via_ac_x_chars = models.IntegerField(default=0)
+
+    repeatable = models.BooleanField(default=False)
     hide_when_requirements_unmet = models.BooleanField(default=False)
+    only_visible_to_node_owner = models.BooleanField(default=False)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -83,10 +84,11 @@ class Relation(models.Model):
                 'author': self.author.username,
                 'views': self.views,
                 'vote': self.vote,
+                'only_discoverable_via_ac_x_chars': self.only_discoverable_via_ac_x_chars,
+                'repeatable': self.repeatable,
+                'hide_when_requirements_unmet': self.hide_when_requirements_unmet,
+                'only_visible_to_node_owner': self.only_visible_to_node_owner,
                 'created': self.created.strftime('%Y-%m-%d')}
-
-        if user is not None and self.require_item is not None:
-            robj['require_item'] = self.require_item.make_json_response_dict(user)
 
         return robj
 
