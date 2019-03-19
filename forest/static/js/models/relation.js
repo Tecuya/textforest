@@ -1,4 +1,4 @@
-define(['backbone', 'js/models/item'], function(Backbone, Item) {
+define(['backbone', 'js/models/relationitem'], function(Backbone, RelationItem) {
 
     return Backbone.Model.extend({
         idAttribute: 'slug',
@@ -11,17 +11,19 @@ define(['backbone', 'js/models/item'], function(Backbone, Item) {
         },
 
         parse: function(response, options) {
-            if (response['require_item']) {
-                var i = response['require_item'];
+            var relationitems = [];
+            _.each(response['relationitems'], function(relationitem, idx) {
+                relationitems.push(
+                    new RelationItem(
+                        {
+                            interaction: relationitem['interaction'],
+                            quantity: relationitem['quantity'],
+                            item: relationitem['item']
+                        })
+                );
+            });
 
-                response['require_item'] = new Item({
-                    name: i['name'],
-                    slug: i['slug'],
-                    author: i['author'],
-                    created: i['created'],
-                    owned: i['owned']
-                });
-            }
+            response['relationitems'] = relationitems;
             return response;
         }
     });

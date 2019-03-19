@@ -8,6 +8,10 @@ define(['backbone', 'js/models/item'], function(Backbone, item) {
             } else {
                 return '/xhr/items_for_user';
             }
+        },
+
+        set_search_text: function(text) {
+            this.text = text;
         }
     });
 });

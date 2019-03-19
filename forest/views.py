@@ -13,7 +13,7 @@ from django.db.models import Q
 from django_registration.backends.activation.views import RegistrationView
 from social_django.models import UserSocialAuth
 
-from .models import UserItem, Item, Node, NodeItem, Relation, UserRelation, Subscription, Notification
+from .models import UserItem, Item, Node, NodeItem, Relation, RelationItem, UserRelation, Subscription, Notification
 
 from slugify import slugify
 
@@ -378,6 +378,18 @@ def xhr_relation_by_slug(request, slug=None):
         relation.repeatable = bool(doc['repeatable'])
         relation.hide_when_requirements_unmet = bool(doc['hide_when_requirements_unmet'])
         relation.only_visible_to_node_owner = bool(doc['only_visible_to_node_owner'])
+
+        relation.relationitem_set.all().delete()
+
+        for ri in doc['relationitems']:
+            RelationItem.objects.create(
+                relation=relation,
+                interaction=ri['interaction'],
+                quantity=int(ri['quantity']),
+                item=Item.objects.get(
+                    Q(author=request.user) | Q(public_can_link=True),
+                    slug=ri['item']))
+
         relation.save()
 
     elif request.method == 'DELETE':
@@ -411,9 +423,9 @@ def xhr_item_by_slug(request, slug=None):
             item = Item.objects.get(slug=slug)
             item.name = make_safe(doc['name'])
 
-        item.max_quantity = doc['max_quantity']
+        item.max_quantity = bool(doc['max_quantity'])
         item.droppable = doc['droppable']
-        item.public_can_give = doc['public_can_give']
+        item.public_can_link = doc['public_can_link']
 
         if 'description_node' in doc and len(doc['description_node']) > 0:
             item.description_node = Node.objects.get(
@@ -427,7 +439,7 @@ def xhr_item_by_slug(request, slug=None):
         return JsonResponse({}, safe=False)
 
     else:
-        return HttpResponseForbidden('unimp')
+        item = Item.objects.get(slug=slug)
 
     return JsonResponse(item.make_json_response_dict(), safe=False)
 

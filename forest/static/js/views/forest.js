@@ -645,15 +645,30 @@ define(
                 this.node_edit_view.render('create', inline_create_options);
             },
 
+            item_inline_create: function(inline_options) {
+                var self = this;
+
+                this.show_divmodal(this.elements.divmodal_item_edit);
+
+                // wrap the callback in our own code to handle modal visibility
+                var callback_on_save = inline_options.callback_on_save;
+                inline_options.callback_on_save = function(created_node) {
+                    self.show_divmodal(inline_options.return_to_divmodal);
+                    callback_on_save(created_node);
+                };
+
+                this.item_edit_view.render('create', inline_options);
+            },
+
             item_edit: function(item) {
                 this.item_edit_view.set_item(item);
-                this.item_edit_view.render();
+                this.item_edit_view.render('edit');
                 this.show_divmodal(this.elements.divmodal_item_edit);
             },
 
             relation_edit: function(relation) {
                 this.relation_edit_view.set_relation(relation);
-                this.relation_edit_view.render();
+                this.relation_edit_view.render('edit');
                 this.show_divmodal(this.elements.divmodal_relation_edit);
             }
         });

@@ -13,7 +13,7 @@ class Node(models.Model):
     public_can_link = models.BooleanField(default=True)
 
     name = models.CharField(max_length=255)
-    slug = models.CharField(max_length=255, default='')
+    slug = models.CharField(max_length=255, default='', unique=True)
     text = models.TextField(default='')
 
     def find_last_branching_node(self):
@@ -54,7 +54,7 @@ class Relation(models.Model):
     views = models.IntegerField(default=0)
     vote = models.IntegerField(default=0)
 
-    slug = models.CharField(max_length=255, default='')
+    slug = models.CharField(max_length=255, default='', unique=True)
     text = models.TextField(default='')
 
     parent = models.ForeignKey('Node', related_name='outbound_relations', on_delete=models.CASCADE)
@@ -88,7 +88,8 @@ class Relation(models.Model):
                 'repeatable': self.repeatable,
                 'hide_when_requirements_unmet': self.hide_when_requirements_unmet,
                 'only_visible_to_node_owner': self.only_visible_to_node_owner,
-                'created': self.created.strftime('%Y-%m-%d')}
+                'created': self.created.strftime('%Y-%m-%d'),
+                'relationitems': [ri.make_json_response_dict(user) for ri in self.relationitem_set.all()]}
 
         return robj
 
@@ -115,6 +116,13 @@ class RelationItem(models.Model):
     interaction = models.CharField(choices=INTERACTIONS, max_length=100)
     quantity = models.IntegerField()
     item = models.ForeignKey('Item', on_delete=models.CASCADE)
+
+    def make_json_response_dict(self, user):
+        return {
+            'interaction': self.interaction,
+            'quantity': self.quantity,
+            'item': self.item.slug
+        }
 
     def __str__(self):
         return '{} {} {}'.format(self.relation, self.interaction, self.quantity, self.item)
@@ -214,13 +222,13 @@ class Item(models.Model):
 
     author = models.ForeignKey(User, on_delete=models.PROTECT)
     name = models.CharField(max_length=255)
-    slug = models.CharField(max_length=255, default='')
+    slug = models.CharField(max_length=255, default='', unique=True)
 
     description_node = models.ForeignKey(Node, blank=True, null=True, default=None, on_delete=models.PROTECT)
 
     max_quantity = models.IntegerField(default=0)
     droppable = models.BooleanField(default=True)
-    public_can_give = models.BooleanField(default=True)
+    public_can_link = models.BooleanField(default=True)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -235,7 +243,7 @@ class Item(models.Model):
                  'description_node': self.description_node.slug if self.description_node is not None else None,
                  'max_quantity': self.max_quantity,
                  'droppable': self.droppable,
-                 'public_can_give': self.public_can_give,
+                 'public_can_link': self.public_can_link,
                  'created': self.created.strftime('%Y-%m-%d')}
 
         if user is not None and not user.is_anonymous and user.is_active:

@@ -2,34 +2,34 @@ define(
     ['jquery',
         'underscore',
         'backbone',
-        'js/models/node',
-        'js/collections/nodes',
+        'js/models/item',
+        'js/collections/items',
         'js/views/model_selector'],
 
-    function($, _, Backbone, Node, Nodes, ModelSelector) {
+    function($, _, Backbone, Item, Items, ModelSelector) {
         return ModelSelector.extend({
 
             initialize: function(options) {
-                options.collection = new Nodes();
+                options.collection = new Items();
                 ModelSelector.prototype.initialize.call(this, options);
             },
 
-            select_model: function(node) {
-                ModelSelector.prototype.select_model.call(this, node);
-                this.$el.find(this.elements.input).val(node.get('name'));
+            select_model: function(item) {
+                ModelSelector.prototype.select_model.call(this, item);
+                // this.$el.find(this.elements.input).val(item.get('name')).hide();
             },
 
             perform_creation: function(inline_create_options) {
-                this.forest_view.node_inline_create(inline_create_options);
+                this.forest_view.item_inline_create(inline_create_options);
             },
 
             prime_from_slug: function(slug) {
                 var self = this;
                 if (slug) {
-                    var node = new Node({ slug: slug });
-                    node.fetch({
+                    var item = new Item({ slug: slug });
+                    item.fetch({
                         success: function() {
-                            self.select_model(node);
+                            self.select_model(item);
                         },
                         error: function(xhr, err) {
                             self.forest_view.add_error(err.responseText);

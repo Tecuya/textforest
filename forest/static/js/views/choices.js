@@ -3,10 +3,10 @@ define(
         'underscore',
         'backbone',
         'put_cursor_at_end',
-        'js/views/node_list',
+        'js/views/model_selector_list',
         'js/views/item_list',
         'tpl!templates/choices'],
-    function($, _, Backbone, put_cursor_at_end, NodeList, ItemList, relationslisttpl) {
+    function($, _, Backbone, put_cursor_at_end, ModelList, ItemList, relationslisttpl) {
         return Backbone.View.extend({
 
             template: relationslisttpl,
@@ -40,7 +40,7 @@ define(
 
                 this.forest_view = options.forest_view;
                 this.relations_collection = options.relations_collection;
-                this.node_list_view = new NodeList({ forest_view: this.forest_view, choices_view: this });
+                this.node_list_view = new ModelList({ forest_view: this.forest_view, choices_view: this });
 
                 this.require_item_list_view = new ItemList({
                     forest_view: this.forest_view,

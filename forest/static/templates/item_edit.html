@@ -1,4 +1,10 @@
-<div class="modal_title dash_underline">Edit Item</div>
+<div class="modal_title dash_underline">
+  <% if(inline_options && inline_options.title) { %>
+  <%= inline_options.title %>
+  <% } else { %>
+  <% if(mode == 'edit') { %>Edit<% } else { %>Create<% } %> Item
+  <% } %>
+</div>
 
 <div class="form_text">
   Name:
@@ -14,7 +20,8 @@
 </div>
 
 <div class="form_text">
-  Max Quantity:
+  Max Quantity in Inventory:<br>
+  <small>0 = unlimited</small>
 </div>
 <div class="form_widget">
   <input type=text id="item_max_quantity_input">
@@ -28,10 +35,10 @@
 </div>
 
 <div class="form_text">
-  Public can give:
+  Public can use:
 </div>
 <div class="form_widget">
-  <input type=checkbox id="item_public_can_give_checkbox">
+  <input type=checkbox id="item_public_can_link_checkbox">
 </div>
 
 <div class="cleardiv">
