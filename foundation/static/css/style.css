@@ -275,6 +275,7 @@ div#modal_relation_edit {
 }
 
 div#modal_item_edit {
+  width: 700px;
   display: inline-block;
 }
 
@@ -556,10 +557,6 @@ input.relation_edit_input {
   background-color: #000;
 }
 
-div.node_list_item {
-  background-color: #111;
-}
-
 div.footnote {
   font-size: 10pt;
 }
@@ -640,4 +637,17 @@ td.align_right {
 
 tbody tr {
   cursor: pointer;
+}
+
+div.node_selector_list {
+  border: solid white 2px;
+  border-radius: 7px;
+  background-color: #222;
+  position: fixed;
+  overflow: auto;
+  max-height: 200px;
+}
+
+div.node_selector_selection {
+  display: none;
 }

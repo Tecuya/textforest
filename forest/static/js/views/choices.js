@@ -279,7 +279,7 @@ define(
             },
 
             update_dest_node_list: function() {
-                this.node_list_view.update_text(this.$el.find('input#relation_create_dest').val());
+                // this.node_list_view.update_text(this.$el.find('input#relation_create_dest').val());
             },
 
             update_require_item_list: function() {

@@ -5,8 +5,11 @@ define(
         'showdown',
         'put_cursor_at_end',
         'js/models/item',
+        'js/models/node',
+        'js/collections/nodes',
+        'js/views/node_selector',
         'tpl!templates/item_edit'],
-    function($, _, Backbone, showdown, put_cursor_at_end, Item, itemedittpl) {
+    function($, _, Backbone, showdown, put_cursor_at_end, Item, Node, Nodes, NodeSelector, itemedittpl) {
 
         return Backbone.View.extend({
 
@@ -22,13 +25,15 @@ define(
             events: {
                 'click button#item_edit_save': 'save',
                 'click button#item_edit_preview': 'preview',
-                'click button#item_edit_cancel': 'cancel'
+                'click button#item_edit_cancel': 'cancel',
             },
 
             template: itemedittpl,
 
             initialize: function(options) {
                 this.forest_view = options.forest_view;
+                this.nodes_collection = new Nodes();
+                this.node_selector = new NodeSelector({ forest_view: this.forest_view });
             },
 
             set_item: function(item) {
@@ -36,15 +41,26 @@ define(
             },
 
             render: function() {
+                var self = this;
+
                 this.$el.html(this.template({ item: this.item }));
 
                 this.$el.find(this.elements.name_input).val(this.item.get('name')).focus();
 
-                if (this.item.get('description_node')) {
+                this.node_selector.setElement(this.$el.find('div#item_dest_widget'));
+                this.node_selector.render();
 
-                    // slug is a stand-in until it looks up the real node
-                    this.$el.find(this.elements.dest_widget).html(this.item.get('description_node'));
-
+                var slug = this.item.get('description_node');
+                if (slug) {
+                    var node = new Node({ slug: slug });
+                    node.fetch({
+                        success: function() {
+                            self.node_selector.select_node(node);
+                        },
+                        error: function(xhr, err) {
+                            self.forest_view.add_error(err.responseText);
+                        }
+                    });
                 }
 
                 this.$el.find(this.elements.max_quantity_input).val(this.item.get('max_quantity'));
@@ -59,7 +75,9 @@ define(
             save: function() {
                 this.item.set('name', this.$el.find(this.elements.name_input).val());
 
-                // TODO description node here
+                if (this.node_selector.selected_node) {
+                    this.item.set('description_node', this.node_selector.selected_node_slug);
+                }
 
                 this.item.set('max_quantity', this.$el.find(this.elements.max_quantity_input).val());
                 this.item.set('droppable', this.$el.find(this.elements.droppable_checkbox).is(':checked'));

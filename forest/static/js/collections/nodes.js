@@ -8,6 +8,10 @@ define(['backbone', 'js/models/node'], function(Backbone, node) {
             }
 
             return '/xhr/nodes_for_user';
+        },
+
+        set_search_text: function(text) {
+            this.text = text;
         }
     });
 });

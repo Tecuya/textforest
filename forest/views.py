@@ -8,6 +8,7 @@ from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.models import User
 from django.middleware.csrf import get_token
 from django.conf import settings
+from django.db.models import Q
 
 from django_registration.backends.activation.views import RegistrationView
 from social_django.models import UserSocialAuth
@@ -378,17 +379,30 @@ def xhr_item_by_slug(request, slug=None):
     if not request.user.is_active:
         return HttpResponseForbidden('You are not logged in')
 
-    if request.method == 'POST':
+    if request.method in ('POST', 'PUT'):
         doc = ujson.loads(request.body)
 
-        item, created = Item.objects.get_or_create(
-            author=request.user,
-            name=doc['name'])
+        if request.method == 'POST':
+            item, created = Item.objects.get_or_create(author=request.user, name=doc['name'])
 
-        if not created:
-            return HttpResponseForbidden('An item by this name already exists.')
+            if not created:
+                return HttpResponseForbidden('An item by this name already exists.')
+
+        else:
+
+            item = Item.objects.get(slug=slug)
+            item.name = make_safe(doc['name'])
 
         item.slug = uniqueify(Item, make_safe(slugify('{} {}'.format(request.user.username, doc['name']))))
+        item.max_quantity = doc['max_quantity']
+        item.droppable = doc['droppable']
+        item.public_can_give = doc['public_can_give']
+
+        if 'description_node' in doc and len(doc['description_node']) > 0:
+            item.description_node = Node.objects.get(
+                Q(author=request.user) | Q(public_can_link=True),
+                slug=doc['description_node'])
+
         item.save()
 
     elif request.method == 'DELETE':
