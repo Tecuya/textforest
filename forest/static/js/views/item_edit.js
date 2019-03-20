@@ -94,6 +94,16 @@ define(
                     {},
                     {
                         success: function() {
+
+                            self.forest_view.user.fetch({
+                                success: function() {
+                                    self.forest_view.inventory_view.render();
+                                },
+                                error: function(xhr, resp) {
+                                    self.forest_view.add_error(resp.responseText);
+                                }
+                            });
+
                             if (self.callback_on_save) {
                                 self.callback_on_save(self.item);
                             } else {

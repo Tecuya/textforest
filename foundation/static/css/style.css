@@ -68,27 +68,27 @@ input#prompt {
 }
 
 div.list_item {
-  border: 2px solid white;
+  border: 2px solid #888;
   border-radius: 2px;
-  background-color: #222;
+  background-color: #111;
   padding: 5px;
   margin-bottom: 2px;
   font-family: monospace;
+  cursor: pointer;
 }
 
 div.list_item:hover {
-  background-color: #777;
-  cursor: pointer;
+  background-color: #333;
+  color: white;
 }
 
 div.list_item:focus {
-  background-color: #555;
-  cursor: pointer;
+  border: solid #559 2px;
 }
 
 div.visited_relation {
-  background-color: #1e1e1e;
-  color: #888;
+  background-color: #111;
+  color: #aaa;
 }
 
 div.list_item_backward {
@@ -217,7 +217,7 @@ div.error {
   font-weight: bold;
 }
 
-div.delete_list_item {
+div.list_item_modify_link {
   text-decoration: underline;
   cursor: pointer;
   font-weight: bold;
@@ -488,22 +488,25 @@ div#notification_clear_all {
   float: right;
 }
 
-span.inventory_drop {
-  cursor: pointer;
-  float: right;
-  padding-right: 8px;
+div.inventory_item {
+  margin: 5px;
+  height: 1.4em;
+}
+
+div.inventory_label {
+  float: left;
+  width: 6em;
+}
+
+div.inventory_item_desc {
+  float: left;
+  clear: right;
 }
 
 div#inventory_clear_all {
   cursor: pointer;
   text-decoration: underline;
   float: right;
-}
-
-div.inventory_item {
-  border: solid #444 1px;
-  padding: 2px;
-  margin: 5px;
 }
 
 
@@ -570,10 +573,6 @@ div.info_message {
   color: #ada;
 }
 
-div.requires_unowned_item {
-  text-decoration: line-through;
-}
-
 div.drawer_close_button {
   float: left;
   display: inline-block;
@@ -581,16 +580,20 @@ div.drawer_close_button {
   text-decoration: underline;
 }
 
-span.required_item {
+span.choice_relationitem {
   font-size: 8pt;
   color: #ada;
-  display: inline-block;
-  margin-left: 10px;
+  margin-left: 2px;
 }
 
-div.requires_unowned_item span.required_item {
-  text-decoration: none;
-  color: #d55;
+span.choice_relation_not_repeatable {
+  font-size: 8pt;
+  color: orange;
+  margin-left: 2px;
+}
+
+span.choice_relationitem_cannot_repeat {
+  text-decoration: line-through;
 }
 
 div#manage_content {
@@ -682,4 +685,14 @@ div.relationitem_remove {
 
 div.relation_edit_item_interaction {
   clear: both;
+}
+
+input.inventory_quantity_edit {
+  background-color: #000;
+  display: none;
+}
+
+div.inventory_quantity_complaint {
+  color: red;
+  font-size: 8pt;
 }

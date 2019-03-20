@@ -181,7 +181,7 @@ define(
                     // enter
                     if (prompt_contents == '/edit') {
                         this.log_command(prompt_contents);
-                        this.node_edit();
+                        this.node_edit(this.current_node);
 
                     } else if (prompt_contents == '/delete') {
                         this.log_command(prompt_contents);
@@ -233,15 +233,8 @@ define(
                 var selected_relation = this.relations_collection.findWhere({ 'slug': slug });
 
                 if (selected_relation) {
-
-                    if (selected_relation.get('direction') == 'forward' && selected_relation.get('require_item') && !selected_relation.get('require_item').get('owned')) {
-                        this.log_command(selected_relation.get('text'));
-                        this.add_error('You lack the required item "' + selected_relation.get('require_item').get('name') + '"');
-                        return;
-                    }
-
                     this.$el.find(this.elements.text_area).append(commandhistorytpl({ command: selected_relation.get('text') }));
-                    this.node_view_for_relation(selected_relation.get('slug'), backward);
+                    this.node_view_for_relation(selected_relation, backward);
                 }
             },
 
@@ -279,12 +272,22 @@ define(
                 }
             },
 
+            relation_edit: function(relation) {
+                this.relation_edit_view.set_relation(relation);
+                this.relation_edit_view.render('edit');
+                this.show_divmodal(this.elements.divmodal_relation_edit);
+            },
+
+            edit_relation: function(slug) {
+                var selected_relation = this.relations_collection.findWhere({ 'slug': slug });
+                if (selected_relation) {
+                    this.relation_edit(selected_relation);
+                }
+            },
 
             delete_relation: function(slug) {
                 var self = this;
-
                 var selected_relation = this.relations_collection.findWhere({ 'slug': slug });
-
                 if (selected_relation) {
 
                     this.requires_login(
@@ -375,10 +378,11 @@ define(
             },
 
             update_current_node: function() {
-                this.view_current_node();
+                // this.view_current_node();
                 this.update_choices();
                 this.refresh_notifications();
                 this.inventory_view.render();
+                this.focus_prompt();
             },
 
             update_choices: function() {
@@ -392,24 +396,47 @@ define(
                 this.choices_view.render();
             },
 
-            refresh_current_node: function() {
-                var self = this;
-                this.current_node.fetch({
-                    success: function() { self.update_current_node(); },
-                    error: function(col, resp) { self.add_error(resp.responseText); }
-                });
-            },
-
-            node_view_for_relation: function(relation_slug, backward) {
+            node_view_for_relation: function(relation, backward) {
                 var self = this;
 
+                var original_node_slug = this.current_node.get('slug');
+
+                // this is the fetch that actually applies relationitems..
                 this.current_node = new Node({
                     direction: backward ? 'backward' : 'forward',
-                    relation_slug: relation_slug
+                    relation_slug: relation.get('slug')
                 });
                 this.current_node.fetch({
                     success: function() {
+                        if(relation.get('relationitems').length > 0) {
+                            self.user.fetch({
+                                success: function() {
+
+                                    if(relation.get('repeatable') || !relation.get('visited')) {
+                                        _.each(relation.get('relationitems'), function(ri, idx) {
+                                            if(ri.get('interaction') == 'give') {
+                                                self.add_info_message('You receive '+ri.get('quantity')+' '+ri.get('item').get('name'));
+                                            } else if(ri.get('interaction') == 'consume') {
+                                                self.add_info_message('You lose '+ri.get('quantity')+' '+ri.get('item').get('name'));
+                                            }
+                                        });
+                                    } else if(!relation.get('repeatable') && relation.get('relationitems').length > 0) {
+                                        self.add_info_message('Item interactions skipped because this choice is not repeatable.');
+                                    }
+
+                                    self.statusbar_view.render();
+                                    if(self.inventory_view.$el.is(':visible')) {
+                                        self.inventory_view.render();
+                                    }
+                                },
+                                error: function(col, resp) { self.add_error(resp.responseText); }
+                            });
+                        }
                         self.update_current_node();
+                        // we are already there.  what matters is that we applied the relationitems
+                        if(original_node_slug != relation.get('child')) {
+                            self.view_current_node();
+                        }
                         Backbone.history.navigate('/f/' + self.current_node.get('slug'));
                     },
                     error: function(col, resp) { self.add_error(resp.responseText); }
@@ -417,14 +444,15 @@ define(
             },
 
             node_view: function(slug) {
+                var self = this;
                 this.current_node = new Node({ slug: slug });
-                this.refresh_current_node();
-            },
-
-            node_edit: function(node) {
-                this.node_edit_view.set_node(node);
-                this.node_edit_view.render('edit');
-                this.show_divmodal(this.elements.divmodal_node_edit);
+                this.current_node.fetch({
+                    success: function() {
+                        self.update_current_node();
+                        self.view_current_node();
+                    },
+                    error: function(col, resp) { self.add_error(resp.responseText); }
+                });
             },
 
             node_inline_create: function(inline_create_options) {
@@ -442,6 +470,12 @@ define(
                 this.node_edit_view.render('create', inline_create_options);
             },
 
+            item_edit: function(item) {
+                this.item_edit_view.set_item(item);
+                this.item_edit_view.render('edit');
+                this.show_divmodal(this.elements.divmodal_item_edit);
+            },
+
             item_inline_create: function(inline_options) {
                 var self = this;
 
@@ -457,19 +491,7 @@ define(
                 this.item_edit_view.render('create', inline_options);
             },
 
-            item_edit: function(item) {
-                this.item_edit_view.set_item(item);
-                this.item_edit_view.render('edit');
-                this.show_divmodal(this.elements.divmodal_item_edit);
-            },
-
-            relation_edit: function(relation) {
-                this.relation_edit_view.set_relation(relation);
-                this.relation_edit_view.render('edit');
-                this.show_divmodal(this.elements.divmodal_relation_edit);
-            },
-
-            relation_create: function() {
+            relation_inline_create: function() {
                 var self = this;
                 this.relation_edit_view.render(
                     'create',
@@ -483,7 +505,42 @@ define(
                     });
 
                 this.show_divmodal(this.elements.divmodal_relation_edit);
+            },
+
+            node_edit: function(node) {
+                var self = this;
+                this.node_edit_view.set_node(node);
+                this.node_edit_view.render(
+                    'edit',
+                    {
+                        callback_on_save: function() {
+                            self.update_current_node();
+                            self.hide_divmodal();
+                        }
+                    });
+
+                this.show_divmodal(this.elements.divmodal_node_edit);
+            },
+
+            node_delete: function(node) {
+                var self = this;
+
+                var deleting_current_node = node.get('slug') == self.current_node.get('slug');
+
+                node.destroy({
+                    success: function() {
+                        if(deleting_current_node) {
+
+                            // if we deleted the node we are actually on, go home
+                            Backbone.history.navigate('/f/home', true);
+
+                        } else {
+                            self.update_current_node();
+                        }
+                    }
+                });
             }
+
         });
     }
 );

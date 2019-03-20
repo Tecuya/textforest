@@ -45,16 +45,18 @@ define(
                     inline_options: inline_options
                 }));
 
+                if (inline_options) {
+                    if (inline_options.initial_name) {
+                        this.$el.find(this.elements.name_input).val(inline_options.initial_name);
+                    }
+                    this.callback_on_save = inline_options.callback_on_save;
+                }
+
                 if (mode == 'edit') {
                     this.$el.find(this.elements.name_input).val(this.node.get('name'));
                     this.$el.find(this.elements.text_textarea).val(this.node.get('text'));
                     this.$el.find(this.elements.backward_relation_checkbox).prop('checked', this.node.get('show_backward_relations'));
                     this.$el.find(this.elements.public_can_link_checkbox).prop('checked', this.node.get('public_can_link'));
-                }
-
-                if (inline_options) {
-                    this.$el.find(this.elements.name_input).val(inline_options.initial_name);
-                    this.callback_on_save = inline_options.callback_on_save;
                 }
 
                 this.$el.find(this.elements.name_input).focus();

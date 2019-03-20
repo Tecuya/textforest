@@ -83,6 +83,7 @@ class Relation(models.Model):
                 'author': self.author.username,
                 'views': self.views,
                 'vote': self.vote,
+                'visited': len(self.userrelation_set.all()) > 0,
                 'only_discoverable_via_ac_x_chars': self.only_discoverable_via_ac_x_chars,
                 'repeatable': self.repeatable,
                 'hide_when_requirements_unmet': self.hide_when_requirements_unmet,
@@ -120,7 +121,7 @@ class RelationItem(models.Model):
         return {
             'interaction': self.interaction,
             'quantity': self.quantity,
-            'item': self.item.slug
+            'item': self.item.make_json_response_dict()
         }
 
     def __str__(self):
@@ -136,13 +137,48 @@ class UserRelation(models.Model):
     @staticmethod
     def handle_user_action(user, relation, vote=None):
 
+        fails = []
+        ui_modified = False
+
         user_relation, created = UserRelation.objects.get_or_create(user=user, relation=relation)
+
+        if created or relation.repeatable:
+
+            for ri in RelationItem.objects.filter(relation=relation):
+                if ri.interaction in ('require', 'consume'):
+
+                    uiqs = ri.item.useritem_set.all()
+                    if len(uiqs) < 1:
+                        fails.append('You need {} "{}" but you have none.'.format(ri.quantity, ri.item))
+                        continue
+
+                    ui = uiqs[0]
+
+                    if ui.quantity < ri.quantity:
+                        fails.append('You need {} "{}" but you only have {}.'.format(ri.quantity, ri.item, ui.quantity))
+
+                    elif ri.interaction == 'consume':
+                        ui.quantity -= ri.quantity
+                        ui_modified = True
+
+                elif ri.interaction == 'give':
+                    ui, created = UserItem.objects.get_or_create(user=user, item=ri.item)
+                    ui.quantity += ri.quantity
+                    ui_modified = True
+
+                if ui_modified:
+                    ui.save()
+
+        if len(fails) > 0:
+            return False, ' '.join(fails)
 
         if vote is not None:
             user_relation.vote += 1
             user_relation.save()
 
         relation.update_user_relations()
+
+        return True, ''
 
     def __str__(self):
         return '{} followed {} and voted {}'.format(self.user, self.relation, self.vote)
@@ -231,9 +267,6 @@ class Item(models.Model):
                  'public_can_link': self.public_can_link,
                  'created': self.created.strftime('%Y-%m-%d')}
 
-        if user is not None and not user.is_anonymous and user.is_active:
-            rdict['owned'] = len(user.useritem_set.filter(item=self)) > 0
-
         return rdict
 
     def __str__(self):
@@ -252,6 +285,14 @@ class UserItem(models.Model):
 
     class Meta:
         unique_together = ('user', 'item')
+
+    def make_json_response_dict(self):
+        return {
+            'id': self.id,
+            'item': self.item.make_json_response_dict(),
+            'quantity': self.quantity,
+            'created': self.created.strftime('%Y-%m-%d')
+        }
 
     def __str__(self):
         return '{} owns {}'.format(self.user, self.item)

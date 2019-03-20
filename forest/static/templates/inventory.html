@@ -1,20 +1,53 @@
 <div class="title">Inventory</div>
 
-<% if(inventory.length == 0) { %>
-<div class="inventory_item">
-  (Your inventory is empty)
-</div>
-<% } %>
+<table data-scroll-y="400px" data-paging="false" class="hover">
+  <thead>
+    <tr>
+      <th>Item</th>
+      <th>Author</th>
+      <th data-class-name="dt-right">Quantity</th>
+      <th data-class-name="dt-right">Date Acquired</th>
+      <th data-orderable="false" data-class-name="dt-right">Actions</th>
+    </tr>
+  </thead>
 
-<% _.each(inventory, function(item, idx) { %>
-<div class="inventory_item">
+  <tbody>
+    <% _.each(inventory, function(useritem, idx) { %>
+    <tr data-id="<%= useritem.get('id') %>">
+      <td><%= useritem.get('item').get('name') %></td>
+      <td><%= useritem.get('item').get('author') %></td>
+      <td>
+        <div class="clickable inventory_quantity">
+          <%= useritem.get('quantity') %>
 
-  "<%= item.get('name') %>" by <%= item.get('author') %> <%= item.get('created') %>
+          <% if(useritem.get('item').get('max_quantity') > 0) { %>
+          / <%= useritem.get('item').get('max_quantity') %>
+          <% } %>
 
-  <span class="inventory_drop" data-drop-item-id="<%= item.get('slug') %>">❌</span>
+        </div>
+        <input class="inventory_quantity_edit" size=9 value="<%= parseInt(useritem.get('quantity')) %>">
+        <div class="inventory_quantity_complaint"></div>
+        <% if(!useritem.get('item').get('droppable')) { %><small>(undroppable)</small><% } %>
+      </td>
+      <td><%= useritem.get('created') %></td>
+      <td>
 
-</div>
-<% }) %>
+        <% if(useritem.get('item').get('description_node')) { %>
+        <span class="clickable inventory_view">👁</span>
+        <% } %>
+
+        <% if(useritem.get('item').get('author') == username) { %>
+        <span class="clickable inventory_edit">🖉</span>
+        <% } %>
+
+        <% if(useritem.get('item').get('droppable') || useritem.get('item').get('author') == username) { %>
+        <span class="clickable inventory_drop">❌</span>
+        <% } %>
+
+      </td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
 
 <div class="drawer_close_button">Close</div>
-<div class="clickable" id="inventory_clear_all">Drop all</div>

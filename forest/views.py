@@ -52,7 +52,12 @@ def xhr_node_by_relation_slug(request, slug, direction):
 
     if request.user.is_active:
         r = Relation.objects.get(slug=slug)
-        UserRelation.handle_user_action(request.user, r)
+
+        allow, reason = UserRelation.handle_user_action(request.user, r)
+
+        if not allow:
+            return HttpResponseForbidden('You lack necessary items: ' + reason)
+
         if direction == 'forward':
             nqs = Node.objects.filter(inbound_relations=r)
         else:
@@ -232,9 +237,6 @@ def xhr_relations(request, slug, text=None):
             reldict = r.make_json_response_dict(request.user)
             reldict['direction'] = direction
 
-            if request.user.is_active:
-                reldict['visited'] = len(r.userrelation_set.filter(user=request.user)) > 0
-
             resp.append(reldict)
 
     if sortpriop:
@@ -354,11 +356,11 @@ def xhr_item_by_slug(request, slug=None):
             item = Item.objects.get(slug=slug)
             item.name = make_safe(doc['name'])
 
-        item.max_quantity = bool(doc['max_quantity'])
+        item.max_quantity = int(doc['max_quantity'])
         item.droppable = doc['droppable']
         item.public_can_link = doc['public_can_link']
 
-        if 'description_node' in doc and len(doc['description_node']) > 0:
+        if 'description_node' in doc and doc['description_node'] is not None and len(doc['description_node']) > 0:
             item.description_node = Node.objects.get(
                 Q(author=request.user) | Q(public_can_link=True),
                 slug=doc['description_node'])
@@ -383,8 +385,51 @@ def make_user_obj(user):
         'first_name': user.first_name,
         'last_name': user.last_name,
         'username': user.username,
-        'items': [ui.item.make_json_response_dict(user) for ui in user.useritem_set.all()]
+        'items': [ui.make_json_response_dict() for ui in user.useritem_set.all()]
     }
+
+
+def xhr_useritem_by_id(request, useritem_id):
+
+    ui = UserItem.objects.get(id=useritem_id)
+
+    if request.user != ui.user:
+        return HttpResponseForbidden('You do not own this UserItem.')
+
+    if request.method == 'DELETE':
+
+        if not ui.item.droppable and ui.item.author != request.user:
+            return HttpResponseForbidden('Cannot drop undroppable item.')
+
+        ui.delete()
+        return JsonResponse({}, safe=False)
+
+    elif request.method == 'PUT':
+
+        doc = ujson.loads(request.body)
+
+        complaints = []
+        if int(doc['quantity']) < ui.quantity:
+            if not ui.item.droppable:
+                complaints.append('This item is not droppable.')
+
+        if int(doc['quantity']) > ui.quantity:
+            complaints.append('You may not increase the quantity.')
+
+        if len(complaints) and ui.item.author != request.user:
+            return HttpResponseForbidden(' '.join(complaints))
+
+        ui.quantity = int(doc['quantity'])
+
+        if ui.quantity == 0:
+            ui.delete()
+        else:
+            ui.save()
+
+        return JsonResponse(ui.make_json_response_dict(), safe=False)
+
+    else:
+        return HttpResponseForbidden('unimp')
 
 
 def xhr_user(request):

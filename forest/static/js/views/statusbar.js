@@ -32,6 +32,13 @@ define(
                             sortpriop: this.forest_view.sortpriop,
                             notifications: this.forest_view.notifications_collection
                         }));
+
+                this.drawers = {
+                    'notifications': this.forest_view.$el.find('div#notifications'),
+                    'inventory': this.forest_view.$el.find('div#inventory'),
+                    'manage_content': this.forest_view.$el.find('div#manage_content')
+                };
+
             },
 
             user_page_link: function() {
@@ -80,32 +87,38 @@ define(
             },
 
             notification_link: function() {
-                var notification_area = this.forest_view.$el.find('div#notifications');
+                this.drawers.inventory.hide();
+                this.drawers.manage_content.hide();
+                var notification_area = this.drawers.notifications;
                 if (notification_area.is(':visible')) {
                     notification_area.hide();
                 } else {
+                    this.forest_view.notifications_view.render();
                     notification_area.show();
                 }
             },
 
             inventory_link: function() {
-                var inventory_area = this.forest_view.$el.find('div#inventory');
+                this.drawers.notifications.hide();
+                this.drawers.manage_content.hide();
+                var inventory_area = this.drawers.inventory;
                 if (inventory_area.is(':visible')) {
                     inventory_area.hide();
                 } else {
+                    this.forest_view.inventory_view.render();
                     inventory_area.show();
+                    $('table').DataTable().columns.adjust();
                 }
             },
 
             manage_content_link: function() {
-
-                var manage_content_area = this.forest_view.$el.find('div#manage_content');
+                this.drawers.notifications.hide();
+                this.drawers.inventory.hide();
+                var manage_content_area = this.drawers.manage_content;
                 if (manage_content_area.is(':visible')) {
                     manage_content_area.hide();
                 } else {
                     manage_content_area.show();
-
-                    // when a table is drawn hidden, the columns get borked.  this forces it to recalc columns
                     $('table').DataTable().columns.adjust();
                 }
             }

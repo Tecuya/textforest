@@ -54,12 +54,14 @@ define(
                 }));
 
                 if (inline_options) {
-                    this.$el.find('input#relation_edit_text').val(inline_options.initial_name);
                     if (inline_options.initial_slug) {
                         this.relation = new Relation();
                         this.node_selector_source.prime_from_slug(inline_options.initial_slug);
                     }
-
+                    if (inline_options.initial_name) {
+                        this.$el.find('input#relation_edit_text').val(inline_options.initial_name);
+                        this.relation.set('text', inline_options.initial_name);
+                    }
                     this.callback_on_save = inline_options.callback_on_save;
                 }
 
@@ -140,13 +142,13 @@ define(
                 }
 
                 this.relation.set('only_discoverable_via_ac_x_chars', this.$el.find('input#relation_edit_only_discoverable_via_ac_x_chars').val());
-                this.relation.set('repeatable', this.$el.find('input#relation_edit_repeatable').val());
-                this.relation.set('hide_when_requirements_unmet', this.$el.find('input#relation_edit_hide_when_requirements_unmet').val());
-                this.relation.set('only_visible_to_node_owner', this.$el.find('input#relation_edit_only_visible_to_node_owner').val());
+                this.relation.set('repeatable', this.$el.find('input#relation_edit_repeatable').prop('checked'));
+                this.relation.set('hide_when_requirements_unmet', this.$el.find('input#relation_edit_hide_when_requirements_unmet').prop('checked'));
+                this.relation.set('only_visible_to_node_owner', this.$el.find('input#relation_edit_only_visible_to_node_owner').prop('checked'));
 
                 var relationitems = [];
                 this.$el
-                    .find('div#relation_edit_item_interactions')
+                    .find('div.relation_edit_item_interaction')
                     .each(
                     function() {
                         var i = $(this);
@@ -165,6 +167,11 @@ define(
                     {},
                     {
                         success: function() {
+
+                            if(self.forest_view.relations_collection.findWhere({slug: self.relation.get('slug')})) {
+                                self.forest_view.choices_view.render();
+                            }
+
                             if (self.callback_on_save) {
                                 self.callback_on_save(self.relation);
                             } else {

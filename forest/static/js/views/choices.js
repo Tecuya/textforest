@@ -80,14 +80,13 @@ define(
                 var clicked_item_id = clicked_item.attr('id');
 
                 if ($(evt.target).hasClass('delete_list_item')) { // little delete link
+                    this.forest_view.delete_relation(clicked_item.data('relation-slug'));
 
-                    if (clicked_item.data('relation-slug')) {
-                        this.forest_view.delete_relation(clicked_item.data('relation-slug'));
-                    }
+                } else if ($(evt.target).hasClass('edit_list_item')) { // little delete link
+                    this.forest_view.edit_relation(clicked_item.data('relation-slug'));
 
                 } else if (clicked_item_id == 'create_relation') {
-
-                    this.forest_view.relation_create();
+                    this.forest_view.relation_inline_create();
 
                 } else {
 

@@ -35,7 +35,7 @@ define(
                 var action = $(evt.target).data('action');
                 if (action == 'edit') {
                     this.forest_view.log_command('[Edit ' + this.forest_view.current_node.get('slug') + ']');
-                    this.forest_view.node_edit(this.node.get('slug'));
+                    this.forest_view.node_edit(this.node);
 
                 } else if (action == 'delete') {
                     this.$el.find(this.elements.delete_confirm_div).show();
@@ -46,7 +46,7 @@ define(
 
                 } else if (action == 'delete-yes') {
                     this.forest_view.log_command('[Delete ' + this.forest_view.current_node.get('slug') + ']');
-                    this.forest_view.delete_node();
+                    this.forest_view.node_delete(this.node);
                 }
             },
 

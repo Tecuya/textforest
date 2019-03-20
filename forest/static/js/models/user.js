@@ -1,4 +1,4 @@
-define(['backbone', 'js/models/item'], function(Backbone, Item) {
+define(['backbone', 'js/models/item', 'js/models/useritem'], function(Backbone, Item, UserItem) {
     return Backbone.Model.extend({
         idAttribute: 'username',
         url: function() {
@@ -47,20 +47,18 @@ define(['backbone', 'js/models/item'], function(Backbone, Item) {
 
         parse: function(response, options) {
             // convert the json items in to item models
-            var items = [];
-            _.each(response['items'], function(i, idx) {
-                items.push(
-                    new Item(
-                        {
-                            name: i['name'],
-                            slug: i['slug'],
-                            author: i['author'],
-                            created: i['created'],
-                            owned: i['owned']
-                        }));
+            var useritems = [];
+            _.each(response['items'], function(ui, idx) {
+                useritems.push(new UserItem(
+                    {
+                        id: ui['id'],
+                        item: Item.construct_from_json(ui['item']),
+                        quantity: ui['quantity'],
+                        created: ui['created']
+                    }));
             });
 
-            response['items'] = items;
+            response['items'] = useritems;
             return response;
         }
 

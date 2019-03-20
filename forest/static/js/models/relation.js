@@ -1,4 +1,4 @@
-define(['backbone', 'js/models/relationitem'], function(Backbone, RelationItem) {
+define(['backbone', 'js/models/relationitem', 'js/models/item'], function(Backbone, RelationItem, Item) {
 
     return Backbone.Model.extend({
         idAttribute: 'slug',
@@ -18,7 +18,7 @@ define(['backbone', 'js/models/relationitem'], function(Backbone, RelationItem) 
                         {
                             interaction: relationitem['interaction'],
                             quantity: relationitem['quantity'],
-                            item: relationitem['item']
+                            item: Item.construct_from_json(relationitem['item'])
                         })
                 );
             });
