@@ -42,64 +42,6 @@
 </div>
 <% }); %>
 
-<% if(relations.text && relations.text.length > 0) { %>
-
-<div class="branch_create list_item" id="create_relation" tabindex=<%= node.get('items').length + relations.models.length %>>
-  Create new branch with this text
+<div class="model_create list_item" id="create_relation" tabindex=<%= node.get('items').length + relations.models.length %>>
+  Create new choice
 </div>
-
-<div id="create_relation_form" class="create_form">
-
-  <div class="relation_form_title">Create new branch</div>
-
-  <div class="relation_form_text">
-    Destination:
-  </div>
-
-  <div class="relation_create_input_div" id="relation_create_dest_select">
-    <input class="relation_create_input" id="relation_create_dest" name=destination type=text size=80>
-    <div id="existing_list"></div>
-  </div>
-
-  <div class="cleardiv"></div>
-
-  <div class="relation_form_text">
-    Require item:
-  </div>
-
-  <div class="relation_create_input_div" id="relation_create_item_select">
-    <input class="relation_create_input" id="relation_create_require_item" name=require_item type=text placeholder=" (No item required)" size=80>
-    <div id="require_item_list"></div>
-  </div>
-
-  <div class="cleardiv"></div>
-
-  <button id="create_branch_cancel">Cancel</button>
-  <button id="create_branch_create">Create this branch</button>
-</div>
-
-<div class="branch_create list_item" id="create_give_item" tabindex=<%= node.get('items').length + relations.models.length + 1 %>>
-  Create item give
-</div>
-
-<div id="create_give_item_form" class="create_form">
-
-  <div class="relation_form_title">Create item give</div>
-
-  <div class="relation_form_text">
-    Give item:
-  </div>
-
-  <div class="relation_create_input_div" id="relation_give_item_select">
-    <input class="relation_create_input" id="relation_give_item" name=give_item type=text size=80>
-    <div id="give_item_list"></div>
-  </div>
-
-  <div class="cleardiv"></div>
-
-  <button id="create_item_give_cancel">Cancel</button>
-  <button id="create_item_give_create">Create this item give</button>
-
-</div>
-
-<% } %>

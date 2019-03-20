@@ -37,6 +37,13 @@ define(
                 this.relation = relation;
             },
 
+            // create_relation_with_initial_vals: function(source_slug, initial_text) {
+            //     this.relation = new Relation({
+            //         parent: source_slug,
+            //         text: initial_text
+            //     });
+            // },
+
             render: function(mode, inline_options) {
                 var self = this;
 
@@ -45,6 +52,16 @@ define(
                     relation: this.relation,
                     inline_options: inline_options
                 }));
+
+                if (inline_options) {
+                    this.$el.find('input#relation_edit_text').val(inline_options.initial_name);
+                    if (inline_options.initial_slug) {
+                        this.relation = new Relation();
+                        this.node_selector_source.prime_from_slug(inline_options.initial_slug);
+                    }
+
+                    this.callback_on_save = inline_options.callback_on_save;
+                }
 
                 this.node_selector_source.setElement(this.$el.find('div#relation_node_select_source'));
                 this.node_selector_source.inline_create_options = {
@@ -60,6 +77,8 @@ define(
                 };
                 this.node_selector_dest.render();
 
+                // we can rely on these being present from create_relation_with_initial_vals
+
                 if (mode == 'edit' && this.relation) {
                     this.$el.find('input#relation_edit_text').val(this.relation.get('text'));
                     this.$el.find('input#relation_edit_only_discoverable_via_ac_x_chars').val(this.relation.get('only_discoverable_via_ac_x_chars'));
@@ -74,11 +93,8 @@ define(
                         self.add_item_interaction(relationitem);
                     });
 
-                }
-
-                if (inline_options) {
-                    this.$el.find('input#relation_edit_text').val(inline_options.initial_name);
-                    this.callback_on_save = inline_options.callback_on_save;
+                } else {
+                    this.$el.find('input#relation_edit_only_discoverable_via_ac_x_chars').val('0');
                 }
 
                 this.$el.find('input#relation_edit_text').focus();
@@ -116,7 +132,13 @@ define(
 
                 this.relation.set('text', this.$el.find('input#relation_edit_text').val());
                 this.relation.set('parent', this.node_selector_source.get_selected_model().get('slug'));
-                this.relation.set('child', this.node_selector_dest.get_selected_model().get('slug'));
+
+                // child is optional
+                var selected_child = this.node_selector_dest.get_selected_model();
+                if (selected_child) {
+                    this.relation.set('child', this.node_selector_dest.get_selected_model().get('slug'));
+                }
+
                 this.relation.set('only_discoverable_via_ac_x_chars', this.$el.find('input#relation_edit_only_discoverable_via_ac_x_chars').val());
                 this.relation.set('repeatable', this.$el.find('input#relation_edit_repeatable').val());
                 this.relation.set('hide_when_requirements_unmet', this.$el.find('input#relation_edit_hide_when_requirements_unmet').val());

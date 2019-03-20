@@ -99,12 +99,6 @@ define(
             },
 
             user_link: function() {
-
-                // if (this.$el.find(this.elements.divmodal_user).is(':visible')) {
-                //     this.hide_divmodal(this.divmodal_user);
-                //     return;
-                // }
-
                 var self = this;
                 if (this.user.get('username')) {
                     this.user.fetch({
@@ -131,11 +125,9 @@ define(
                 });
             },
 
-            show_divmodal: function(innerdiv, dont_hide_others) {
+            show_divmodal: function(innerdiv) {
                 this.$el.find(this.elements.divmodal).show();
-                if (!dont_hide_others) {
-                    this.$el.find(this.elements.divmodal).find('div.modal_content').hide();
-                }
+                this.$el.find(this.elements.divmodal).find('div.modal_content').hide();
                 this.$el.find(this.elements.divmodal).find(innerdiv).show();
             },
 
@@ -181,21 +173,7 @@ define(
 
                 if (evt.which == 40) {
                     // down arrow
-
-                    // jump to appropriate piece of creation form, if visible... (messy)
-                    if ($('div#create_relation_form').is(':visible')) {
-                        if ($('input#relation_create_dest').is(':visible')) {
-                            $('input#relation_create_dest').focus();
-                        } else if ($('input#relation_create_require_item').is(':visible')) {
-                            $('input#relation_create_require_item').focus();
-                        } else {
-                            $('button#create_branch_cancel').focus();
-                        }
-                    } else if ($('div#create_give_item_form').is(':visible')) {
-                        $('input#relation_give_item').focus();
-                    } else {
-                        this.$el.find('div.list_item').first().focus();
-                    }
+                    this.$el.find('div.list_item').first().focus();
                     return;
 
                 } else if (evt.which == 13) {
@@ -251,26 +229,6 @@ define(
                     }, 10);
             },
 
-            delete_node: function() {
-                var self = this;
-                this.requires_login(
-                    function() {
-                        if (self.current_node.get('author') != self.user.get('username')) {
-                            self.add_error('You cannot delete this because you do not own it.');
-                            return;
-                        }
-
-                        self.current_node.destroy({
-                            wait: true,
-                            success: function() { history.back(); },
-                            error: function(node, resp) {
-                                self.add_error(resp.responseText);
-                            }
-                        });
-                    }
-                );
-            },
-
             go_to_relation: function(slug, backward) {
                 var selected_relation = this.relations_collection.findWhere({ 'slug': slug });
 
@@ -285,145 +243,6 @@ define(
                     this.$el.find(this.elements.text_area).append(commandhistorytpl({ command: selected_relation.get('text') }));
                     this.node_view_for_relation(selected_relation.get('slug'), backward);
                 }
-            },
-
-            take_item: function(slug) {
-
-                var self = this;
-
-                this.requires_login(
-                    function() {
-
-                        var taken_item;
-                        _.each(self.current_node.get('items'), function(item, idx) {
-                            if (item.get('slug') == slug) {
-                                taken_item = item;
-                                return;
-                            }
-                        });
-
-                        if (!taken_item) {
-                            self.add_error('The item you tried to take does not exist.');
-                            return;
-                        }
-
-                        var items = [];
-                        if (self.user.has('items')) {
-                            items = self.user.get('items');
-                        }
-
-                        items.push(taken_item);
-
-                        self.user.set('items', items);
-                        self.user.save(
-                            {},
-                            {
-                                success: function() {
-                                    self.log_command('Pick up ' + taken_item.get('name'));
-                                    self.add_info_message('You picked up item: ' + taken_item.get('name'));
-                                    self.inventory_view.render();
-                                    self.statusbar_view.render();
-
-                                    self.current_node.fetch(
-                                        {
-                                            success: function() {
-                                                self.update_choices();
-                                            },
-                                            error: function(col, err) { self.add_error(err.responseText); }
-                                        });
-                                },
-                                error: function(xhr, err, ex) {
-                                    self.add_error('Node save failed: ' + err.responseText);
-                                }
-                            });
-                    });
-            },
-
-            create_item_giver: function(existing_item, new_item_name) {
-
-                var self = this;
-
-                function add_item_to_current_node(item) {
-
-                    var current_item_gives = self.current_node.get('items');
-                    current_item_gives.push(item);
-
-                    self.current_node.save(
-                        {},
-                        {
-                            success: function() {
-                                self.update_current_node();
-                            },
-                            error: function(xhr, err, ex) {
-                                self.add_error('Node save failed: ' + err.responseText);
-                            }
-                        });
-                };
-
-                if (existing_item) {
-                    add_item_to_current_node(existing_item);
-                } else {
-                    existing_item = new Item({ 'name': new_item_name });
-                    existing_item.save(
-                        {},
-                        {
-                            success: function() {
-                                add_item_to_current_node(existing_item);
-                            },
-                            error: function(xhr, err, ex) {
-                                self.add_error('Item creation failed: ' + err.responseText);
-                            }
-                        });
-                }
-            },
-
-            create_relation_to_node: function(existing_node, new_node_name, existing_required_item, new_required_item_name) {
-
-                var relation = new Relation();
-                relation.set('text', this.prompt_contents());
-                relation.set('parent', this.current_node.get('slug'));
-
-                if (existing_required_item) {
-                    relation.set('required_item', existing_required_item.get('slug'));
-                } else {
-                    relation.set('_new_required_item_name', new_required_item_name);
-                }
-
-                // if we do not pass in child slug, django will create a new node automatically.  this allows this method
-                // to pass in node to link to existing, or undefined to create new.
-                var creating;
-
-                if (existing_node) {
-                    creating = false;
-                    relation.set('child', existing_node.get('slug'));
-
-                } else {
-                    creating = true;
-                    relation.set('_new_node_name', new_node_name); // server knows to handle this special value to name created nodes
-                }
-
-                var self = this;
-
-                this.requires_login(
-                    function() {
-                        relation.save(
-                            {},
-                            {
-                                success: function() {
-
-                                    self.relations_collection.add(relation);
-
-                                    if (creating) {
-                                        self.node_edit(relation.get('child'));
-                                    } else {
-                                        self.go_to_relation(relation.get('slug'));
-                                    }
-                                },
-                                error: function(err, resp) {
-                                    self.add_error(resp.responseText);
-                                }
-                            });
-                    });
             },
 
             vote: function(slug, dir) {
@@ -460,25 +279,6 @@ define(
                 }
             },
 
-            delete_item_giver: function(slug) {
-                var self = this;
-
-                this.current_node.set(
-                    'items',
-                    _.filter(
-                        this.current_node.get('items'),
-                        function(item, idx) {
-                            return item.get('slug') != slug;
-                        }
-                    ));
-
-                this.current_node.save(
-                    {},
-                    {
-                        success: function() { self.update_current_node(); },
-                        error: function(xhr, err) { self.add_error(err.responseText); }
-                    });
-            },
 
             delete_relation: function(slug) {
                 var self = this;
@@ -600,9 +400,6 @@ define(
                 });
             },
 
-            ////////////
-            // routes
-
             node_view_for_relation: function(relation_slug, backward) {
                 var self = this;
 
@@ -669,6 +466,22 @@ define(
             relation_edit: function(relation) {
                 this.relation_edit_view.set_relation(relation);
                 this.relation_edit_view.render('edit');
+                this.show_divmodal(this.elements.divmodal_relation_edit);
+            },
+
+            relation_create: function() {
+                var self = this;
+                this.relation_edit_view.render(
+                    'create',
+                    {
+                        initial_name: this.prompt_contents(),
+                        initial_slug: this.current_node.get('slug'),
+                        callback_on_save: function() {
+                            self.update_current_node();
+                            self.hide_divmodal();
+                        }
+                    });
+
                 this.show_divmodal(this.elements.divmodal_relation_edit);
             }
         });

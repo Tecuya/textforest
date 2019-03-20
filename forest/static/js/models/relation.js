@@ -6,7 +6,7 @@ define(['backbone', 'js/models/relationitem'], function(Backbone, RelationItem) 
             if (this.get('slug')) {
                 return '/xhr/relation_by_slug/' + escape(this.get('slug'));
             } else {
-                return '/xhr/create_relation';
+                return '/xhr/relation_by_slug';
             }
         },
 

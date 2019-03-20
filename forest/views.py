@@ -13,7 +13,7 @@ from django.db.models import Q
 from django_registration.backends.activation.views import RegistrationView
 from social_django.models import UserSocialAuth
 
-from .models import UserItem, Item, Node, NodeItem, Relation, RelationItem, UserRelation, Subscription, Notification
+from .models import UserItem, Item, Node, Relation, RelationItem, UserRelation, Subscription, Notification
 
 from slugify import slugify
 
@@ -38,71 +38,6 @@ def uniqueify(model, slug):
         uniqueifier += 1
 
     return new_slug
-
-
-# def xhr_create_relation(request):
-
-#     if not request.method == 'POST':
-#         return HttpResponseNotAllowed('POST only on this endpoint')
-
-#     if not request.user.is_active:
-#         return HttpResponseForbidden('You are not logged in')
-
-#     doc = ujson.loads(request.body)
-
-#     # resolve parent node
-#     nqs = Node.objects.filter(slug=doc['parent'])
-#     if len(nqs) == 0:
-#         return HttpResponseNotFound('No such parent')
-
-#     parent = nqs[0]
-
-#     if 'child' in doc:
-#         # if client specified a child slug it MUST be found or we fail
-#         nqs = Node.objects.filter(slug=doc['child'])
-#         if len(nqs) == 0:
-#             return HttpResponseNotFound('No such child')
-
-#         child = nqs[0]
-
-#     else:
-#         # if client did NOT specify a child slug we generate one
-#         # which MUST be unique, if we collide we try again
-
-#         child = Node.objects.create(
-#             author=request.user,
-#             name=make_safe(doc['_new_node_name']),
-#             slug=uniqueify(Node, make_safe(slugify(doc['_new_node_name']))))
-
-#         Subscription.objects.create(
-#             user=request.user,
-#             node=child)
-
-#     robj = {
-#         'author': request.user,
-#         'slug': uniqueify(Relation, make_safe(slugify(doc['text']))),
-#         'parent': parent,
-#         'child': child,
-#         'text': make_safe(doc['text'])
-#     }
-
-#     if 'required_item' in doc:
-#         robj['require_item'] = Item.objects.get(slug=doc['required_item'])
-
-#     relation = Relation.objects.create(**robj)
-
-#     for subscription in parent.subscription_set.exclude(user=request.user):
-#         Notification.objects.create(
-#             user=subscription.user,
-#             subscription=subscription,
-#             actor=request.user,
-#             node=parent,
-#             relation=relation,
-#             action=Notification.ACTION_CREATE)
-
-#     return JsonResponse(
-#         relation.make_json_response_dict(request.user),
-#         safe=False)
 
 
 def xhr_node_by_forward_relation_slug(request, slug):
@@ -186,18 +121,6 @@ def xhr_node_by_slug(request, slug=None):
         node.show_backward_relations = bool(doc['show_backward_relations'])
         node.public_can_link = bool(doc['public_can_link'])
         node.save()
-
-        if 'items' in doc:
-            current_nodeitem_slugs = set(ni.item.slug for ni in node.nodeitem_set.all())
-            desired_nodeitem_slugs = set(i['slug'] for i in doc['items'])
-
-            delete_slugs = current_nodeitem_slugs - desired_nodeitem_slugs
-            add_slugs = desired_nodeitem_slugs - current_nodeitem_slugs
-
-            NodeItem.objects.filter(node=node, item__slug__in=delete_slugs).delete()
-
-            for i in add_slugs:
-                NodeItem.objects.create(node=node, item=Item.objects.get(author=request.user, slug=i))
 
         for subscription in node.subscription_set.exclude(user=request.user):
             Notification.objects.create(
@@ -321,12 +244,15 @@ def xhr_relations(request, slug, text=None):
         fetch('forward', {**forward_filters, 'author': node.author})
         fetch('forward', forward_filters, {'author': node.author})
 
-        fetch('backward', {**backward_filters, 'author': node.author})
-        fetch('backward', backward_filters, {'author': node.author})
+        if node.show_backward_relations:
+            fetch('backward', {**backward_filters, 'author': node.author})
+            fetch('backward', backward_filters, {'author': node.author})
 
     else:
         fetch('forward', forward_filters)
-        fetch('backward', backward_filters)
+
+        if node.show_backward_relations:
+            fetch('backward', backward_filters)
 
     return JsonResponse(resp, safe=False)
 
@@ -352,6 +278,8 @@ def xhr_relation_by_slug(request, slug=None):
 
     if slug is not None:
         relation = Relation.objects.get(slug=slug)
+    else:
+        relation = Relation(author=request.user)
 
     if request.method in ('PUT', 'POST'):
         doc = ujson.loads(request.body)
@@ -369,9 +297,12 @@ def xhr_relation_by_slug(request, slug=None):
             Q(author=request.user) | Q(public_can_link=True),
             slug=doc['parent'])
 
-        relation.child = Node.objects.get(
-            Q(author=request.user) | Q(public_can_link=True),
-            slug=doc['child'])
+        if 'child' in doc:
+            relation.child = Node.objects.get(
+                Q(author=request.user) | Q(public_can_link=True),
+                slug=doc['child'])
+        else:
+            relation.child = relation.parent
 
         relation.only_discoverable_via_ac_x_chars = int(doc['only_discoverable_via_ac_x_chars'])
 
@@ -380,6 +311,7 @@ def xhr_relation_by_slug(request, slug=None):
         relation.only_visible_to_node_owner = bool(doc['only_visible_to_node_owner'])
 
         relation.relationitem_set.all().delete()
+        relation.save()
 
         for ri in doc['relationitems']:
             RelationItem.objects.create(
@@ -390,7 +322,6 @@ def xhr_relation_by_slug(request, slug=None):
                     Q(author=request.user) | Q(public_can_link=True),
                     slug=ri['item']))
 
-        relation.save()
 
     elif request.method == 'DELETE':
         relation = Relation.objects.filter(author=request.user, slug=slug).delete()

@@ -35,8 +35,7 @@ class Node(models.Model):
             'show_backward_relations': self.show_backward_relations,
             'public_can_link': self.public_can_link,
             'author': self.author.username,
-            'created': self.created.strftime('%Y-%m-%d'),
-            'items': [ni.item.make_json_response_dict(user) for ni in self.nodeitem_set.all()]
+            'created': self.created.strftime('%Y-%m-%d')
         }
 
         if user is not None and user.is_active:
@@ -202,20 +201,6 @@ class Notification(models.Model):
 
     def __str__(self):
         return '{} {} {} {} {}'.format(self.user, self.actor, self.action, self.node, self.relation)
-
-
-class NodeItem(models.Model):
-    node = models.ForeignKey('Node', on_delete=models.CASCADE)
-    item = models.ForeignKey('Item', on_delete=models.CASCADE)
-
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        unique_together = ('node', 'item')
-
-    def __str__(self):
-        return '{} has item {}'.format(self.node, self.item)
 
 
 class Item(models.Model):
