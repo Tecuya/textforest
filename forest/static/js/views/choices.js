@@ -80,7 +80,12 @@ define(
                 var clicked_item_id = clicked_item.attr('id');
 
                 if ($(evt.target).hasClass('delete_list_item')) { // little delete link
-                    this.forest_view.delete_relation(clicked_item.data('relation-slug'));
+
+                    if (!$(evt.target).hasClass('red')) {
+                        $(evt.target).addClass('red');
+                    } else {
+                        this.forest_view.delete_relation(clicked_item.data('relation-slug'));
+                    }
 
                 } else if ($(evt.target).hasClass('edit_list_item')) { // little delete link
                     this.forest_view.edit_relation(clicked_item.data('relation-slug'));

@@ -12,7 +12,9 @@ define(
             events: {
                 'click span.notification_clear': 'notification_clear',
                 'click div#notification_clear_all': 'notification_clear_all',
-                'click div.drawer_close_button': 'close_notifications'
+                'click div.drawer_close_button': 'close_notifications',
+                'click tr': 'click_view_notification'
+
             },
 
             initialize: function(options) {
@@ -22,28 +24,46 @@ define(
 
             render: function() {
                 this.$el.html(this.template({ notifications_collection: this.notifications_collection }));
+                this.$el.find('table').DataTable();
             },
 
             close_notifications: function(evt) {
                 this.$el.hide();
             },
 
-            notification_clear: function(evt) {
-                var self = this;
-                this.notifications_collection
-                    .findWhere({ id: $(evt.target).data('notification-id') })
-                    .destroy({
-                        success: function() {
-                            self.render();
-                            if (self.notifications_collection.models.length == 0) {
-                                $('div#notifications').hide();
-                            }
-                            self.forest_view.statusbar_view.render();
-                        }
-                    });
+            click_view_notification: function(evt) {
+                var node_slug = $(evt.target).closest('tr').data('node-slug');
+                this.forest_view.node_view(node_slug);
             },
 
-            notification_clear_all: function() {
+            notification_clear: function(evt) {
+
+                evt.stopPropagation();
+
+                if (!$(evt.target).hasClass('red')) {
+                    $(evt.target).addClass('red');
+                    return;
+                }
+
+                var self = this;
+                this.notifications_collection
+                    .findWhere({ id: $(evt.target).closest('tr').data('notification-id') })
+                    .destroy({
+                            success: function() {
+                                self.render();
+                                self.forest_view.statusbar_view.render();
+                            }
+                    });
+
+            },
+
+            notification_clear_all: function(evt) {
+
+                if (!$(evt.target).hasClass('red')) {
+                    $(evt.target).addClass('red');
+                    return;
+                }
+
                 var self = this;
 
                 _.each(
@@ -52,11 +72,6 @@ define(
                         m.destroy({
                             success: function() {
                                 self.render();
-
-                                if (self.notifications_collection.models.length == 0) {
-                                    $('div#notifications').hide();
-                                }
-
                                 self.forest_view.statusbar_view.render();
                             }
                         });

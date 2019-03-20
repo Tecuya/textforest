@@ -96,7 +96,9 @@ define(
                     });
 
                 } else {
+                    // sane defaults
                     this.$el.find('input#relation_edit_only_discoverable_via_ac_x_chars').val('0');
+                    this.$el.find('input#relation_edit_repeatable').prop('checked', true);
                 }
 
                 this.$el.find('input#relation_edit_text').focus();

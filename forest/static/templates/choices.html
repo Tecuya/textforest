@@ -30,15 +30,15 @@
   <div class="relation_list_item_right">
     Created by <%= relation.get('author') %> <%= relation.get('created') %><br>
     <% if(relation.get('author') == user.get('username')) { %>
-    <div class="edit_list_item list_item_modify_link">Edit</div>
-    <div class="delete_list_item list_item_modify_link">Delete</div>
+    <div class="delete_list_item list_item_modify_link">🗑</div>
+    <div class="edit_list_item list_item_modify_link">🖉</div>
     <% } %>
     <div class="relation_stats">
       Views: <%= relation.get('views') %>
       Vote:
-      <span class="voteup clickable" data-slug="<%= relation.get('slug') %>">&uarr;</span>
+      <span class="voteup clickable" data-slug="<%= relation.get('slug') %>">⬆</span>
       <%= relation.get('vote') %>
-      <span class="votedown clickable" data-slug="<%= relation.get('slug') %>">&darr;</span>
+      <span class="votedown clickable" data-slug="<%= relation.get('slug') %>">⬇</span>
     </div>
   </div>
   &nbsp;

@@ -1,45 +1,40 @@
 <div class="title">Notifications</div>
 
-<% if(notifications_collection.models.length == 0) { %>
-<div class="notification">
-  (No notifications)
-</div>
-<% } %>
+<table data-scroll-y="400px" data-paging="false" class="hover">
+  <thead>
+    <tr>
+      <th>Actor</th>
+      <th>Action</th>
+      <th>Modified Data</th>
+      <th data-class-name="dt-right">Date Acquired</th>
+      <th data-orderable="false" data-class-name="dt-right">Clear</th>
+    </tr>
+  </thead>
 
-<% _.each(notifications_collection.models, function(n) { %>
+  <tbody>
+    <% _.each(notifications_collection.models, function(n) { %>
+    <tr data-notification-id="<%= n.get('id') %>" data-node-slug="<%= n.get('node_slug') %>">
+      <td>
+        <%= n.get('actor') %>
+      </td>
+      <td><%= n.get('action') %></td>
+      <td>
+        <%= n.get('node_name').substring(0,15) %>
 
-<div class="notification">
-  <%= n.get('created') %>
+        <% if(n.get('relation_name')) { %>
+        &rarr; <%= n.get('relation_name').substring(0,15) %>
+        <% } %>
+      </td>
+      <td><%= n.get('created') %></td>
 
-  <span class="clickable user_link" data-user-link="<%= n.get('actor') %>"><%= n.get('actor') %></span>
-
-  <%= n.get('action') %>
-
-  <% if(n.get('relation_slug')) { %>
-  relation
-
-  "
-  <span class="clickable relation_link" data-relation-link="<%= n.get('relation_slug') %>">
-    <%= n.get('relation_name').substring(0,15) %>
-  </span>
-  "
-
-  on
-
-  <% } %>
-
-  node
-
-  "
-  <span class="clickable node_link" data-node-link="<%= n.get('node_slug') %>">
-    <%= n.get('node_name').substring(0,15) %>
-  </span>
-  "
-
-  <span class="notification_clear" data-notification-id="<%= n.get('id') %>">❌</span>
-</div>
-
-<% }) %>
+      <td>
+        <span class="clickable notification_view">👁</span>
+        <span class="clickable notification_clear">🗑</span>
+      </td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
 
 <div class="drawer_close_button">Close</div>
 <div class="clickable" id="notification_clear_all">Clear all</div>

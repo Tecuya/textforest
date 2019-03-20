@@ -145,6 +145,7 @@ class UserRelation(models.Model):
         if created or relation.repeatable:
 
             for ri in RelationItem.objects.filter(relation=relation):
+
                 if ri.interaction in ('require', 'consume'):
 
                     uiqs = ri.item.useritem_set.all()
@@ -227,7 +228,7 @@ class Notification(models.Model):
             'id': self.id,
             'user': self.user.username,
             'node_slug': self.node.slug,
-            'node_name': self.node.text,
+            'node_name': self.node.name,
             'relation_slug': self.relation.slug if self.relation is not None else '',
             'relation_name': self.relation.text if self.relation is not None else '',
             'actor': self.actor.username,
@@ -278,7 +279,7 @@ class UserItem(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     item = models.ForeignKey('Item', on_delete=models.CASCADE)
 
-    quantity = models.IntegerField(default=1)
+    quantity = models.IntegerField(default=0)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

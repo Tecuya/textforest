@@ -234,6 +234,9 @@ def xhr_relations(request, slug, text=None):
 
         for r in rqs:
 
+            if r.parent == r.child and direction == 'backward':
+                continue
+
             reldict = r.make_json_response_dict(request.user)
             reldict['direction'] = direction
 
@@ -324,13 +327,24 @@ def xhr_relation_by_slug(request, slug=None):
                     Q(author=request.user) | Q(public_can_link=True),
                     slug=ri['item']))
 
-
     elif request.method == 'DELETE':
-        relation = Relation.objects.filter(author=request.user, slug=slug).delete()
-        return JsonResponse({}, safe=False)
+        Relation.objects.filter(author=request.user, slug=slug).delete()
 
     else:
         return HttpResponseForbidden('unimp')
+
+    for subscription in relation.parent.subscription_set.exclude(user=request.user):
+        n = Notification(
+            user=subscription.user,
+            subscription=subscription,
+            actor=request.user,
+            node=relation.parent,
+            action=(Notification.ACTION_CREATE if request.method == 'POST' else Notification.ACTION_MODIFY))
+
+        if request.method != 'DELETE':
+            n.relation = relation
+
+        n.save()
 
     return JsonResponse(relation.make_json_response_dict(), safe=False)
 

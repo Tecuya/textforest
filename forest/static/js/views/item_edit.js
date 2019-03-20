@@ -61,7 +61,10 @@ define(
                     this.$el.find(this.elements.public_can_give_checkbox).prop('checked', this.item.get('public_can_link'));
                     this.node_selector.prime_from_slug(this.item.get('description_node'));
                 } else {
+                    // sane default
                     this.$el.find(this.elements.max_quantity_input).val('0');
+                    this.$el.find(this.elements.droppable_checkbox).prop('checked', true);
+                    this.$el.find(this.elements.public_can_give_checkbox).prop('checked', true);
                 }
 
                 if (inline_options) {

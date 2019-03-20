@@ -95,6 +95,7 @@ define(
                 } else {
                     this.forest_view.notifications_view.render();
                     notification_area.show();
+                    $('table').DataTable().columns.adjust();
                 }
             },
 

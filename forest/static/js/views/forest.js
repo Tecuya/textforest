@@ -18,7 +18,6 @@ define(
                 'click div#modal': 'click_divmodal',
                 'click span.user_link': 'user_page_link',
                 'click span.node_link': 'node_link',
-                'click span.relation_link': 'relation_link'
             },
 
             elements: {
@@ -328,10 +327,6 @@ define(
 
             node_link: function(evt) {
                 Backbone.history.navigate('/f/' + encodeURIComponent($(evt.target).data('node-link')), true);
-            },
-
-            relation_link: function(evt) {
-                Backbone.history.navigate('/r/' + encodeURIComponent($(evt.target).data('relation-link')), true);
             },
 
             requires_login: function(callable) {
