@@ -53,7 +53,10 @@ def xhr_node_by_relation_slug(request, slug, direction):
     if request.user.is_active:
         r = Relation.objects.get(slug=slug)
 
-        allow, reason = UserRelation.handle_user_action(request.user, r)
+        if direction == 'forward':
+            allow, reason = UserRelation.handle_user_action(request.user, r)
+        else:
+            allow = True
 
         if not allow:
             return HttpResponseForbidden('You lack necessary items: ' + reason)

@@ -8,6 +8,7 @@
     <%= relation.get('text') %>
     <% } %>
 
+    <% if(relation.get('direction') == 'forward') { %>
     <% _.each(relation.get('relationitems'), function(ri, idx) { %>
 
     <span class="choice_relationitem">
@@ -21,6 +22,7 @@
     </span>
 
     <% }) %>
+    <% } %>
 
     <% if(!relation.get('repeatable')) { %>
     <span class="choice_relation_not_repeatable">(not repeatable)</span>

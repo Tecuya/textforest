@@ -403,7 +403,7 @@ define(
                 });
                 this.current_node.fetch({
                     success: function() {
-                        if(relation.get('relationitems').length > 0) {
+                        if(!backward && relation.get('relationitems').length > 0) {
                             self.user.fetch({
                                 success: function() {
 
@@ -428,8 +428,7 @@ define(
                             });
                         }
                         self.update_current_node();
-                        // we are already there.  what matters is that we applied the relationitems
-                        if(original_node_slug != relation.get('child')) {
+                        if(original_node_slug != self.current_node.get('slug')) {
                             self.view_current_node();
                         }
                         Backbone.history.navigate('/f/' + self.current_node.get('slug'));
