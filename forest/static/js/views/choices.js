@@ -26,7 +26,7 @@ define(
                 this.relations_collection = options.relations_collection;
             },
 
-            render: function(autocomplete_render_cycle) {
+            render: function() {
 
                 // we will restore the users focused tabindex after rendering
                 var focused_tabindex = this.$el.find('div.list_item:focus').attr('tabindex');

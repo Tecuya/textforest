@@ -67,14 +67,14 @@ define(
 
                 this.node_selector_source.setElement(this.$el.find('div#relation_node_select_source'));
                 this.node_selector_source.inline_create_options = {
-                    title: 'Create Source Node for Relation: "' + this.relation.get('text') + '"',
+                    title: 'Create Source Node for Choice: "' + this.relation.get('text') + '"',
                     return_to_divmodal: this.forest_view.elements.divmodal_relation_edit
                 };
                 this.node_selector_source.render();
 
                 this.node_selector_dest.setElement(this.$el.find('div#relation_node_select_dest'));
                 this.node_selector_dest.inline_create_options = {
-                    title: 'Create Destination Node for ' + (this.relation ? ('Relation: "' + this.relation.get('text') + '"') : 'New Relation'),
+                    title: 'Create Destination Node for ' + (this.relation ? ('Choice: "' + this.relation.get('text') + '"') : 'New Choice'),
                     return_to_divmodal: this.forest_view.elements.divmodal_relation_edit
                 };
                 this.node_selector_dest.render();

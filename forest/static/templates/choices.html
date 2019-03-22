@@ -11,7 +11,7 @@
     <% if(relation.get('direction') == 'forward') { %>
     <% _.each(relation.get('relationitems'), function(ri, idx) { %>
 
-    <span class="choice_relationitem">
+    <span class="choice_relationitem <% if(relation.get('visited') && !relation.get('repeatable')) { %>line-through<% } %>">
     <%   if(ri.get('interaction') == 'require') { %>
     (requires <% if(ri.get('quantity') > 1) { %><%= ri.get('quantity') %><% } %> <%= ri.get('item').get('name') %>)
     <%   } else if(ri.get('interaction') == 'consume') { %>
@@ -32,22 +32,22 @@
   <div class="relation_list_item_right">
     Created by <%= relation.get('author') %> <%= relation.get('created') %><br>
     <% if(relation.get('author') == user.get('username')) { %>
-    <div class="delete_list_item list_item_modify_link">🗑</div>
-    <div class="edit_list_item list_item_modify_link">🖉</div>
+    <div class="delete_list_item list_item_modify_link">Delete</div>
+    <div class="edit_list_item list_item_modify_link">Edit</div>
     <% } %>
     <div class="relation_stats">
       Views: <%= relation.get('views') %>
       Vote:
-      <span class="voteup clickable" data-slug="<%= relation.get('slug') %>">⬆</span>
+      <span class="voteup pointer" data-slug="<%= relation.get('slug') %>">&uarr;</span>
       <%= relation.get('vote') %>
-      <span class="votedown clickable" data-slug="<%= relation.get('slug') %>">⬇</span>
+      <span class="votedown pointer" data-slug="<%= relation.get('slug') %>">&darr;</span>
     </div>
   </div>
   &nbsp;
 </div>
 <% }); %>
 
-<% if(prompt && prompt.length > 0 && (node.get('author') == user.username || node.get('public_can_link'))) { %>
+<% if(prompt && prompt.length > 0 && (node.get('author') == user.get('username') || node.get('public_can_link'))) { %>
 <div class="model_create list_item" id="create_relation" tabindex=<%= node.get('items').length + relations.models.length %>>
   Create new choice
 </div>

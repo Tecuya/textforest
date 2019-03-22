@@ -46,38 +46,35 @@ define(
             keyup_model_input: function() {
                 var self = this;
 
-                var input_contents = this.$el.find(self.elements.input).val();
-                if (input_contents.length < 2) {
-                    this.$el.find(this.elements.model_selector_list).hide();
-                    return;
-                }
+                fetch_completions({
+                    lastfetch: self.lastfetch,
+                    refresh: function() {
+                        var input_contents = self.$el.find(self.elements.input).val();
 
-                window.setTimeout(
-                    function() {
-                        fetch_completions(
-                            self.lastfetch,
-                            function() {
-                                var input_contents = self.$el.find(self.elements.input).val();
-                                self.lastfetch = new Date().getTime();
-                                self.collection.set_search_text(input_contents);
+                        if (input_contents.length < 2) {
+                            self.$el.find(self.elements.model_selector_list).hide();
+                            return;
+                        }
 
-                                if (input_contents[0] == '/') {
+                        self.lastfetch = new Date().getTime();
+                        self.collection.set_search_text(input_contents);
+
+                        self.collection.fetch({
+                            success: function() {
+                                // they already made a selection so dont interrupt
+                                if (self.$el.find(self.elements.selection_div).is(':visible')) {
                                     return;
                                 }
-
-                                self.collection.fetch({
-                                    success: function() {
-                                        // they already made a selection so dont interrupt
-                                        if (self.$el.find(self.elements.selection_div).is(':visible')) {
-                                            return;
-                                        }
-                                        self.$el.find(self.elements.model_selector_list).show();
-                                        self.model_selector_list_view.render();
-                                    },
-                                    error: function(col, err) { self.forest_view.add_error(err.responseText); }
-                                });
-                            });
-                    }, 10);
+                                self.$el.find(self.elements.model_selector_list).show();
+                                self.model_selector_list_view.render();
+                            },
+                            error: function(col, err) { self.forest_view.add_error(err.responseText); }
+                        });
+                    },
+                    expedite_condition: function() {
+                        return self.$el.find(self.elements.input).val().length < 2;
+                    }
+                });
             },
 
             click_list_item: function(slug) {

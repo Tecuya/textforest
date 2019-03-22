@@ -35,33 +35,6 @@ define(
                 }
             },
 
-            update_text: function(text) {
-                if (text.length == 0) {
-                    this.render();
-                    return;
-                }
-
-                if (text.length < 2) {
-                    return;
-                }
-
-                var self = this;
-                window.setTimeout(
-                    function() {
-                        fetch_completions(
-                            self.lastfetch,
-                            function() {
-                                self.lastfetch = new Date().getTime();
-                                self.items.text = text;
-                                self.items.fetch({
-                                    error: function() { self.$el.html('Server error...'); },
-                                    success: function() { self.render(); }
-                                });
-                            }
-                        );
-                    }, 10);
-            },
-
             keypress_list: function(evt) {
                 var target = $(evt.target);
                 var tabindex = parseInt(target.attr('tabindex'));

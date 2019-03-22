@@ -26,7 +26,7 @@ define(
 
                 this.item_selector.setElement(this.$el.find('div.relationitem_item_selector'));
                 this.item_selector.inline_create_options = {
-                    title: 'Create Item for Relation: "' + this.relation_edit_view.relation.get('text') + '"',
+                    title: 'Create Item for Choice: "' + this.relation_edit_view.relation.get('text') + '"',
                     return_to_divmodal: this.forest_view.elements.divmodal_relation_edit
                 };
                 this.item_selector.render();

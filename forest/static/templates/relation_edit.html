@@ -1,4 +1,4 @@
-<div class="modal_title dash_underline">Edit relation</div>
+<div class="modal_title dash_underline">Edit Choice</div>
 
 <div class="form_text">
   Text:
@@ -16,18 +16,35 @@
 </div>
 
 <div class="form_text">
-  Destination:
+  Destination:<br>
+  <small>If blank, link to self</small>
 </div>
 
 <div class="form_widget" id="relation_node_select_dest">
 </div>
 
-<div class="form_text">
-  Only discoverable with this many chars:<br>
-  <small>0 = always discoverable</small>
-</div>
-<div class="form_widget">
-  <input id="relation_edit_only_discoverable_via_ac_x_chars" type=text>
+<div id="unimplemented_features" style="display:none;">
+  <div class="form_text">
+    Only discoverable with this many chars:<br>
+    <small>0 = always discoverable</small>
+  </div>
+  <div class="form_widget">
+    <input id="relation_edit_only_discoverable_via_ac_x_chars" type=text>
+  </div>
+
+  <div class="form_text">
+    <label for="relation_edit_hide_when_requirements_unmet">Hide when requirements unmet:</label>
+  </div>
+  <div class="form_widget">
+    <input id="relation_edit_hide_when_requirements_unmet" type=checkbox>
+  </div>
+
+  <div class="form_text">
+    <label for="relation_edit_only_visible_to_node_owner">Only visible to node owner:</label>
+  </div>
+  <div class="form_widget">
+    <input id="relation_edit_only_visible_to_node_owner" type=checkbox>
+  </div>
 </div>
 
 <div class="form_text">
@@ -37,19 +54,6 @@
   <input id="relation_edit_repeatable" type=checkbox>
 </div>
 
-<div class="form_text">
-  <label for="relation_edit_hide_when_requirements_unmet">Hide when requirements unmet:</label>
-</div>
-<div class="form_widget">
-  <input id="relation_edit_hide_when_requirements_unmet" type=checkbox>
-</div>
-
-<div class="form_text">
-  <label for="relation_edit_only_visible_to_node_owner">Only visible to node owner:</label>
-</div>
-<div class="form_widget">
-  <input id="relation_edit_only_visible_to_node_owner" type=checkbox>
-</div>
 
 <div class="form_text">
   <div>Item interactions:</div>

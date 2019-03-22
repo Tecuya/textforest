@@ -14,7 +14,8 @@ define(
             template: foresttpl,
 
             events: {
-                'keyup input#prompt': 'keypress_prompt',
+                'keyup input#prompt': 'keyup_prompt',
+                'keypress input#prompt': 'keypress_prompt',
                 'click div#modal': 'click_divmodal',
                 'click span.user_link': 'user_page_link',
                 'click span.node_link': 'node_link'
@@ -166,6 +167,18 @@ define(
             },
 
             keypress_prompt: function(evt) {
+                // input is wrapped in a form to prevent chrome
+                // autocomplete.  since its a form we need to prevent
+                // enter submit
+                if(evt.which == 13) {
+                    evt.preventDefault();
+                }
+            },
+
+            keyup_prompt: function(evt) {
+
+                evt.stopPropagation();
+
                 var self = this;
 
                 var prompt_contents = this.prompt_contents();
@@ -206,34 +219,45 @@ define(
                     }
                 }
 
-                // without this short timeout it seems the event fires
-                // before jquerys val could get the updated text
-                window.setTimeout(
-                    function() {
-                        fetch_completions(
-                            self.lastfetch,
-                            function() {
-                                self.lastfetch = new Date().getTime();
-                                self.relations_collection.set_search_text(prompt_contents);
-
-                                if (prompt_contents[0] == '/') {
-                                    return;
-                                }
-
-                                self.relations_collection.fetch({
-                                    success: function() { self.choices_view.render(true); },
-                                    error: function(col, err) { self.add_error(err.responseText); }
-                                });
-                            });
-                    }, 10);
+                fetch_completions({
+                    lastfetch: self.lastfetch,
+                    refresh: function() {
+                        self.relations_collection.set_search_text(prompt_contents);
+                        self.lastfetch = new Date().getTime();
+                        self.relations_collection.fetch({
+                            success: function() { self.choices_view.render(); },
+                            error: function(col, err) { self.add_error(err.responseText); }
+                        });
+                    },
+                    noop_condition: function() {
+                        return prompt_contents[0] == '/';
+                    },
+                    expedite_condition: function() {
+                        return prompt_contents.length == 0;
+                    }
+                });
             },
 
             go_to_relation: function(slug, backward) {
                 var selected_relation = this.relations_collection.findWhere({ 'slug': slug });
 
                 if (selected_relation) {
-                    this.$el.find(this.elements.text_area).append(commandhistorytpl({ command: selected_relation.get('text') }));
-                    this.node_view_for_relation(selected_relation, backward);
+
+                    var command;
+                    if(backward) {
+                        command = selected_relation.get('parent_name');
+                    } else {
+                        command = selected_relation.get('text');
+                    }
+
+                    this.$el.find(this.elements.text_area).append(commandhistorytpl({ command: command  }));
+
+                    if(selected_relation.get('relationitems').length > 0) {
+                        var self = this;
+                        this.requires_login(function() { self.node_view_for_relation(selected_relation, backward); });
+                    } else {
+                        this.node_view_for_relation(selected_relation, backward);
+                    }
                 }
             },
 
@@ -332,7 +356,7 @@ define(
             requires_login: function(callable) {
                 if (!this.user.get('username')) {
                     this.user_view.render();
-                    this.show_divmodal(this.divmodal_user);
+                    this.show_divmodal(this.elements.divmodal_user);
                 } else {
                     callable();
                 }

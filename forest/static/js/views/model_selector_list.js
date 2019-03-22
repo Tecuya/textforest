@@ -19,10 +19,6 @@ define(
             },
 
             render: function() {
-                if (!this.collection) {
-                    console.log('Deprecated call fixme');
-                    return;
-                }
                 this.$el.html(this.template({ collection: this.collection }));
             },
 

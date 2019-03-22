@@ -4,34 +4,46 @@ define(
 
     function($, _, Backbone) {
 
-        var min_fetch_interval = 1500;
+        var min_fetch_interval = 750;
 
-        return function(lastfetch, refresh) {
-
-            // determine when the fetch should occur so as not to
-            // violate min_fetch_interval
-            var milliseconds = new Date().getTime();
-            var fetchwait = 0;
-            if (lastfetch) {
-                var time_since_fetch = milliseconds - lastfetch;
-                if (time_since_fetch > min_fetch_interval) {
-                    fetchwait = 0;
-                } else {
-                    fetchwait = min_fetch_interval - time_since_fetch;
-                }
-            }
-
-            var queuetime = new Date().getTime();
-
-            self.highest_queue_time = queuetime;
-
+        return function(options) {
             window.setTimeout(
                 function() {
-                    // nuke superceded jobs
-                    if (queuetime < self.highest_queue_time) return;
-                    refresh();
+
+                    if(options.noop_condition && options.noop_condition()) {
+                        return;
+                    }
+
+                    var queuetime = new Date().getTime();
+                    self.highest_queue_time = queuetime;
+
+                    if(options.expedite_condition && options.expedite_condition()) {
+                        options.refresh();
+                        return;
+                    }
+
+                    var milliseconds = new Date().getTime();
+                    var fetchwait = 0;
+                    if (options.lastfetch) {
+                        var time_since_fetch = milliseconds - options.lastfetch;
+                        if (time_since_fetch > min_fetch_interval) {
+                            fetchwait = 0;
+                        } else {
+                            fetchwait = min_fetch_interval - time_since_fetch;
+                        }
+                    }
+
+                    window.setTimeout(
+                        function() {
+                            // nuke superceded jobs
+                            if (queuetime < self.highest_queue_time) {
+                               return;
+                            }
+                            options.refresh();
+                        },
+                        fetchwait);
                 },
-                fetchwait);
+                10);
         };
 
     }

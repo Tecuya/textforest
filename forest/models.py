@@ -83,7 +83,7 @@ class Relation(models.Model):
                 'author': self.author.username,
                 'views': self.views,
                 'vote': self.vote,
-                'visited': len(self.userrelation_set.all()) > 0,
+                'visited': user is not None and user.is_active and len(self.userrelation_set.all()) > 0,
                 'only_discoverable_via_ac_x_chars': self.only_discoverable_via_ac_x_chars,
                 'repeatable': self.repeatable,
                 'hide_when_requirements_unmet': self.hide_when_requirements_unmet,
@@ -165,6 +165,10 @@ class UserRelation(models.Model):
                 elif ri.interaction == 'give':
                     ui, created = UserItem.objects.get_or_create(user=user, item=ri.item)
                     ui.quantity += ri.quantity
+
+                    if ui.quantity > ri.item.max_quantity:
+                        ui.quantity = ri.item.max_quantity
+
                     ui_modified = True
 
                 if ui_modified:

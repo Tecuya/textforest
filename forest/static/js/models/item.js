@@ -5,7 +5,7 @@ define(['backbone'], function(Backbone) {
             idAttribute: 'slug',
 
             to_string: function() {
-                return '"' + this.get('name') + '" created by ' + this.get('author') + ' ' + this.get('created');
+                return '"' + this.get('name') + '" by ' + this.get('author') + ' ' + this.get('created');
             },
 
             url: function() {
