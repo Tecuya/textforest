@@ -449,6 +449,7 @@ div#user_create_form_result {
 
 div#editpreview {
   display: none;
+  background-color: #111;
   border: solid white 1px;
   border-radius: 7px;
   padding: 3px;

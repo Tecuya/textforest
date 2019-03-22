@@ -24,7 +24,8 @@ define(
                 'name_input': 'input#node_name_input',
                 'text_textarea': 'textarea#node_text_textarea',
                 'backward_relation_checkbox': 'input#node_show_backward_relations_checkbox',
-                'public_can_link_checkbox': 'input#node_public_can_link_checkbox'
+                'public_can_link_checkbox': 'input#node_public_can_link_checkbox',
+                'preview': 'div#editpreview'
             },
 
             template: nodeedittpl,
