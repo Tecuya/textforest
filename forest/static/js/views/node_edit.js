@@ -57,6 +57,9 @@ define(
                     this.$el.find(this.elements.text_textarea).val(this.node.get('text'));
                     this.$el.find(this.elements.backward_relation_checkbox).prop('checked', this.node.get('show_backward_relations'));
                     this.$el.find(this.elements.public_can_link_checkbox).prop('checked', this.node.get('public_can_link'));
+                } else {
+                    this.$el.find(this.elements.backward_relation_checkbox).prop('checked', true);
+                    this.$el.find(this.elements.public_can_link_checkbox).prop('checked', true);
                 }
 
                 this.$el.find(this.elements.name_input).focus();

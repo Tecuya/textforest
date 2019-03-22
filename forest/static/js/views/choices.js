@@ -24,7 +24,6 @@ define(
 
                 this.forest_view = options.forest_view;
                 this.relations_collection = options.relations_collection;
-                // this.node_list_view = new ModelList({ forest_view: this.forest_view, choices_view: this });
             },
 
             render: function(autocomplete_render_cycle) {
@@ -42,9 +41,6 @@ define(
                         }
                     )
                 );
-
-                // this.node_list_view.setElement('div#existing_list');
-                // this.node_list_view.render();
 
                 if (focused_tabindex) {
                     this.$el.find('div.list_item[tabindex=' + focused_tabindex + ']').focus();

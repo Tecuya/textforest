@@ -10,11 +10,12 @@ define(
                 'click span#user_page_link': 'user_page_link',
                 'click div#logout_link': 'logout_link',
                 'click div#status_title': 'home',
-                'click div.sort_pref': 'sort',
+                'click div.sort_pref': 'click_sort',
                 'click div#notifications_link': 'notification_link',
                 'click div#inventory_link': 'inventory_link',
                 'click div#manage_content_link': 'manage_content_link',
-                'click div#notification_clear_all': 'notification_clear_all'
+                'click div#notification_clear_all': 'notification_clear_all',
+                'change input#sort_prioritize_op_checkbox': 'change_sort_priop'
             },
 
             initialize: function(options) {
@@ -57,33 +58,30 @@ define(
                 Backbone.history.navigate('/f/home', true);
             },
 
-            sort: function(evt) {
+            click_sort: function(evt) {
                 var targ = $(evt.target);
 
                 var sort = this.forest_view.sort;
                 var sortdir = this.forest_view.sortdir;
                 var sortpriop = this.forest_view.sortpriop;
 
-                if (targ.data('sort') == 'views') {
-                    sort = 'views';
+                if(targ.data('sort')) {
+                    sort = targ.data('sort');
+                }
 
-                } else if (targ.data('sort') == 'vote') {
-                    sort = 'vote';
-
-                } else if (targ.data('sort') == 'date') {
-                    sort = 'date';
-
-                } else if (targ.data('sortdir') == 'asc') {
-                    sortdir = 'asc';
-
-                } else if (targ.data('sortdir') == 'desc') {
-                    sortdir = 'desc';
-
-                } else if (targ.data('sortpriop') == '1') {
-                    sortpriop = !sortpriop;
+                if(targ.data('sortdir')) {
+                    sortdir = targ.data('sortdir');
                 }
 
                 this.forest_view.update_sort(sort, sortdir, sortpriop);
+            },
+
+            change_sort_priop: function(evt) {
+                var sort = this.forest_view.sort;
+                var sortdir = this.forest_view.sortdir;
+                var sortpriop = this.forest_view.sortpriop;
+
+                this.forest_view.update_sort(sort, sortdir, this.$el.find('input#sort_prioritize_op_checkbox').prop('checked'));
             },
 
             notification_link: function() {

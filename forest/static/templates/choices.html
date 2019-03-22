@@ -47,7 +47,7 @@
 </div>
 <% }); %>
 
-<% if(prompt && prompt.length > 0) { %>
+<% if(prompt && prompt.length > 0 && (node.get('author') == user.username || node.get('public_can_link'))) { %>
 <div class="model_create list_item" id="create_relation" tabindex=<%= node.get('items').length + relations.models.length %>>
   Create new choice
 </div>

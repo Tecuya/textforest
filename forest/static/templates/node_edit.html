@@ -1,3 +1,6 @@
+<form>
+
+
 <div class="modal_title dash_underline">
   <% if(inline_options && inline_options.title) { %>
   <%= inline_options.title %>
@@ -20,11 +23,13 @@
 </div>
 
 <div class="editbox">
-  <input type=checkbox id="node_show_backward_relations_checkbox"> Show backward relations
+  <input type=checkbox id="node_show_backward_relations_checkbox">
+  <label for="node_show_backward_relations_checkbox">Show backward relations</label>
 </div>
 
 <div class="editbox">
-  <input type=checkbox id="node_public_can_link_checkbox"> Allow public to link to this node
+  <input type=checkbox id="node_public_can_link_checkbox">
+  <label for="node_public_can_link_checkbox">Allow public to link to this node</label>
 </div>
 
 <div class="editbox">
@@ -34,3 +39,4 @@
 </div>
 
 
+</form>

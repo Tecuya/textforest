@@ -4,7 +4,7 @@
 </div>
 
 <div id="status_sort_prefs">
-  Sort:
+  <b>Sort:</b>
 
   <div class="sort_pref <% if(sort != 'views') { %>clickable<% } %>" data-sort="views">Views</div>
   <div class="sort_pref <% if(sort != 'vote') { %>clickable<% } %>" data-sort="vote">Vote</div>
@@ -12,9 +12,10 @@
   <div class="sort_pref <% if(sortdir != 'asc') { %>clickable<% } %>" data-sortdir="asc">(asc</div> or
   <div class="sort_pref <% if(sortdir != 'desc') { %>clickable<% } %>" data-sortdir="desc">desc)</div>
 
-  <div class="sort_pref" id="sort_prioritize_op" data-sortpriop="1">
-    <input type=checkbox name=priop <% if(sortpriop) { %>checked<% } %>>Prioritize OP
-  </div>
+  <span id="sort_prioritize_op">
+    &nbsp;
+    <input type=checkbox id="sort_prioritize_op_checkbox" <% if(sortpriop) { %>checked<% } %>><label for="sort_prioritize_op_checkbox">Prioritize OP</label>
+  </span>
 </div>
 
 <div id="login_status_info">

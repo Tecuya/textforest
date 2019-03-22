@@ -17,7 +17,7 @@ define(
                 'keyup input#prompt': 'keypress_prompt',
                 'click div#modal': 'click_divmodal',
                 'click span.user_link': 'user_page_link',
-                'click span.node_link': 'node_link',
+                'click span.node_link': 'node_link'
             },
 
             elements: {
@@ -253,11 +253,11 @@ define(
 
                                 if (dir == 'up') {
                                     relation.set('vote', relation.get('vote') + 1);
-                                    self.choices_view.render_list();
+                                    self.choices_view.render();
 
                                 } else if (dir == 'down') {
                                     relation.set('vote', relation.get('vote') - 1);
-                                    self.choices_view.render_list();
+                                    self.choices_view.render();
                                 }
 
                             } else {
