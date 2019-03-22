@@ -113,7 +113,6 @@ small {
 
 div.node_text {
   padding-top: 3px;
-  border-bottom: dashed #333 2px;
 }
 
 div.editbox {
@@ -152,6 +151,8 @@ div.command_history {
   padding-bottom: 8px;
   margin-bottom: 8px;
   padding-top: 8px;
+  border-bottom: dashed #333 2px;
+
 }
 
 div.chosen_link_existing {
