@@ -161,7 +161,10 @@ class UserRelation(models.Model):
 
                     elif ri.interaction == 'consume':
                         ui.quantity -= ri.quantity
-                        ui_modified = True
+                        if ui.quantity == 0:
+                            ui.delete()
+                        else:
+                            ui.save()
 
                 elif ri.interaction == 'give':
                     ui, created = UserItem.objects.get_or_create(user=user, item=ri.item)
@@ -170,9 +173,6 @@ class UserRelation(models.Model):
                     if ri.item.max_quantity > 0 and ui.quantity > ri.item.max_quantity:
                         ui.quantity = ri.item.max_quantity
 
-                    ui_modified = True
-
-                if ui_modified:
                     ui.save()
 
         if len(fails) > 0:
