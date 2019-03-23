@@ -4,7 +4,7 @@ define(['backbone', 'js/models/node'], function(Backbone, node) {
 
         url: function() {
             if (this.text) {
-                return '/xhr/nodes_for_text/' + escape(this.text);
+                return '/xhr/nodes_for_text?text=' + encodeURIComponent(this.text);
             }
 
             return '/xhr/nodes_for_user';

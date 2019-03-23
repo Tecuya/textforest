@@ -20,7 +20,6 @@ define(
             initialize: function(options) {
                 this.manage_content_view = options.manage_content_view;
                 this.forest_view = options.forest_view;
-
                 this.items_collection = new Items();
             },
 

@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -140,39 +142,69 @@ class UserRelation(models.Model):
     def handle_user_action(user, relation, vote=None):
 
         fails = []
-        ui_modified = False
 
         user_relation, created = UserRelation.objects.get_or_create(user=user, relation=relation)
 
         if created or relation.repeatable:
 
+            relation_item_list = list(RelationItem.objects.filter(relation=relation))
+
+            useritem_map = {}
+
+            def get_useritem(item):
+                if item.id not in useritem_map:
+                    uiqs = UserItem.objects.filter(user=user, item=item)
+
+                    if len(uiqs) > 0:
+                        ui = uiqs[0]
+                    else:
+                        ui = UserItem(user=user, item=item)
+
+                    useritem_map[item.id] = ui
+
+                return useritem_map[item.id]
+
+            ui_to_save = []
+
+            # step 1; enforce 'require'
+            for ri in filter(lambda x: x.interaction == 'require', relation_item_list):
+                ui = get_useritem(ri.item)
+                if ui is None:
+                    fails.append('You need {} {} but you have none.'.format(ri.quantity, ri.item))
+                elif ui.quantity < ri.quantity:
+                    fails.append('You need {} {} but you only have {}.'.format(ri.quantity, ri.item, ui.quantity))
+
+            # step 2; sum up all relations so we have a single integer per item
+            item_net_results = defaultdict(int)
             for ri in RelationItem.objects.filter(relation=relation):
-
-                if ri.interaction in ('require', 'consume'):
-                    uiqs = ri.item.useritem_set.filter(user=user)
-                    if len(uiqs) < 1:
-                        fails.append('You need {} "{}" (by {}) but you have none.'.format(ri.quantity, ri.item.name, ri.item.author.username))
-                        continue
-
-                    ui = uiqs[0]
-
-                    if ui.quantity < ri.quantity:
-                        fails.append('You need {} "{}" (by {}) but you only have {}.'.format(ri.quantity, ri.item.name, ri.item.author.username, ui.quantity))
-
-                    elif ri.interaction == 'consume':
-                        ui.quantity -= ri.quantity
-                        if ui.quantity == 0:
-                            ui.delete()
-                        else:
-                            ui.save()
-
+                if ri.interaction == 'consume':
+                    item_net_results[ri.item] -= ri.quantity
                 elif ri.interaction == 'give':
-                    ui, created = UserItem.objects.get_or_create(user=user, item=ri.item)
-                    ui.quantity += ri.quantity
+                    item_net_results[ri.item] += ri.quantity
 
-                    if ri.item.max_quantity > 0 and ui.quantity > ri.item.max_quantity:
-                        ui.quantity = ri.item.max_quantity
+            # step 3: apply integers, enforce 'consume' along the way
+            for item, qty in item_net_results.items():
 
+                if qty == 0:
+                    continue
+
+                ui = get_useritem(item)
+
+                orig_qty = ui.quantity
+                ui.quantity += qty
+                if ui.quantity < 0:
+                    fails.append('You do not have enough of item {}.  You have {} and you need {} more.'.format(item.name, orig_qty, abs(ui.quantity)))
+                    continue
+
+                if ui.item.max_quantity > 0 and ui.quantity > ui.item.max_quantity:
+                    ui.quantity = ui.item.max_quantity
+
+                ui_to_save.append(ui)
+
+            for ui in ui_to_save:
+                if ui.quantity == 0:
+                    ui.delete()
+                else:
                     ui.save()
 
         if len(fails) > 0:
@@ -187,7 +219,7 @@ class UserRelation(models.Model):
         return True, ''
 
     def __str__(self):
-        return '{} followed {} and voted {}'.format(self.user, self.relation, self.vote)
+        return '{} "{}" vote: {}'.format(self.user, self.relation, self.vote)
 
 
 class Subscription(models.Model):
@@ -276,7 +308,7 @@ class Item(models.Model):
         return rdict
 
     def __str__(self):
-        return '{} by {} {}'.format(self.name, self.author, self.created.strftime('%Y-%m-%d'))
+        return '"{}" by {}'.format(self.name, self.author)
 
 
 class UserItem(models.Model):
@@ -301,4 +333,4 @@ class UserItem(models.Model):
         }
 
     def __str__(self):
-        return '{} owns {}'.format(self.user, self.item)
+        return '{} owns {} {}'.format(self.user, self.quantity, self.item)

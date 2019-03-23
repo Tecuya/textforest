@@ -4,7 +4,7 @@ define(['backbone', 'js/models/relationitem', 'js/models/item'], function(Backbo
         idAttribute: 'slug',
         url: function() {
             if (this.get('slug')) {
-                return '/xhr/relation_by_slug/' + escape(this.get('slug'));
+                return '/xhr/relation_by_slug/' + encodeURI(this.get('slug'));
             } else {
                 return '/xhr/relation_by_slug';
             }

@@ -4,10 +4,10 @@ define(['backbone', 'js/models/item'], function(Backbone, item) {
 
         url: function() {
             if (this.text) {
-                return '/xhr/items_for_text/' + escape(this.text);
-            } else {
-                return '/xhr/items_for_user';
+                return '/xhr/items_for_text?text=' + encodeURIComponent(this.text);
             }
+
+            return '/xhr/items_for_user';
         },
 
         set_search_text: function(text) {

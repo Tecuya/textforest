@@ -67,6 +67,7 @@ define(
                             success: function() {
                                 self.user.fetch({
                                     success: function() {
+                                        self.forest_view.refresh_choices();
                                         self.render();
                                     },
                                     error: function(xhr, err) {
@@ -124,6 +125,8 @@ define(
                                 complaint_div.html('');
                                 $(evt.target).hide();
                                 $(evt.target).parent().find('input.inventory_quantity').show();
+
+                                self.forest_view.refresh_choices();
                                 self.render();
                             },
                             error: function(xhr, err) {

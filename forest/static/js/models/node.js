@@ -10,13 +10,13 @@ define(['backbone', 'js/models/item'], function(Backbone, Item) {
 
         url: function() {
             if (this.has('slug')) {
-                return '/xhr/node_by_slug/' + escape(this.get('slug'));
+                return '/xhr/node_by_slug/' + encodeURI(this.get('slug'));
 
             } else if (this.get('relation_slug')) {
                 if (this.get('direction') == 'backward') {
-                    return '/xhr/node_by_backward_relation_slug/' + escape(this.get('relation_slug'));
+                    return '/xhr/node_by_backward_relation_slug/' + encodeURI(this.get('relation_slug'));
                 } else {
-                    return '/xhr/node_by_forward_relation_slug/' + escape(this.get('relation_slug'));
+                    return '/xhr/node_by_forward_relation_slug/' + encodeURI(this.get('relation_slug'));
                 }
 
             } else {

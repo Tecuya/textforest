@@ -223,11 +223,7 @@ define(
                     lastfetch: self.lastfetch,
                     refresh: function() {
                         self.relations_collection.set_search_text(prompt_contents);
-                        self.lastfetch = new Date().getTime();
-                        self.relations_collection.fetch({
-                            success: function() { self.choices_view.render(); },
-                            error: function(col, err) { self.add_error(err.responseText); }
-                        });
+                        self.refresh_choices();
                     },
                     noop_condition: function() {
                         return prompt_contents[0] == '/';
@@ -362,10 +358,11 @@ define(
                 }
             },
 
-            fetch_relations_collection: function() {
+            refresh_choices: function() {
                 var self = this;
+                this.lastfetch = new Date().getTime();
                 this.relations_collection.fetch({
-                    success: function() { self.choices_view.render(true); },
+                    success: function() { self.choices_view.render(); },
                     error: function(col, resp) { self.add_error(resp.responseText); }
                 });
             },
@@ -376,7 +373,7 @@ define(
                 this.sortpriop = sortpriop;
                 this.relations_collection.update_sort(sort, sortdir, sortpriop);
                 this.statusbar_view.render();
-                this.fetch_relations_collection();
+                this.refresh_choices();
             },
 
             view_current_node: function() {
@@ -397,7 +394,6 @@ define(
             },
 
             update_current_node: function() {
-                // this.view_current_node();
                 this.update_choices();
                 this.refresh_notifications();
                 this.inventory_view.render();
@@ -405,14 +401,11 @@ define(
             },
 
             update_choices: function() {
-                // update relations collection for new node and reset
                 this.relations_collection.set_parent_node(this.current_node);
                 this.relations_collection.set_search_text('');
-                this.fetch_relations_collection();
+                this.refresh_choices();
 
-                // clear prompt
                 this.$el.find(this.elements.prompt).val('');
-                this.choices_view.render();
             },
 
             node_view_for_relation: function(relation, backward) {
@@ -427,6 +420,7 @@ define(
                 });
                 this.current_node.fetch({
                     success: function() {
+
                         if(!backward && relation.get('relationitems').length > 0) {
 
                             if(relation.get('repeatable') || !relation.get('visited')) {
@@ -442,10 +436,16 @@ define(
                                 self.add_info_message('(Item interactions skipped because this choice is not repeatable.)');
                             }
 
+                            // server has applied item interactions, now we need to reload to pick them up
                             self.user.fetch({
                                 success: function() {
-                                    
+                                    // update choices
+                                    self.update_current_node();
+
+                                    // inventory count might have changed
                                     self.statusbar_view.render();
+
+                                    // also update inventory if its open
                                     if(self.inventory_view.$el.is(':visible')) {
                                         self.inventory_view.render();
                                     }
@@ -453,10 +453,13 @@ define(
                                 error: function(col, resp) { self.add_error(resp.responseText); }
                             });
                         }
-                        self.update_current_node();
+
+                        // draw new node if we moved
                         if(original_node_slug != self.current_node.get('slug')) {
                             self.view_current_node();
+                            self.update_current_node();
                         }
+
                         Backbone.history.navigate('/f/' + self.current_node.get('slug'));
                     },
                     error: function(col, resp) { self.add_error(resp.responseText); }

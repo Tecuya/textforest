@@ -116,6 +116,11 @@ define(
                                 self.forest_view.manage_content_view.manage_nodes_view.render();
                                 self.forest_view.hide_divmodal();
                             }
+
+                            if(self.node.get('slug') == self.forest_view.current_node.get('slug')) {
+                                self.forest_view.current_node = self.node;
+                                self.forest_view.view_current_node();
+                            }
                         },
                         error: function(xhr, resp) {
                             self.forest_view.add_error(resp.responseText);

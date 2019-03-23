@@ -22,7 +22,7 @@ def make_safe(s):
     return re.sub('<\/?[^>]+(>|$)', '', s)
 
 
-def uniqueify(model, slug):
+def uniqueify(model, existing_id, slug):
     uniqueifier = 0
     new_slug = slug
 
@@ -31,8 +31,13 @@ def uniqueify(model, slug):
         if uniqueifier != 0:
             new_slug = slug + '-' + str(uniqueifier)
 
-        nqs = model.objects.filter(slug=new_slug)
-        if len(nqs) == 0:
+        qs = model.objects.filter(slug=new_slug)
+
+        if len(qs) > 1:
+            raise Exception('Model {} has duplicate slug: {}'.format(model, new_slug))
+
+        # if this slug doesnt exist, or it does but only in the existing object
+        if len(qs) == 0 or (len(qs) == 1 and existing_id and qs[0].id == existing_id):
             break
 
         uniqueifier += 1
@@ -94,6 +99,7 @@ def xhr_node_by_slug(request, slug=None):
         node, created = Node.objects.get_or_create(slug=slug, author=user)
 
         if created:
+            node.author = user
             node.name = ('User: ' + user.username)
             node.text = 'This is the user page for '+user.username
             node.save()
@@ -105,8 +111,6 @@ def xhr_node_by_slug(request, slug=None):
         nqs = Node.objects.filter(slug=slug)
 
         if nqs is None or len(nqs) == 0:
-
-            # special handling for user pages
             return HttpResponseNotFound('No such node')
 
         node = nqs[0]
@@ -137,11 +141,14 @@ def xhr_node_by_slug(request, slug=None):
         if node.author is not None and node.author != request.user:
             return HttpResponseForbidden('This node does not belong to you')
 
+        if not is_user_page and doc['name'][:5] == 'User:':
+            return HttpResponseForbidden('Only real user pages can start with "User:"')
+
         node.author = request.user
 
         if not is_user_page:
             node.name = make_safe(doc['name'])
-            node.slug = slugify(doc['name'])
+            node.slug = uniqueify(Node, node.id, make_safe(slugify(doc['name'])))
 
         node.text = make_safe(doc['text'])
         node.show_backward_relations = bool(doc['show_backward_relations'])
@@ -158,11 +165,11 @@ def xhr_node_by_slug(request, slug=None):
 
     elif request.method == 'DELETE':
 
+        if node.author != request.user:
+            return HttpResponseForbidden('This node does not belong to you.')
+
         if is_user_page:
             return HttpResponseForbidden('User pages cannot be deleted.')
-
-        if node.author != request.user:
-            return HttpResponseForbidden('This node does not belong to you')
 
         node.delete()
 
@@ -197,19 +204,13 @@ def xhr_subscribe(request, slug, subscribe=True):
     return JsonResponse({}, safe=False)
 
 
-def xhr_relations_for_parent_node(request, slug):
-    return JsonResponse(
-        [r.make_json_response_dict(request.user)
-         for r in Relation.objects.filter(parent__slug=slug).order_by('-created')],
-        safe=False)
-
-
-def xhr_relations(request, slug, text=None):
+def xhr_relations_for_node_slug(request, slug):
 
     # unpack sorting prefs
     sortdir = request.GET.get('sortdir')
     sort = request.GET.get('sort')
     sortpriop = request.GET.get('sortpriop') == 'true'
+    text = request.GET.get('text')
 
     # find parent node
     nqs = Node.objects.filter(slug=slug)
@@ -292,14 +293,16 @@ def xhr_relations(request, slug, text=None):
     return JsonResponse(resp, safe=False)
 
 
-def xhr_nodes_for_text(request, text):
+def xhr_nodes_for_text(request):
+    text = request.GET.get('text')
     return JsonResponse(
         [n.make_json_response_dict(request.user)
          for n in Node.objects.filter(name__contains=text)],
         safe=False)
 
 
-def xhr_items_for_text(request, text):
+def xhr_items_for_text(request):
+    text = request.GET.get('text')
     return JsonResponse(
         [i.make_json_response_dict()
          for i in Item.objects.filter(Q(author=request.user) | Q(public_can_link=True), name__contains=text)],
@@ -326,7 +329,7 @@ def xhr_relation_by_slug(request, slug=None):
         relation.text = make_safe(doc['text'])
 
         if request.method == 'POST':
-            relation.slug = uniqueify(Relation, make_safe(slugify('{} {}'.format(request.user.username, doc['text']))))
+            relation.slug = uniqueify(Relation, relation.id, make_safe(slugify('{} {}'.format(request.user.username, doc['text']))))
 
         relation.parent = Node.objects.get(
             Q(author=request.user) | Q(public_can_link=True),
@@ -394,7 +397,7 @@ def xhr_item_by_slug(request, slug=None):
             if not created:
                 return HttpResponseForbidden('An item by this name already exists for this user')
 
-            item.slug = uniqueify(Item, make_safe(slugify('{} {}'.format(request.user.username, doc['name']))))
+            item.slug = uniqueify(Item, item.id, make_safe(slugify('{} {}'.format(request.user.username, doc['name']))))
 
         else:
 

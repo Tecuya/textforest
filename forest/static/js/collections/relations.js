@@ -64,13 +64,14 @@ define(['backbone', 'js/models/relation'], function(Backbone, relation) {
 
             } else {
 
+                var url = '/xhr/relations_for_node_slug/' + encodeURIComponent(this.parent_node.get('slug')) +
+                    '?sort=' + this.sort + '&sortdir=' + this.sortdir + '&sortpriop=' + this.sortpriop;
+
                 if (this.text) {
-                    return '/xhr/relations_for_node_slug/' + escape(this.parent_node.get('slug')) +
-                        '/' + escape(this.text) + '?sort=' + this.sort + '&sortdir=' + this.sortdir + '&sortpriop=' + this.sortpriop;
-                } else {
-                    return '/xhr/relations_for_node_slug/' + escape(this.parent_node.get('slug')) +
-                        '?sort=' + this.sort + '&sortdir=' + this.sortdir + '&sortpriop=' + this.sortpriop;
+                    url += '&text=' + encodeURIComponent(this.text);
                 }
+
+                return url;
             }
         }
     });
