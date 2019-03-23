@@ -52,7 +52,6 @@ define(
                 var item = this.items_collection.findWhere({ slug: slug });
 
                 this.forest_view.item_edit(item);
-
             },
 
             click_delete_item: function(evt) {

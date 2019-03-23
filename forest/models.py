@@ -83,7 +83,7 @@ class Relation(models.Model):
                 'author': self.author.username,
                 'views': self.views,
                 'vote': self.vote,
-                'visited': user is not None and user.is_active and len(self.userrelation_set.all()) > 0,
+                'visited': user is not None and user.is_active and len(self.userrelation_set.filter(user=user)) > 0,
                 'only_discoverable_via_ac_x_chars': self.only_discoverable_via_ac_x_chars,
                 'repeatable': self.repeatable,
                 'hide_when_requirements_unmet': self.hide_when_requirements_unmet,
@@ -125,7 +125,7 @@ class RelationItem(models.Model):
         }
 
     def __str__(self):
-        return '{} {} {}'.format(self.relation, self.interaction, self.quantity, self.item)
+        return '{} {} {} {}'.format(self.relation, self.interaction, self.quantity, self.item)
 
 
 class UserRelation(models.Model):
@@ -147,16 +147,15 @@ class UserRelation(models.Model):
             for ri in RelationItem.objects.filter(relation=relation):
 
                 if ri.interaction in ('require', 'consume'):
-
-                    uiqs = ri.item.useritem_set.all()
+                    uiqs = ri.item.useritem_set.filter(user=user)
                     if len(uiqs) < 1:
-                        fails.append('You need {} "{}" but you have none.'.format(ri.quantity, ri.item))
+                        fails.append('You need {} "{}" (by {}) but you have none.'.format(ri.quantity, ri.item.name, ri.item.author.username))
                         continue
 
                     ui = uiqs[0]
 
                     if ui.quantity < ri.quantity:
-                        fails.append('You need {} "{}" but you only have {}.'.format(ri.quantity, ri.item, ui.quantity))
+                        fails.append('You need {} "{}" (by {}) but you only have {}.'.format(ri.quantity, ri.item.name, ri.item.author.username, ui.quantity))
 
                     elif ri.interaction == 'consume':
                         ui.quantity -= ri.quantity
@@ -166,7 +165,7 @@ class UserRelation(models.Model):
                     ui, created = UserItem.objects.get_or_create(user=user, item=ri.item)
                     ui.quantity += ri.quantity
 
-                    if ui.quantity > ri.item.max_quantity:
+                    if ri.item.max_quantity > 0 and ui.quantity > ri.item.max_quantity:
                         ui.quantity = ri.item.max_quantity
 
                     ui_modified = True
@@ -275,7 +274,7 @@ class Item(models.Model):
         return rdict
 
     def __str__(self):
-        return '{} by {} {}'.format(self.name, self.name, self.created.strftime('%Y-%m-%d'))
+        return '{} by {} {}'.format(self.name, self.author, self.created.strftime('%Y-%m-%d'))
 
 
 class UserItem(models.Model):

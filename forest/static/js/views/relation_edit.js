@@ -37,13 +37,6 @@ define(
                 this.relation = relation;
             },
 
-            // create_relation_with_initial_vals: function(source_slug, initial_text) {
-            //     this.relation = new Relation({
-            //         parent: source_slug,
-            //         text: initial_text
-            //     });
-            // },
-
             render: function(mode, inline_options) {
                 var self = this;
 
@@ -53,21 +46,9 @@ define(
                     inline_options: inline_options
                 }));
 
-                if (inline_options) {
-                    if (inline_options.initial_slug) {
-                        this.relation = new Relation();
-                        this.node_selector_source.prime_from_slug(inline_options.initial_slug);
-                    }
-                    if (inline_options.initial_name) {
-                        this.$el.find('input#relation_edit_text').val(inline_options.initial_name);
-                        this.relation.set('text', inline_options.initial_name);
-                    }
-                    this.callback_on_save = inline_options.callback_on_save;
-                }
-
                 this.node_selector_source.setElement(this.$el.find('div#relation_node_select_source'));
                 this.node_selector_source.inline_create_options = {
-                    title: 'Create Source Node for Choice: "' + this.relation.get('text') + '"',
+                    title: 'Create Source Node for ' + (this.relation ? ('Choice: "' + this.relation.get('text') + '"') : 'New Choice'),
                     return_to_divmodal: this.forest_view.elements.divmodal_relation_edit
                 };
                 this.node_selector_source.render();
@@ -81,7 +62,7 @@ define(
 
                 // we can rely on these being present from create_relation_with_initial_vals
 
-                if (mode == 'edit' && this.relation) {
+                if (mode == 'edit') {
                     this.$el.find('input#relation_edit_text').val(this.relation.get('text'));
                     this.$el.find('input#relation_edit_only_discoverable_via_ac_x_chars').val(this.relation.get('only_discoverable_via_ac_x_chars'));
                     this.$el.find('input#relation_edit_repeatable').prop('checked', this.relation.get('repeatable'));
@@ -96,11 +77,24 @@ define(
                     });
 
                 } else {
-                    // sane defaults
+                    this.relation = undefined;
                     this.$el.find('input#relation_edit_only_discoverable_via_ac_x_chars').val('0');
                     this.$el.find('input#relation_edit_repeatable').prop('checked', true);
                 }
 
+
+                if (inline_options) {
+                    if (inline_options.initial_slug) {
+                        this.relation = new Relation();
+                        this.node_selector_source.prime_from_slug(inline_options.initial_slug);
+                    }
+                    if (inline_options.initial_name) {
+                        this.$el.find('input#relation_edit_text').val(inline_options.initial_name);
+                        this.relation.set('text', inline_options.initial_name);
+                    }
+                    this.callback_on_save = inline_options.callback_on_save;
+                }
+                
                 this.$el.find('input#relation_edit_text').focus();
             },
 
@@ -175,7 +169,9 @@ define(
                             }
 
                             if (self.callback_on_save) {
-                                self.callback_on_save(self.relation);
+                                var cb = self.callback_on_save;
+                                self.callback_on_save = undefined;
+                                cb(self.relation);                                
                             } else {
                                 self.forest_view.manage_content_view.manage_relations_view.render();
                                 self.forest_view.hide_divmodal();

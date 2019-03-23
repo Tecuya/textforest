@@ -103,12 +103,30 @@ def xhr_node_by_slug(request, slug=None):
     elif slug is not None:
 
         nqs = Node.objects.filter(slug=slug)
+
         if nqs is None or len(nqs) == 0:
 
             # special handling for user pages
             return HttpResponseNotFound('No such node')
 
         node = nqs[0]
+
+        if not node.public_can_link:
+
+            valid = False
+
+            if request.user.is_active:
+
+                # not public nodes verify that the user has loaded the node in the past
+                user_visited_inbound_relations = len(
+                    node.inbound_relations.filter(userrelation__user=request.user))
+
+                valid = user_visited_inbound_relations >= 1
+
+            if not valid:
+                return HttpResponseForbidden(
+                    'This load is not publicly linkable, and you have never visited it. ' +
+                    'You must find the choice that leads to this node in order to load it like this.')
 
     else:
         node = Node(author=request.user)

@@ -59,6 +59,7 @@ define(
                     this.$el.find(this.elements.backward_relation_checkbox).prop('checked', this.node.get('show_backward_relations'));
                     this.$el.find(this.elements.public_can_link_checkbox).prop('checked', this.node.get('public_can_link'));
                 } else {
+                    this.node = undefined;
                     this.$el.find(this.elements.backward_relation_checkbox).prop('checked', true);
                     this.$el.find(this.elements.public_can_link_checkbox).prop('checked', true);
                 }
@@ -108,7 +109,9 @@ define(
                     {
                         success: function() {
                             if (self.callback_on_save) {
-                                self.callback_on_save(self.node);
+                                var cb = self.callback_on_save;
+                                self.callback_on_save = undefined;
+                                cb(self.node);
                             } else {
                                 self.forest_view.manage_content_view.manage_nodes_view.render();
                                 self.forest_view.hide_divmodal();

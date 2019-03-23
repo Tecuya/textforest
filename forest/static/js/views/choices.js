@@ -88,7 +88,7 @@ define(
 
                 } else if (clicked_item_id == 'create_relation') {
                     this.forest_view.relation_inline_create();
-
+                    
                 } else {
 
                     this.forest_view.go_to_relation(

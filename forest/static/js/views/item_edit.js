@@ -54,14 +54,14 @@ define(
                 };
                 this.node_selector.render();
 
-                if (mode == 'edit' && this.item) {
+                if (mode == 'edit') {
                     this.$el.find(this.elements.name_input).val(this.item.get('name')).focus();
                     this.$el.find(this.elements.max_quantity_input).val(this.item.get('max_quantity'));
                     this.$el.find(this.elements.droppable_checkbox).prop('checked', this.item.get('droppable'));
                     this.$el.find(this.elements.public_can_give_checkbox).prop('checked', this.item.get('public_can_link'));
                     this.node_selector.prime_from_slug(this.item.get('description_node'));
                 } else {
-                    // sane default
+                    this.item = undefined;
                     this.$el.find(this.elements.max_quantity_input).val('0');
                     this.$el.find(this.elements.droppable_checkbox).prop('checked', true);
                     this.$el.find(this.elements.public_can_give_checkbox).prop('checked', true);
@@ -108,7 +108,9 @@ define(
                             });
 
                             if (self.callback_on_save) {
-                                self.callback_on_save(self.item);
+                                var cb = self.callback_on_save;
+                                self.callback_on_save = undefined;
+                                cb(self.item);                                
                             } else {
                                 self.forest_view.manage_content_view.manage_items_view.render();
                                 self.forest_view.hide_divmodal();

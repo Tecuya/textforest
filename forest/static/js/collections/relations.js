@@ -23,6 +23,40 @@ define(['backbone', 'js/models/relation'], function(Backbone, relation) {
             this.sortpriop = sortpriop;
         },
 
+        filtered_for_user: function(user) {
+            var filtered = [];
+
+            _.each(this.models, function(relation, idx) {
+                var allow = true;
+
+                if(relation.get('direction') == 'forward' && relation.get('hide_when_requirements_unmet')) { 
+                    _.each(relation.get('relationitems'), function(ri, idx) {
+                        if(ri.get('interaction') == 'require' || ri.get('interaction') == 'consume') {
+                            
+                            var useritems = _.filter(
+                                user.get('items'),
+                                function(useritem) {
+                                    return useritem.get('item').get('slug') == ri.get('item').get('slug');
+                                });
+
+                            if(useritems.length == 0) {
+                                allow=false;
+                            } else if(useritems[0].get('quantity') < ri.get('quantity')) {
+                                allow=false;
+                            }
+                            
+                        }
+                    });
+                }
+
+                if(allow) {
+                    filtered.push(relation);
+                }
+            });
+            
+            return filtered;
+        },
+        
         url: function() {
 
             if (!this.parent_node) {

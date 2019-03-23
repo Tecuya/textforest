@@ -428,21 +428,23 @@ define(
                 this.current_node.fetch({
                     success: function() {
                         if(!backward && relation.get('relationitems').length > 0) {
+
+                            if(relation.get('repeatable') || !relation.get('visited')) {
+                                _.each(relation.get('relationitems'), function(ri, idx) {
+                                    var info_message;
+                                    if(ri.get('interaction') == 'give') {
+                                        self.add_info_message('You receive '+ri.get('quantity')+' '+ri.get('item').get('name') + '.');
+                                    } else if(ri.get('interaction') == 'consume') {
+                                        self.add_info_message('You lose '+ri.get('quantity')+' '+ri.get('item').get('name') + '.');
+                                    }
+                                });
+                            } else if(!relation.get('repeatable') && relation.get('relationitems').length > 0) {
+                                self.add_info_message('(Item interactions skipped because this choice is not repeatable.)');
+                            }
+
                             self.user.fetch({
                                 success: function() {
-
-                                    if(relation.get('repeatable') || !relation.get('visited')) {
-                                        _.each(relation.get('relationitems'), function(ri, idx) {
-                                            if(ri.get('interaction') == 'give') {
-                                                self.add_info_message('You receive '+ri.get('quantity')+' '+ri.get('item').get('name'));
-                                            } else if(ri.get('interaction') == 'consume') {
-                                                self.add_info_message('You lose '+ri.get('quantity')+' '+ri.get('item').get('name'));
-                                            }
-                                        });
-                                    } else if(!relation.get('repeatable') && relation.get('relationitems').length > 0) {
-                                        self.add_info_message('Item interactions skipped because this choice is not repeatable.');
-                                    }
-
+                                    
                                     self.statusbar_view.render();
                                     if(self.inventory_view.$el.is(':visible')) {
                                         self.inventory_view.render();

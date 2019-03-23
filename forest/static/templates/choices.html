@@ -1,4 +1,4 @@
-<% _.each(relations.models, function(relation, idx) { %>
+<% _.each(relations.filtered_for_user(user), function(relation, idx) { %>
 <div class="existing_relation list_item <% if(relation.get('direction') == 'backward') { %> list_item_backward <% } %> <% if(relation.get('visited')) { %>visited_relation<% } %>" data-relation-slug="<%= relation.get('slug') %>" tabindex=<%= node.get('items').length + idx %>>
 
   <div class="relation_list_item_left">
