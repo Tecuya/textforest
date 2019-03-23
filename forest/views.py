@@ -125,7 +125,7 @@ def xhr_node_by_slug(request, slug=None):
 
             if not valid:
                 return HttpResponseForbidden(
-                    'This load is not publicly linkable, and you have never visited it. ' +
+                    'This node is not publicly linkable, and you have never visited it. ' +
                     'You must find the choice that leads to this node in order to load it like this.')
 
     else:
