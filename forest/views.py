@@ -255,7 +255,16 @@ def xhr_relations(request, slug, text=None):
 
         for r in rqs:
 
+            # let self-ref links be forward-only
             if r.parent == r.child and direction == 'backward':
+                continue
+
+            # enforce only_discoverable_via_ac_x_chars
+            if r.only_discoverable_via_ac_x_chars > 0 and (text is None or len(text) < r.only_discoverable_via_ac_x_chars):
+                continue
+
+            # enforce only_visible_to_node_owner
+            if r.only_visible_to_node_owner and request.user not in (r.parent.author, r.author):
                 continue
 
             reldict = r.make_json_response_dict(request.user)

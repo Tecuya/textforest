@@ -25,7 +25,19 @@
     <% } %>
 
     <% if(!relation.get('repeatable')) { %>
-    <span class="choice_relation_not_repeatable">(not repeatable)</span>
+    <span class="choice_relation_extra">(not repeatable)</span>
+    <% } %>
+
+    <% if(relation.get('only_discoverable_via_ac_x_chars')) { %>
+    <span class="choice_relation_extra">(discovered with <% relation.get('only_discoverable_via_ac_x_chars') %> character auto-complete)</span>
+    <% } %>
+
+    <% if(relation.get('only_visible_to_node_owner')) { %>
+    <span class="choice_relation_extra">(only visible to node owner)</span>
+    <% } %>
+
+    <% if(relation.get('hide_when_requirements_unmet')) { %>
+    <span class="choice_relation_extra">(hidden if requirements unmet)</span>
     <% } %>
 
   </div>

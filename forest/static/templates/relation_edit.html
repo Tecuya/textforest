@@ -24,33 +24,29 @@
 </div>
 
 <div class="form_text">
-  <label for="relation_edit_hide_when_requirements_unmet">Hide when requirements unmet:</label>
+  Hide unless matches this many auto-complete chars:<br>
+  <small>0 = do not hide based on auto-complete</small>
+</div>
+<div class="form_widget">
+  <input id="relation_edit_only_discoverable_via_ac_x_chars" type=text>
+</div>
+
+<div class="form_text">
+  <label for="relation_edit_only_visible_to_node_owner">Only visible to node owner:</label>
+</div>
+<div class="form_widget">
+  <input id="relation_edit_only_visible_to_node_owner" type=checkbox>
+</div>
+
+<div class="form_text">
+  <label for="relation_edit_hide_when_requirements_unmet">Hide when item requirements unmet:</label>
 </div>
 <div class="form_widget">
   <input id="relation_edit_hide_when_requirements_unmet" type=checkbox>
 </div>
 
-<div id="unimplemented_features" style="display:none;">
-  <div class="form_text">
-    Only discoverable with this many chars:<br>
-    <small>0 = always discoverable</small>
-  </div>
-  <div class="form_widget">
-    <input id="relation_edit_only_discoverable_via_ac_x_chars" type=text>
-  </div>
-
-
-  <div class="form_text">
-    <label for="relation_edit_only_visible_to_node_owner">Only visible to node owner:</label>
-  </div>
-  <div class="form_widget">
-    <input id="relation_edit_only_visible_to_node_owner" type=checkbox>
-  </div>
-</div>
-
 <div class="form_text">
-  <label for="relation_edit_repeatable">Repeatable:</label><br>
-  <small>Only applies to interactions</small>
+  <label for="relation_edit_repeatable">Item interactions repeatable:</label><br>
 </div>
 <div class="form_widget">
   <input id="relation_edit_repeatable" type=checkbox>
