@@ -60,6 +60,10 @@ select {
   font-family: Inconsolata, sans-serif;
 }
 
+textarea {
+  font-family: Inconsolata, sans-serif;
+}
+
 input:disabled {
   background-color: #222;
   color: #555;
