@@ -11,15 +11,17 @@
     <% if(relation.get('direction') == 'forward') { %>
     <% _.each(relation.get('relationitems'), function(ri, idx) { %>
 
+    <%   if(!ri.get('hide')) { %>
     <span class="choice_relationitem <% if(relation.get('visited') && !relation.get('repeatable')) { %>line-through<% } %>">
-    <%   if(ri.get('interaction') == 'require') { %>
+    <%     if(ri.get('interaction') == 'require') { %>
     (requires <% if(ri.get('quantity') > 1) { %><%= ri.get('quantity') %><% } %> <%= ri.get('item').get('name') %>)
-    <%   } else if(ri.get('interaction') == 'consume') { %>
+    <%     } else if(ri.get('interaction') == 'consume') { %>
     (consumse <% if(ri.get('quantity') > 1) { %><%= ri.get('quantity') %><% } %> <%= ri.get('item').get('name') %>)
-    <%   } else if(ri.get('interaction') == 'give') { %>
+    <%     } else if(ri.get('interaction') == 'give') { %>
     (gives <% if(ri.get('quantity') > 1) { %><%= ri.get('quantity') %><% } %> <%= ri.get('item').get('name') %>)
-    <%   } %>
+    <%     } %>
     </span>
+    <%   } %>
 
     <% }) %>
     <% } %>

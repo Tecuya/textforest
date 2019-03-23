@@ -302,7 +302,7 @@ def xhr_nodes_for_text(request, text):
 def xhr_items_for_text(request, text):
     return JsonResponse(
         [i.make_json_response_dict()
-         for i in Item.objects.filter(name__contains=text)],
+         for i in Item.objects.filter(Q(author=request.user) | Q(public_can_link=True), name__contains=text)],
         safe=False)
 
 
@@ -355,7 +355,8 @@ def xhr_relation_by_slug(request, slug=None):
                 quantity=int(ri['quantity']),
                 item=Item.objects.get(
                     Q(author=request.user) | Q(public_can_link=True),
-                    slug=ri['item']))
+                    slug=ri['item']),
+                hide=ri['hide'])
 
     elif request.method == 'DELETE':
         Relation.objects.filter(author=request.user, slug=slug).delete()

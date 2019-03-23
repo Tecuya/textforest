@@ -34,6 +34,7 @@ define(
                 if (mode == 'edit' && this.relationitem) {
                     this.$el.find('select#relationitem_action_select').val(this.relationitem.get('interaction'));
                     this.$el.find('input#relationitem_qty_input').val(this.relationitem.get('quantity'));
+                    this.$el.find('input#relationitem_hide').prop('checked', this.relationitem.get('hide'));
                     this.item_selector.select_model(this.relationitem.get('item'));
                 } else {
                     // sane defaults

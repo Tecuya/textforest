@@ -151,9 +151,10 @@ define(
                         var interaction = i.find('select#relationitem_action_select').val();
                         var quantity = i.find('input#relationitem_qty_input').val();
                         var item = i.find('div.model_selector_selection').data('slug');
-
+                        var hide = i.find('input#relationitem_hide').prop('checked');
+                        
                         if (interaction && quantity && item) {
-                            relationitems.push(new RelationItem({ interaction: interaction, quantity: quantity, item: item }));
+                            relationitems.push(new RelationItem({ interaction: interaction, quantity: quantity, item: item, hide: hide }));
                         }
                     });
                 this.relation.set('relationitems', relationitems);

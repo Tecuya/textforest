@@ -273,6 +273,7 @@ div#modal_node_edit {
 
 div#modal_relation_edit {
   display: inline-block;
+  width: 950px;
 }
 
 div#modal_item_edit {
@@ -670,12 +671,18 @@ div.model_create {
 div.relationitem_action {
   display: inline-block;
   float: left;
+  padding-left: 5px;
 }
 
 div.relationitem_qty {
   display: inline-block;
   float: left;
   padding-left: 5px;
+}
+
+div.relationitem_hide {
+  display: inline-block;
+  float: left;
 }
 
 div.relationitem_item_selector {

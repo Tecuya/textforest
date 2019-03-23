@@ -18,7 +18,8 @@ define(['backbone', 'js/models/relationitem', 'js/models/item'], function(Backbo
                         {
                             interaction: relationitem['interaction'],
                             quantity: relationitem['quantity'],
-                            item: Item.construct_from_json(relationitem['item'])
+                            item: Item.construct_from_json(relationitem['item']),
+                            hide: relationitem['hide']
                         })
                 );
             });

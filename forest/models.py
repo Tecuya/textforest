@@ -116,12 +116,14 @@ class RelationItem(models.Model):
     interaction = models.CharField(choices=INTERACTIONS, max_length=100)
     quantity = models.IntegerField()
     item = models.ForeignKey('Item', on_delete=models.CASCADE)
+    hide = models.BooleanField(default=False)
 
     def make_json_response_dict(self, user):
         return {
             'interaction': self.interaction,
             'quantity': self.quantity,
-            'item': self.item.make_json_response_dict()
+            'item': self.item.make_json_response_dict(),
+            'hide': self.hide
         }
 
     def __str__(self):
