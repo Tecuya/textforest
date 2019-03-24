@@ -3,11 +3,12 @@ define(
         'underscore',
         'backbone',
         'datatables',
+     'js/util/shorten',
         'js/models/node',
         'js/collections/nodes',
         'tpl!templates/manage_nodes',
     ],
-    function($, _, Backbone, datatables, Node, Nodes, managenodestpl) {
+    function($, _, Backbone, datatables, shorten, Node, Nodes, managenodestpl) {
         return Backbone.View.extend({
 
             template: managenodestpl,
@@ -32,7 +33,7 @@ define(
                 this.nodes_collection.fetch(
                     {
                         success: function() {
-                            self.$el.html(self.template({ nodes: self.nodes_collection }));
+                            self.$el.html(self.template({ shorten: shorten, nodes: self.nodes_collection }));
                             self.$el.find('table').DataTable();
                         },
                         error: function(xhr, err, ex) {

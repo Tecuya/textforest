@@ -80,6 +80,30 @@ define(
                     this.item_edit_view.setElement(this.$el.find(this.elements.divmodal_item_edit));
                 }
 
+                var self = this;
+                $('body').click(
+                    function(evt) {
+
+                        if($(evt.target).closest('div#manage_content').length == 0 &&
+                           $(evt.target).closest('div#notifications').length == 0 &&
+                           $(evt.target).closest('div#inventory').length == 0 &&
+                            
+                           $(evt.target).closest('div#manage_content_link').length == 0 &&
+                           $(evt.target).closest('div#notifications_link').length == 0 &&
+                           $(evt.target).closest('div#inventory_link').length == 0 &&
+                           
+                           $(evt.target).closest('div#modal').length == 0 &&
+
+                           (self.$el.find('div#manage_content:visible').length > 0 ||
+                            self.$el.find('div#inventory:visible').length > 0 ||
+                            self.$el.find('div#notifications:visible').length > 0)) { 
+                            
+                            self.$el.find('div#manage_content').hide();
+                            self.$el.find('div#inventory').hide();
+                            self.$el.find('div#notifications').hide();
+                        }
+                    });
+
                 this.focus_prompt();
             },
 

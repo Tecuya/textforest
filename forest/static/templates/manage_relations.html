@@ -13,7 +13,7 @@
   <tbody>
     <% _.each(relations.models, function(relation, idx) { %>
     <tr data-slug="<%= relation.get('slug') %>">
-      <td><%= relation.get('text') %></td>
+      <td><%= shorten(relation.get('text'), 70) %></td>
       <td><%= relation.get('views') %></td>
       <td><%= relation.get('vote') %></td>
       <td><%= relation.get('created') %></td>

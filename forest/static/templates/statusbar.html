@@ -1,22 +1,19 @@
 
 <div id="status_left">
 
-  <img src="/static/favicon.ico" height=11 id="status_img">
+  <img src="/static/favicon.ico" height=11 id="status_img" />
 
-  <span class="node_link" data-slug="home">TextForest</div>
+  <span class="node_link" data-slug="home">TextForest</span>
 
   &nbsp;
 
-<div class="status_block">
-  |
+  <div class="status_block">
+    <b>Sort:</b>
     <div class="sort_pref <% if(sort != 'views') { %>clickable<% } %>" data-sort="views">Views</div>
     <div class="sort_pref <% if(sort != 'vote') { %>clickable<% } %>" data-sort="vote">Vote</div>
     <div class="sort_pref <% if(sort != 'date') { %>clickable<% } %>" data-sort="date">Date</div>
     (<div class="sort_pref <% if(sortdir != 'asc') { %>clickable<% } %>" data-sortdir="asc">asc</div> or
     <div class="sort_pref <% if(sortdir != 'desc') { %>clickable<% } %>" data-sortdir="desc">desc</div>)
-  </div>
-
-  <div class="status_block">
     <input type=checkbox id="sort_prioritize_op_checkbox" <% if(sortpriop) { %>checked<% } %>><label for="sort_prioritize_op_checkbox">Prioritize OP</label>
   </div>
 
@@ -24,24 +21,31 @@
 
 <div id="status_right">
 
-  <% if(user.get('username')) { %>
-  <div class="status_info clickable" id="logout_link">Logout</div>
-  <div class="status_info clickable" id="user_settings_link">Settings</div>
-  <div class="status_info clickable" id="manage_content_link">Content</div>
 
-  <div class="status_info">
-    | &nbsp; Logged in as
-    <span class="node_link" data-slug="~<%= encodeURIComponent(user.get('username')) %>" id="user_link"><%= user.get('username') %></span>
+  <% if(user.get('username')) { %>
+
+  <div class="status_block">
+    <div class="status_info clickable" id="notifications_link" >Notifications (<%= notifications.models.length %>)</div>
+    <div class="status_info clickable" id="inventory_link">Inventory (<%= user.get('items').length %>)</div>
   </div>
 
-  <div class="status_info clickable" id="notifications_link" >Notifications (<%= notifications.models.length %>)</div>
-  <div class="status_info clickable" id="inventory_link">Inventory (<%= user.get('items').length %>)</div>
+  <div class="status_block">
+    <div class="status_info clickable" id="logout_link">Logout</div>
+    <div class="status_info clickable" id="user_settings_link">Settings</div>
+    <div class="status_info clickable" id="manage_content_link">Content</div>
+
+    <div class="status_info">
+      Logged in as
+      <span class="node_link" data-slug="~<%= encodeURIComponent(user.get('username')) %>" id="user_link"><%= user.get('username') %></span>
+    </div>
+  </div>
 
   <% } else { %>
 
-  <div class="status_info clickable" id="login_link">Log in</div>
-
-  <div class="status_info">Not logged in</div>
+  <div class="status_block">
+    <div class="status_info clickable" id="login_link">Log in</div>
+    <div class="status_info">Not logged in</div>
+  </div>
 
   <% } %>
 </div>

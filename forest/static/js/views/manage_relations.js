@@ -2,11 +2,12 @@ define(
     ['jquery',
         'underscore',
         'backbone',
+     'js/util/shorten',
         'js/collections/relations',
         'js/models/node',
         'tpl!templates/manage_relations'
     ],
-    function($, _, Backbone, Relations, Node, managerelationstpl) {
+    function($, _, Backbone, shorten, Relations, Node, managerelationstpl) {
         return Backbone.View.extend({
 
             template: managerelationstpl,
@@ -30,7 +31,7 @@ define(
                 this.relations_collection.fetch(
                     {
                         success: function() {
-                            self.$el.html(self.template({ relations: self.relations_collection }));
+                            self.$el.html(self.template({ shorten: shorten, relations: self.relations_collection }));
                             self.$el.find('table').DataTable();
                         },
                         error: function(xhr, err, ex) {

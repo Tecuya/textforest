@@ -1,11 +1,12 @@
 define(
     ['jquery',
         'underscore',
-        'backbone',
+     'backbone',
+     'js/util/shorten',
         'js/collections/items',
         'tpl!templates/manage_items'
     ],
-    function($, _, Backbone, Items, manageitemstpl) {
+    function($, _, Backbone, shorten, Items, manageitemstpl) {
         return Backbone.View.extend({
 
             template: manageitemstpl,
@@ -29,7 +30,7 @@ define(
                 this.items_collection.fetch(
                     {
                         success: function() {
-                            self.$el.html(self.template({ items: self.items_collection }));
+                            self.$el.html(self.template({ items: self.items_collection, shorten: shorten }));
                             self.$el.find('table').DataTable();
                         },
                         error: function(xhr, err, ex) {

@@ -9,6 +9,7 @@ body {
   color: #fff;
   font-size: 16px;
   overflow: hidden;
+  margin: 0px;
 }
 
 a:link {
@@ -153,14 +154,14 @@ div#forest {
   display: flex;
   flex-flow: column;
   align-items: stretch;
-  height: 97%;
+  height: 100%;
 }
 
 div#text_area {
+  flex: 0 1 auto;
   border: 2px solid #000;
   border-radius: 7px;
   background-color: #111;
-  flex: 0 1 auto;
   overflow: auto;
   height: 100%;
   padding: 10px;
@@ -169,7 +170,13 @@ div#text_area {
 
 div#user_area {
   flex: 1 1 auto;
-  height: 300px;
+  height: 290px;
+}
+
+div#status_bar {
+  flex: 0 1 auto;
+  width: 100%;
+  background-color: black;
 }
 
 div#choices {
@@ -192,15 +199,6 @@ div.relation_list_item_right {
   float: right;
 }
 
-div.relation_attribution_block {
-  padding-right: 4px;
-  padding-top: 2px;
-  padding-left: 5px;
-  font-size: 8px;
-  text-align: left;
-  color: #eee;
-  width: 120px;
-}
 
 div.node_header {
   margin-top: 5px;
@@ -280,15 +278,6 @@ div#modal_item_edit {
   display: inline-block;
 }
 
-div#status_bar {
-  position: fixed;
-  z-index: 100;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background-color: black;
-}
-
 div#status_left {
   float: left;
   vertical-align: top;
@@ -350,7 +339,22 @@ div.relation_vote_block {
   color: #eee;
   font-size: 0px;
   margin-top: 3px;
-  width: 60px;
+}
+
+div.relation_view_block {
+  color: #ccc;
+  padding-top: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+div.relation_attribution_block {
+  padding-right: 4px;
+  padding-top: 2px;
+  padding-left: 5px;
+  font-size: 8px;
+  text-align: left;
+  color: #eee;
 }
 
 div.relation_right_block {
@@ -367,14 +371,6 @@ span.votecount {
   color: white;
   padding-left: 5px;
   padding-right: 5px;
-}
-
-div.relation_view_block {
-  color: #ccc;
-  padding-top: 5px;
-  padding-left: 5px;
-  padding-right: 5px;
-  width: 60px;
 }
 
 span.relation_views {
@@ -511,15 +507,14 @@ div.delete_confirm_choice {
 
 div.drawer {
   position: fixed;
-
-  bottom: 21;
-  left: 55%;
-  width: 44%;
-  right: 1%;
-  background-color: black;
-  border-top: solid #444 2px;
+  top: 0px;
+  right: 0px;
   padding: 8px;
+  background-color: black;
   display: none;
+  border-left: solid #222 1px;
+  border-bottom: solid #222 1px;
+  border-radius: 0px 0px 0px 8px;
 }
 
 div.notification {
@@ -560,7 +555,6 @@ div#inventory_clear_all {
   text-decoration: underline;
   float: right;
 }
-
 
 span#star_empty {
   cursor: pointer;
@@ -613,13 +607,6 @@ div.info_message {
   color: #ada;
 }
 
-div.drawer_close_button {
-  float: left;
-  display: inline-block;
-  cursor: pointer;
-  text-decoration: underline;
-}
-
 span.choice_relationitem {
   font-size: 9px;
   color: #ada;
@@ -627,24 +614,17 @@ span.choice_relationitem {
 }
 
 span.choice_relation_extra {
-  font-size: 13px;
+  font-size: 9px;
   color: orange;
   margin-left: 2px;
 }
 
-div#manage_content {
-  border-top: solid #444 1px;
-  border-left: solid #444 1px;
-  border-right: solid #444 1px;
-  border-radius: 8px 8px 0px 0px;
-}
-
 div.drawer_tab {
-  float: left;
-  border-top: solid #444 1px;
+  float: right;
+  border-bottom: solid #444 1px;
   border-left: solid #444 1px;
   border-right: solid #444 1px;
-  border-radius: 8px 8px 0px 0px;
+  border-radius: 0px 0px 8px 8px;
   padding: 5px;
   cursor: pointer;
   color: #aaa;
@@ -659,7 +639,6 @@ div.manage_content_tab_area {
   border: solid #444 1px;
   display: none;
   padding: 5px;
-  margin-bottom: 5px;
 }
 
 td.align_right {

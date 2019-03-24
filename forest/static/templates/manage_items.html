@@ -11,7 +11,7 @@
   <tbody>
     <% _.each(items.models, function(item, idx) {  %>
     <tr data-slug="<%= item.get('slug') %>">
-      <td><%= item.get('name') %></td>
+      <td><%= shorten(item.get('name'), 70) %></td>
       <td><%= item.get('created') %></td>
       <td>
         <!-- <span id="manage_view_item" class="clickable">View</span> -->
