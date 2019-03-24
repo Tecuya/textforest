@@ -53,7 +53,7 @@
     </div>
 
     <div class="relation_right_block relation_view_block">
-      <%= relation.get('views') %><span class="relation_views">views</span>
+      <%= relation.get('views') %><span class="relation_views">view<% if(relation.get('views') > 1) { %>s<% } %></span>
     </div>
 
     <div class="relation_right_block relation_attribution_block">
