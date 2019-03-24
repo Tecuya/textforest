@@ -171,17 +171,13 @@ div#text_area {
 div#user_area {
   flex: 1 1 auto;
   height: 290px;
+  overflow: auto;
 }
 
 div#status_bar {
   flex: 0 1 auto;
   width: 100%;
   background-color: black;
-}
-
-div#choices {
-  overflow: auto;
-  height: 270px;
 }
 
 div#relations_list {
@@ -281,16 +277,15 @@ div#modal_item_edit {
 div#status_left {
   float: left;
   vertical-align: top;
-  height: 18px;
+}
+
+div#status_right {
+  float: right;
 }
 
 input#sort_prioritize_op_checkbox {
   padding-top: 4px;
   height: 10px;
-}
-
-div#status_right {
-  float: right;
 }
 
 div#status_title {
