@@ -1,22 +1,24 @@
-<div class="node_attribution">
+<div class="node_header">
 
-  <span id="star_full" <% if(!node.get('subscribed')) { %>style="display: none;"<% } %>>★</span>
-  <span id="star_empty" <% if(node.get('subscribed')) { %>style="display: none;"<% } %>>☆</span>
-
-  <b><a href="/f/<%= node.get('slug') %>"><%= node.get('name') %></a></b><br>
-
-  Created <%= node.get('created') %> by
-  <span class="clickable user_link" data-user-link="<%= node.get('author') %>"><%= node.get('author') %></span><br>
-
-  <% if(node.get('author') == user.get('username')) { %>
-  <div class="actionlink" data-action="edit">Edit</div>
-  <div class="actionlink" data-action="delete">Delete</div>
-  <div class="delete_confirm">
-    Really delete this post?
-    <div class="delete_confirm_choice actionlink" data-action="delete-no">No</div>
-    <div class="delete_confirm_choice actionlink" data-action="delete-yes">Yes</div>
+  <div class="node_header_left">
+    <b><span class="node_link" data-slug="<%= encodeURIComponent(node.get('slug')) %>"><%= node.get('name') %></span></b>
+    <span id="star_full" <% if(!node.get('subscribed')) { %>style="display: none;"<% } %>>★</span>
+    <span id="star_empty" <% if(node.get('subscribed')) { %>style="display: none;"<% } %>>☆</span>
   </div>
-  <% } %>
+
+  <div class="node_header_right">
+    <%= node.get('created') %> by
+    <span class="clickable node_link" data-slug="~<%= encodeURIComponent(node.get('author')) %>"><%= node.get('author') %></span>
+
+    <% if(node.get('author') == user.get('username')) { %>
+    <span class="node_header_actions">
+      <span class="node_header_edit clickable" data-slug="<%= node.get('slug') %>">Edit</span>
+      <span class="node_header_delete clickable" data-slug="<%= node.get('slug') %>">Delete</span>
+    </span>
+    <% } %>
+  </div>
+
+  <div class="cleardiv"></div>
 
 </div>
 

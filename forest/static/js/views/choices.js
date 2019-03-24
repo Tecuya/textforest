@@ -88,7 +88,7 @@ define(
 
                 } else if (clicked_item_id == 'create_relation') {
                     this.forest_view.relation_inline_create();
-                    
+
                 } else {
 
                     this.forest_view.go_to_relation(
@@ -101,14 +101,24 @@ define(
 
             vote_up: function(evt) {
                 evt.stopPropagation();
-                var slug = $(evt.target).data('slug');
-                this.forest_view.vote(slug, 'up');
+                var self = this;
+                this.forest_view.requires_login(
+                    function() {
+                        var slug = $(evt.target).data('slug');
+                        self.forest_view.vote(slug, 'up');
+                    }
+                );
             },
 
             vote_down: function(evt) {
                 evt.stopPropagation();
-                var slug = $(evt.target).data('slug');
-                this.forest_view.vote(slug, 'down');
+                var self = this;
+                this.forest_view.requires_login(
+                    function() {
+                        var slug = $(evt.target).data('slug');
+                        self.forest_view.vote(slug, 'down');
+                    }
+                );
             }
         });
     }

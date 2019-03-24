@@ -17,7 +17,9 @@ define(
             events: {
                 'click div.actionlink': 'actionlink',
                 'click span#star_full': 'click_subscribe',
-                'click span#star_empty': 'click_subscribe'
+                'click span#star_empty': 'click_subscribe',
+                'click span.node_header_edit': 'edit_node',
+                'click span.node_header_delete': 'delete_node'
             },
 
             initialize: function(options) {
@@ -31,20 +33,15 @@ define(
                 this.$el.html(this.template({ node: this.node, user: this.forest_view.user }));
             },
 
-            actionlink: function(evt) {
-                var action = $(evt.target).data('action');
-                if (action == 'edit') {
-                    this.forest_view.log_command('[Edit ' + this.forest_view.current_node.get('slug') + ']');
-                    this.forest_view.node_edit(this.node);
+            edit_node: function(evt) {
+                this.forest_view.log_command('[Edit ' + this.forest_view.current_node.get('slug') + ']');
+                this.forest_view.node_edit(this.node);
+            },
 
-                } else if (action == 'delete') {
-                    this.$el.find(this.elements.delete_confirm_div).show();
-                    this.forest_view.scroll_bottom();
-
-                } else if (action == 'delete-no') {
-                    this.$el.find(this.elements.delete_confirm_div).hide();
-
-                } else if (action == 'delete-yes') {
+            delete_node: function(evt) {
+                if (!$(evt.target).hasClass('red')) {
+                    $(evt.target).addClass('red');
+                } else {
                     this.forest_view.log_command('[Delete ' + this.forest_view.current_node.get('slug') + ']');
                     this.forest_view.node_delete(this.node);
                 }

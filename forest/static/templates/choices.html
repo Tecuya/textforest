@@ -43,26 +43,34 @@
     <% } %>
 
   </div>
+
   <div class="relation_list_item_right">
-    Author: <%= relation.get('author') %> Date: <%= relation.get('created') %><br>
-    <% if(relation.get('author') == user.get('username')) { %>
-    <div class="delete_list_item list_item_modify_link">Delete</div>
-    <div class="edit_list_item list_item_modify_link">Edit</div>
-    <% } %>
-    <div class="relation_stats">
-      Views: <%= relation.get('views') %>
-      Vote:
-      <span class="voteup pointer" data-slug="<%= relation.get('slug') %>">&uarr;</span>
-      <%= relation.get('vote') %>
-      <span class="votedown pointer" data-slug="<%= relation.get('slug') %>">&darr;</span>
+
+    <div class="relation_right_block relation_vote_block">
+      <span class="vote pointer voteup" data-slug="<%= relation.get('slug') %>">&uarr;</span>
+      <span class="votecount <% if(relation.get('vote') == '0') { %>votezero<% } %>"><%= relation.get('vote') %></span>
+      <span class="vote pointer votedown" data-slug="<%= relation.get('slug') %>">&darr;</span>
+    </div>
+
+    <div class="relation_right_block relation_view_block">
+      <%= relation.get('views') %><span class="relation_views">views</span>
+    </div>
+
+    <div class="relation_right_block relation_attribution_block">
+      <%= relation.get('created') %> by <%= relation.get('author') %>
+      <% if(relation.get('author') == user.get('username')) { %><br>
+      <span class="edit_list_item clickable">Edit</span>
+      <span class="delete_list_item clickable">Delete</span>
+      <% } %>
     </div>
   </div>
-  &nbsp;
 </div>
 <% }); %>
 
 <% if(prompt && prompt.length > 0 && (node.get('author') == user.get('username') || node.get('public_can_link'))) { %>
 <div class="model_create list_item" id="create_relation" tabindex=<%= node.get('items').length + relations.models.length %>>
-  Create new choice
+  <div class="relation_list_item_left">
+    Create new choice
+  </div>
 </div>
 <% } %>

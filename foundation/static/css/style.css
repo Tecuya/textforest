@@ -16,7 +16,7 @@ a:link {
 }
 
 a:visited {
-  color: #DDDDDD;
+  color: #D2D2D2;
 }
 
 a:hover {
@@ -87,7 +87,8 @@ div.list_item {
   cursor: pointer;
   font-size: 14px;
   clear: both;
-  height: 23px;
+  overflow: hidden;
+  vertical-align: bottom;
 }
 
 div.list_item:hover {
@@ -97,24 +98,14 @@ div.list_item:hover {
 
 div.visited_relation {
   background-color: #111;
-  color: #aaa;
+  color: #979797;
 }
 
 div.list_item_backward {
   background-color: #111;
 }
 
-div.actionlink {
-  font-size: 11px;
-  text-decoration: underline;
-  cursor: pointer;
-  float: right;
-  display: inline-block;
-  padding-left: 5px;
-}
-
 div.node_text {
-  padding-top: 3px;
 }
 
 div.editbox {
@@ -151,10 +142,7 @@ button {
 div.command_history {
   font-family: monospace;
   padding-bottom: 8px;
-  margin-bottom: 8px;
   padding-top: 8px;
-  border-bottom: dashed #333 2px;
-
 }
 
 div.chosen_link_existing {
@@ -176,6 +164,7 @@ div#text_area {
   overflow: auto;
   height: 100%;
   padding: 10px;
+  font-size: 16px;
 }
 
 div#user_area {
@@ -194,26 +183,46 @@ div#relations_list {
 }
 
 div.relation_list_item_left {
-  float: left;
   padding: 4px;
+  display: inline-block;
+  overflow: auto;
 }
 
 div.relation_list_item_right {
   float: right;
-  display: inline-block;
-  font-size: 10px;
-  text-align: right;
-  padding-right: 5px;
+  display: block;
 }
 
-div.node_attribution {
-  text-align: right;
-  float: right;
+div.relation_attribution_block {
+  padding-right: 4px;
+  padding-top: 2px;
+  padding-left: 5px;
+  font-size: 10px;
+  text-align: left;
+  color: #eee;
+}
+
+div.node_header {
+  margin-top: 5px;
   font-size: 14px;
-  padding: 4px;
-  margin: 4px;
-  border: dashed #333 1px;
-  border-radius: 7px;
+  border-top: dashed #555 1px;
+  background-color: #000;
+  padding: 3px;
+}
+
+span.node_header_actions {
+  border-left: dashed #444 1px;
+  padding-left: 5px;
+}
+
+div.node_header_left {
+  display: inline-block;
+  float: left;
+}
+
+div.node_header_right {
+  display: inline-block;
+  float: right;
 }
 
 div.cleardiv {
@@ -223,19 +232,6 @@ div.cleardiv {
 div.error {
   color: red;
   font-weight: bold;
-}
-
-div.list_item_modify_link {
-  text-decoration: underline;
-  cursor: pointer;
-  font-weight: bold;
-  float: right;
-  padding-left: 10px;
-  color: white;
-}
-
-div.relation_stats {
-  float: right;
 }
 
 div#modal {
@@ -291,12 +287,12 @@ div#status_bar {
   left: 0;
   width: 100%;
   background-color: black;
-  height: 18px;
 }
 
 div#status_left {
   float: left;
   vertical-align: top;
+  height: 18px;
 }
 
 input#sort_prioritize_op_checkbox {
@@ -350,14 +346,48 @@ div.status_info {
   cusor: pointer;
 }
 
-.voteup {
-  font-weight: bold;
-  color: #afa;
+div.relation_vote_block {
+  background-color: #000;
+  color: #eee;
+  font-size: 0px;
+  padding-top: 5px;
 }
 
-.votedown {
+div.relation_right_block {
+  border-left: dotted #555 1px;
+  border-top: dotted #555 1px;
+  float: left;
+  height: 25px;
+}
+
+span.vote {
   font-weight: bold;
-  color: #faa;
+  font-size: 16px;
+}
+
+span.votecount {
+  font-size: 16px;
+  color: white;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+div.relation_view_block {
+  background-color: #000;
+  color: #ccc;
+  padding-top: 7px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+span.relation_views {
+  font-size: 8px;
+  color: #bbb;
+  padding-left: 2px;
+}
+
+span.votezero {
+  color: #888;
 }
 
 div#login_form_modal {
@@ -716,4 +746,9 @@ div.inventory_quantity_complaint {
 span.node_link {
   text-decoration: underline;
   cursor: pointer;
+}
+
+div.status_block {
+  display: inline-block;
+  whitespace: nowrap;
 }
