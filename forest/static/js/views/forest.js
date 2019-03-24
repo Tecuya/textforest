@@ -17,7 +17,6 @@ define(
                 'keyup input#prompt': 'keyup_prompt',
                 'keypress input#prompt': 'keypress_prompt',
                 'click div#modal': 'click_divmodal',
-                'click span.user_link': 'user_page_link',
                 'click span.node_link': 'node_link'
             },
 
@@ -341,12 +340,10 @@ define(
                 text_area.scrollTop(text_area[0].scrollHeight);
             },
 
-            user_page_link: function(evt) {
-                Backbone.history.navigate('/f/~' + encodeURIComponent($(evt.target).data('user-link')), true);
-            },
-
             node_link: function(evt) {
-                Backbone.history.navigate('/f/' + encodeURIComponent($(evt.target).data('node-link')), true);
+                var slug = $(evt.target).data('slug');
+                this.log_command('/go ' + slug);
+                Backbone.history.navigate('/f/' + encodeURIComponent($(evt.target).data('slug')), true);
             },
 
             requires_login: function(callable) {

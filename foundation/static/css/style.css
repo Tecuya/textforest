@@ -7,7 +7,7 @@ body {
   font-family: Inconsolata, sans-serif;
   background-color: #444;
   color: #fff;
-  font-size: 13pt;
+  font-size: 16px;
   overflow: hidden;
 }
 
@@ -29,13 +29,13 @@ a:active {
 
 div.title {
   text-align: center;
-  font-size: 15pt;
+  font-size: 19px;
 }
 
 textarea {
   background-color: #777;
   color: white;
-  font-size: 13pt;
+  font-size: 16px;
   border: 2px solid white;
   border-radius: 7px;
   padding: 8px;
@@ -44,13 +44,13 @@ textarea {
 select {
   background-color: #777;
   color: white;
-  font-size: 13pt;
+  font-size: 16px;
 }
 
 input {
   background-color: #272727;
   color: white;
-  font-size: 13pt;
+  font-size: 16px;
   border: 1px solid #666;
   padding-left: 4px;
   font-family: Inconsolata, sans-serif;
@@ -83,9 +83,11 @@ input#prompt {
 div.list_item {
   border-bottom: 1px dotted #444;
   background-color: #111;
-  padding: 5px;
   font-family: monospace;
   cursor: pointer;
+  font-size: 14px;
+  clear: both;
+  height: 23px;
 }
 
 div.list_item:hover {
@@ -103,7 +105,7 @@ div.list_item_backward {
 }
 
 div.actionlink {
-  font-size: 11pt;
+  font-size: 11px;
   text-decoration: underline;
   cursor: pointer;
   float: right;
@@ -111,28 +113,24 @@ div.actionlink {
   padding-left: 5px;
 }
 
-small {
-  font-size: 8pt;
-}
-
 div.node_text {
   padding-top: 3px;
 }
 
 div.editbox {
-  font-size: 13pt;
+  font-size: 16px;
   padding: 2px;
 }
 
 input.node_edit_title {
-  width: 1600px;
+  width: 1000px;
   border-radius: 2px;
   background-color: #181818;
   border: solid #555 1px;
 }
 
 textarea.node_edit_text {
-  width: 1600px;
+  width: 1000px;
   height: 400px;
   border-radius: 2px;
   background-color: #181818;
@@ -142,7 +140,7 @@ textarea.node_edit_text {
 button {
   background-color: #777;
   color: white;
-  font-size: 13pt;
+  font-size: 16px;
   border-radius: 4px;
   background-color: #222;
   padding: 3px;
@@ -197,20 +195,21 @@ div#relations_list {
 
 div.relation_list_item_left {
   float: left;
-  display: inline-block;
+  padding: 4px;
 }
 
 div.relation_list_item_right {
   float: right;
   display: inline-block;
-  font-size: 8pt;
+  font-size: 10px;
   text-align: right;
+  padding-right: 5px;
 }
 
 div.node_attribution {
   text-align: right;
   float: right;
-  font-size: 11pt;
+  font-size: 14px;
   padding: 4px;
   margin: 4px;
   border: dashed #333 1px;
@@ -292,16 +291,25 @@ div#status_bar {
   left: 0;
   width: 100%;
   background-color: black;
+  height: 18px;
 }
 
-div#login_status_info {
+div#status_left {
+  float: left;
+  vertical-align: top;
+}
+
+input#sort_prioritize_op_checkbox {
+  padding-top: 4px;
+  height: 10px;
+}
+
+div#status_right {
   float: right;
 }
 
 div#status_title {
   float: left;
-  display: inline-block;
-  font-size: 14pt;
   text-decoration: underline;
   cursor: pointer;
 }
@@ -309,6 +317,8 @@ div#status_title {
 img#status_img {
   padding-left: 6px;
   padding-right: 6px;
+  padding-top: 3px;
+  padding-bottom: 0px;
 }
 
 div#status_sort_prefs {
@@ -422,7 +432,7 @@ div.save_row {
 
 span#pword_small {
   margin-left: 7px;
-  font-size: 10pt;
+  font-size: 10px;
 }
 
 form {
@@ -434,7 +444,7 @@ div#user_form_result {
 }
 
 div.modal_title {
-  font-size: 19pt;
+  font-size: 18px;
   margin-bottom: 14px;
 }
 
@@ -533,12 +543,6 @@ span#star_full {
   cursor: pointer;
 }
 
-div.relation_form_title {
-  font-size: 14pt;
-  font-weight: bold;
-  padding-bottom: 8px;
-}
-
 div.create_form {
   display: none;
   border: solid #eee 2px;
@@ -565,14 +569,8 @@ div.relation_edit_input_div {
   padding-bottom: 5px;
 }
 
-input.relation_edit_input {
-  font-size: 12pt;
-  padding: 2px;
-  background-color: #000;
-}
-
 div.footnote {
-  font-size: 10pt;
+  font-size: 10px;
 }
 
 div.item_list_item {
@@ -596,19 +594,15 @@ div.drawer_close_button {
 }
 
 span.choice_relationitem {
-  font-size: 8pt;
+  font-size: 9px;
   color: #ada;
   margin-left: 2px;
 }
 
 span.choice_relation_extra {
-  font-size: 8pt;
+  font-size: 13px;
   color: orange;
   margin-left: 2px;
-}
-
-span.choice_relationitem_cannot_repeat {
-  text-decoration: line-through;
 }
 
 div#manage_content {
@@ -712,9 +706,14 @@ input.inventory_quantity_edit {
 
 div.inventory_quantity_complaint {
   color: red;
-  font-size: 8pt;
+  font-size: 13px;
 }
 
 .line-through {
   text-decoration: line-through;
+}
+
+span.node_link {
+  text-decoration: underline;
+  cursor: pointer;
 }

@@ -1,5 +1,5 @@
 <% _.each(relations.filtered_for_user(user), function(relation, idx) { %>
-<div class="existing_relation list_item <% if(relation.get('direction') == 'backward') { %> list_item_backward <% } %> <% if(relation.get('visited')) { %>visited_relation<% } %>" data-relation-slug="<%= relation.get('slug') %>" tabindex=<%= node.get('items').length + idx %>>
+<div class="list_item <% if(relation.get('direction') == 'backward') { %> list_item_backward <% } %> <% if(relation.get('visited')) { %>visited_relation<% } %>" data-relation-slug="<%= relation.get('slug') %>" tabindex=<%= node.get('items').length + idx %>>
 
   <div class="relation_list_item_left">
     <% if(relation.get('direction') == 'backward') { %>
@@ -16,7 +16,7 @@
     <%     if(ri.get('interaction') == 'require') { %>
     (requires <% if(ri.get('quantity') > 1) { %><%= ri.get('quantity') %><% } %> <%= ri.get('item').get('name') %>)
     <%     } else if(ri.get('interaction') == 'consume') { %>
-    (consumse <% if(ri.get('quantity') > 1) { %><%= ri.get('quantity') %><% } %> <%= ri.get('item').get('name') %>)
+    (consumes <% if(ri.get('quantity') > 1) { %><%= ri.get('quantity') %><% } %> <%= ri.get('item').get('name') %>)
     <%     } else if(ri.get('interaction') == 'give') { %>
     (gives <% if(ri.get('quantity') > 1) { %><%= ri.get('quantity') %><% } %> <%= ri.get('item').get('name') %>)
     <%     } %>
@@ -44,7 +44,7 @@
 
   </div>
   <div class="relation_list_item_right">
-    Created by <%= relation.get('author') %> <%= relation.get('created') %><br>
+    Author: <%= relation.get('author') %> Date: <%= relation.get('created') %><br>
     <% if(relation.get('author') == user.get('username')) { %>
     <div class="delete_list_item list_item_modify_link">Delete</div>
     <div class="edit_list_item list_item_modify_link">Edit</div>

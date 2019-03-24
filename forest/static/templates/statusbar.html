@@ -1,24 +1,26 @@
 
-<div id="status_title">
-  <img src="/static/favicon.ico" height=16 id="status_img">TextForest
-</div>
+<div id="status_left">
 
-<div id="status_sort_prefs">
+  <img src="/static/favicon.ico" height=11 id="status_img">
+
+  <span class="node_link" data-slug="home">TextForest</div>
+
+  &nbsp;
+
   <b>Sort:</b>
 
   <div class="sort_pref <% if(sort != 'views') { %>clickable<% } %>" data-sort="views">Views</div>
   <div class="sort_pref <% if(sort != 'vote') { %>clickable<% } %>" data-sort="vote">Vote</div>
   <div class="sort_pref <% if(sort != 'date') { %>clickable<% } %>" data-sort="date">Date</div>
-  <div class="sort_pref <% if(sortdir != 'asc') { %>clickable<% } %>" data-sortdir="asc">(asc</div> or
-  <div class="sort_pref <% if(sortdir != 'desc') { %>clickable<% } %>" data-sortdir="desc">desc)</div>
+  (<div class="sort_pref <% if(sortdir != 'asc') { %>clickable<% } %>" data-sortdir="asc">asc</div> or
+  <div class="sort_pref <% if(sortdir != 'desc') { %>clickable<% } %>" data-sortdir="desc">desc</div>)
 
-  <span id="sort_prioritize_op">
-    &nbsp;
-    <input type=checkbox id="sort_prioritize_op_checkbox" <% if(sortpriop) { %>checked<% } %>><label for="sort_prioritize_op_checkbox">Prioritize OP</label>
-  </span>
+  &nbsp;
+  <input type=checkbox id="sort_prioritize_op_checkbox" <% if(sortpriop) { %>checked<% } %>><label for="sort_prioritize_op_checkbox">Prioritize OP</label>
+
 </div>
 
-<div id="login_status_info">
+<div id="status_right">
 
   <% if(user.get('username')) { %>
 
@@ -28,7 +30,7 @@
 
   <div class="status_info">
     | &nbsp; Logged in as
-    <span class="clickable user_link" data-user-link="<%= user.get('username') %>" id="user_link"><%= user.get('username') %></span>
+    <span class="node_link" data-slug="~<%= encodeURIComponent(user.get('username')) %>" id="user_link"><%= user.get('username') %></span>
   </div>
 
   <div class="status_info clickable" id="notifications_link" >Notifications (<%= notifications.models.length %>)</div>
