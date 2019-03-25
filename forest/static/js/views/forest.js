@@ -439,6 +439,7 @@ define(
                     direction: backward ? 'backward' : 'forward',
                     relation_slug: relation.get('slug')
                 });
+                
                 this.current_node.fetch({
                     success: function() {
 
@@ -476,7 +477,7 @@ define(
                         }
 
                         // draw new node if we moved
-                        if(original_node_slug != self.current_node.get('slug')) {
+                        if(original_node_slug && original_node_slug != self.current_node.get('slug')) {
                             self.view_current_node();
                             self.update_current_node();
                         }
