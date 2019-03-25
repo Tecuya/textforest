@@ -142,6 +142,7 @@ class UserRelation(models.Model):
     def handle_user_action(user, relation, vote=None):
 
         fails = []
+        ui_to_save = []
 
         user_relation, created = UserRelation.objects.get_or_create(user=user, relation=relation)
 
@@ -163,8 +164,6 @@ class UserRelation(models.Model):
                     useritem_map[item.id] = ui
 
                 return useritem_map[item.id]
-
-            ui_to_save = []
 
             # step 1; enforce 'require'
             for ri in filter(lambda x: x.interaction == 'require', relation_item_list):
@@ -201,14 +200,14 @@ class UserRelation(models.Model):
 
                 ui_to_save.append(ui)
 
-            for ui in ui_to_save:
-                if ui.quantity == 0:
-                    ui.delete()
-                else:
-                    ui.save()
-
         if len(fails) > 0:
             return False, ' '.join(fails)
+
+        for ui in ui_to_save:
+            if ui.quantity == 0:
+                ui.delete()
+            else:
+                ui.save()
 
         if vote is not None:
             user_relation.vote += 1
