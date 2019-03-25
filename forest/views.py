@@ -156,7 +156,7 @@ def xhr_node_by_slug(request, slug=None):
         node.save()
 
         if request.method == 'POST':
-            Subscription.objects.create(user=user, node=node)
+            Subscription.objects.create(user=request.user, node=node)
 
         for subscription in node.subscription_set.exclude(user=request.user):
             Notification.objects.create(
