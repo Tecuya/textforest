@@ -218,7 +218,7 @@ def xhr_relations_for_node_slug(request, slug):
     # find parent node
     nqs = Node.objects.filter(slug=slug)
     if len(nqs) == 0:
-        return HttpResponseNotFound('No such parent')
+        return HttpResponseNotFound('No node matches slug: '+slug)
     node = nqs[0]
 
     # calc forward/backward filters
