@@ -2,11 +2,11 @@ define(
     ['jquery',
         'underscore',
         'backbone',
-        'showdown',
         'put_cursor_at_end',
+        'js/util/showdown_tf',
         'js/models/node',
         'tpl!templates/node_edit'],
-    function($, _, Backbone, showdown, put_cursor_at_end, Node, nodeedittpl) {
+    function($, _, Backbone, put_cursor_at_end, showdown_tf, Node, nodeedittpl) {
 
         return Backbone.View.extend({
 
@@ -80,8 +80,7 @@ define(
 
                 if (previewb.html() == 'Preview') {
                     textarea.hide();
-                    var converter = new showdown.Converter();
-                    var edit_contents = converter.makeHtml(textarea.val().replace(/<\/?[^>]+(>|$)/g, ""));
+                    var edit_contents = showdown_tf.makeHtml(textarea.val().replace(/<\/?[^>]+(>|$)/g, ""));
                     previewdiv.html(edit_contents).show();
                     previewb.html('Edit');
 

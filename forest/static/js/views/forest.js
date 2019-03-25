@@ -366,7 +366,7 @@ define(
 
             node_link: function(evt) {
                 var slug = $(evt.target).data('slug');
-                this.log_command('/go ' + slug);
+                this.log_command('click link /f/' + slug + '');
                 Backbone.history.navigate('/f/' + encodeURIComponent($(evt.target).data('slug')), true);
             },
 

@@ -155,6 +155,9 @@ def xhr_node_by_slug(request, slug=None):
         node.public_can_link = bool(doc['public_can_link'])
         node.save()
 
+        if request.method == 'POST':
+            Subscription.objects.create(user=user, node=node)
+
         for subscription in node.subscription_set.exclude(user=request.user):
             Notification.objects.create(
                 user=subscription.user,
@@ -343,7 +346,6 @@ def xhr_relation_by_slug(request, slug=None):
             relation.child = relation.parent
 
         relation.only_discoverable_via_ac_x_chars = int(doc['only_discoverable_via_ac_x_chars'])
-
         relation.repeatable = bool(doc['repeatable'])
         relation.hide_when_requirements_unmet = bool(doc['hide_when_requirements_unmet'])
         relation.only_visible_to_node_owner = bool(doc['only_visible_to_node_owner'])

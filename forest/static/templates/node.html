@@ -4,6 +4,7 @@
     <b><span class="node_link" data-slug="<%= encodeURIComponent(node.get('slug')) %>"><%= node.get('name') %></span></b>
     <span id="star_full" <% if(!node.get('subscribed')) { %>style="display: none;"<% } %>>★</span>
     <span id="star_empty" <% if(node.get('subscribed')) { %>style="display: none;"<% } %>>☆</span>
+    <% if(node.get('public_can_link')) { %><span class="header_label">[public]</span><% } %>
   </div>
 
   <div class="node_header_right">

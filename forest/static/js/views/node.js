@@ -2,10 +2,10 @@ define(
     ['jquery',
         'underscore',
         'backbone',
-        'showdown',
+        'js/util/showdown_tf',
         'js/models/node',
         'tpl!templates/node'],
-    function($, _, Backbone, showdown, Node, nodetpl) {
+    function($, _, Backbone, showdown_tf, Node, nodetpl) {
         return Backbone.View.extend({
 
             template: nodetpl,
@@ -28,8 +28,7 @@ define(
             },
 
             render: function(counter) {
-                var converter = new showdown.Converter();
-                this.node.set('text_presentation', converter.makeHtml(this.node.get('text')));
+                this.node.set('text_presentation', showdown_tf.makeHtml(this.node.get('text')));
                 this.$el.html(this.template({ node: this.node, user: this.forest_view.user }));
             },
 

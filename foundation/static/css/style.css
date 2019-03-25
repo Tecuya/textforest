@@ -723,3 +723,8 @@ div.status_block {
   display: inline-block;
   whitespace: nowrap;
 }
+
+span.header_label {
+  font-size: 10px;
+  color: #888;
+}
