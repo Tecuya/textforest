@@ -364,7 +364,11 @@ def xhr_relation_by_slug(request, slug=None):
                 hide=ri['hide'])
 
     elif request.method == 'DELETE':
-        Relation.objects.filter(author=request.user, slug=slug).delete()
+        rqs = Relation.objects.filter(Q(parent__author=request.user) | Q(author=request.user), slug=slug)
+        if len(rqs) == 0:
+            return HttpResponseNotFound('No such relation')
+            
+        rqs.delete()
 
     else:
         return HttpResponseForbidden('unimp')
