@@ -158,18 +158,6 @@ define(
                 this.$el.find(this.elements.divmodal).hide();
             },
 
-            click_login_button: function() {
-                var self = this;
-                this.user.login({
-                    success: function() {
-                        window.location.reload();
-                    },
-                    failure: function(error) {
-                        self.user_view.set_error(error);
-                    }
-                });
-            },
-
             click_divmodal: function(evt) {
                 if ($(evt.target).hasClass('modal')) {
                     this.hide_divmodal(this.divmodal_user);
@@ -375,7 +363,7 @@ define(
                     this.user_view.render();
                     this.show_divmodal(this.elements.divmodal_user);
                 } else {
-                    window.location.reload();
+                    callable();
                 }
             },
 

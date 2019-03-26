@@ -124,9 +124,10 @@ define(
                     username: this.$el.find(this.elements.username).val(),
                     password: this.$el.find(this.elements.password).val(),
                     success: function() {
-                        self.update_csrf(self.user);
-                        self.forest_view.statusbar_view.render();
-                        self.forest_view.hide_divmodal();
+                        window.location.reload();
+                        // self.update_csrf(self.user);
+                        // self.forest_view.statusbar_view.render();
+                        // self.forest_view.hide_divmodal();
                     },
                     failure: function(error) {
                         self.set_login_error(error);
