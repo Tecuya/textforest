@@ -10,17 +10,17 @@ define(
                             text = text.replace(
                                 /\[([^\]]+)\]\(\/f\/([a-z0-9\-\~]+)\)/g,
                                 '<span class="node_link" data-slug="$2">$1</span>');
-                            
+
                             text = text.replace(
-                                /([^\]]?)\/f\/([a-z0-9\-\~]+)/g,
+                                /([^a-zA-Z0-9\]]?)\/f\/([a-z0-9\-\~]+)/g,
                                 '$1<span class="node_link" data-slug="$2">/f/$2</span>');
 
                             return text;
-                            
+
                         }
                     }];
                 }]
         });
-        
+
         return converter;
     });
