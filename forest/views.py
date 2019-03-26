@@ -350,8 +350,11 @@ def xhr_relation_by_slug(request, slug=None):
         relation.hide_when_requirements_unmet = bool(doc['hide_when_requirements_unmet'])
         relation.only_visible_to_node_owner = bool(doc['only_visible_to_node_owner'])
 
-        if 'sticky_ordering' in doc and len(doc['sticky_ordering']) > 0:
+        if (relation.parent.author == request.user and
+            'sticky_ordering' in doc and len(doc['sticky_ordering']) > 0):
+
             relation.sticky_ordering = int(doc['sticky_ordering'])
+
         else:
             relation.sticky_ordering = 1001
 
