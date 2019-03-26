@@ -66,7 +66,8 @@ class Relation(models.Model):
     repeatable = models.BooleanField(default=False)
     hide_when_requirements_unmet = models.BooleanField(default=False)
     only_visible_to_node_owner = models.BooleanField(default=False)
-
+    sticky_ordering = models.IntegerField(default=1001)
+    
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -90,6 +91,7 @@ class Relation(models.Model):
                 'repeatable': self.repeatable,
                 'hide_when_requirements_unmet': self.hide_when_requirements_unmet,
                 'only_visible_to_node_owner': self.only_visible_to_node_owner,
+                'sticky_ordering': self.sticky_ordering,
                 'created': self.created.strftime('%Y-%m-%d'),
                 'relationitems': [ri.make_json_response_dict(user) for ri in self.relationitem_set.all()]}
 

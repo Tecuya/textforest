@@ -5,7 +5,13 @@
     <% if(relation.get('direction') == 'backward') { %>
     ← <%= relation.get('parent_name') %>
     <% } else { %>
+
+    <% if(relation.get('sticky_ordering') != 1001) { %>
+    <span class="small_label">📌</span>
+    <% } %>
+    
     <%= relation.get('text') %>
+    
     <% } %>
 
     <% if(relation.get('direction') == 'forward') { %>

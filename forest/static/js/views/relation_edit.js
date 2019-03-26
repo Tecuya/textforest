@@ -67,7 +67,12 @@ define(
                     this.$el.find('input#relation_edit_only_discoverable_via_ac_x_chars').val(this.relation.get('only_discoverable_via_ac_x_chars'));
                     this.$el.find('input#relation_edit_repeatable').prop('checked', this.relation.get('repeatable'));
                     this.$el.find('input#relation_edit_hide_when_requirements_unmet').prop('checked', this.relation.get('hide_when_requirements_unmet'));
-                    this.$el.find('input#relation_edit_only_visible_to_node_owner').prop('checked', this.relation.get('only_visible_to_node_owner'));
+                    this.$el.find('input#relation_edit_only_visible_to_node_owner').prop('checked', this.relation.get('only_visible_to_node_owner' ));
+
+                    var sticky_ordering = this.relation.get('sticky_ordering');
+                    if(sticky_ordering < 1001) {
+                        this.$el.find('input#relation_edit_sticky_ordering').val(sticky_ordering);
+                    }
 
                     this.node_selector_source.prime_from_slug(this.relation.get('parent'));
                     this.node_selector_dest.prime_from_slug(this.relation.get('child'));
@@ -82,7 +87,6 @@ define(
                     this.$el.find('input#relation_edit_repeatable').prop('checked', true);
                 }
 
-
                 if (inline_options) {
                     if (inline_options.initial_slug) {
                         this.relation = new Relation();
@@ -94,7 +98,7 @@ define(
                     }
                     this.callback_on_save = inline_options.callback_on_save;
                 }
-                
+
                 this.$el.find('input#relation_edit_text').focus();
             },
 
@@ -141,6 +145,7 @@ define(
                 this.relation.set('repeatable', this.$el.find('input#relation_edit_repeatable').prop('checked'));
                 this.relation.set('hide_when_requirements_unmet', this.$el.find('input#relation_edit_hide_when_requirements_unmet').prop('checked'));
                 this.relation.set('only_visible_to_node_owner', this.$el.find('input#relation_edit_only_visible_to_node_owner').prop('checked'));
+                this.relation.set('sticky_ordering', this.$el.find('input#relation_edit_sticky_ordering').val());
 
                 var relationitems = [];
                 this.$el
@@ -152,7 +157,7 @@ define(
                         var quantity = i.find('input#relationitem_qty_input').val();
                         var item = i.find('div.model_selector_selection').data('slug');
                         var hide = i.find('input#relationitem_hide').prop('checked');
-                        
+
                         if (interaction && quantity && item) {
                             relationitems.push(new RelationItem({ interaction: interaction, quantity: quantity, item: item, hide: hide }));
                         }
@@ -172,7 +177,7 @@ define(
                             if (self.callback_on_save) {
                                 var cb = self.callback_on_save;
                                 self.callback_on_save = undefined;
-                                cb(self.relation);                                
+                                cb(self.relation);
                             } else {
                                 self.forest_view.manage_content_view.manage_relations_view.render();
                                 self.forest_view.hide_divmodal();

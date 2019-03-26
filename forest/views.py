@@ -230,7 +230,7 @@ def xhr_relations_for_node_slug(request, slug):
         backward_filters['text__contains'] = text
 
     # calc orderbys
-    orderby = []
+    orderby = ['sticky_ordering']
 
     sortmap = {
         'views': Relation.views.field_name,
@@ -349,6 +349,11 @@ def xhr_relation_by_slug(request, slug=None):
         relation.repeatable = bool(doc['repeatable'])
         relation.hide_when_requirements_unmet = bool(doc['hide_when_requirements_unmet'])
         relation.only_visible_to_node_owner = bool(doc['only_visible_to_node_owner'])
+
+        if 'sticky_ordering' in doc and len(doc['sticky_ordering']) > 0:
+            relation.sticky_ordering = int(doc['sticky_ordering'])
+        else:
+            relation.sticky_ordering = 1001
 
         relation.relationitem_set.all().delete()
         relation.save()

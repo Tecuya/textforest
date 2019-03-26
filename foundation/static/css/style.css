@@ -724,7 +724,7 @@ div.status_block {
   whitespace: nowrap;
 }
 
-span.header_label {
+span.small_label {
   font-size: 10px;
   color: #888;
 }
