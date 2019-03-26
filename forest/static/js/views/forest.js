@@ -140,7 +140,7 @@ define(
                 var self = this;
                 this.user.logout({
                     success: function() {
-                        self.statusbar_view.render();
+                        window.location.reload();
                     },
                     error: function(xhr, err, ex) {
                         self.add_error('Logout failed: ' + err.responseText);
@@ -375,7 +375,7 @@ define(
                     this.user_view.render();
                     this.show_divmodal(this.elements.divmodal_user);
                 } else {
-                    callable();
+                    window.location.reload();
                 }
             },
 
