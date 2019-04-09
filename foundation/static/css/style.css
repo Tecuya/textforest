@@ -663,8 +663,15 @@ input.bigger {
   width: 300px;
 }
 
+div.model_selector_item {
+  border-left: solid #888 1px;
+  border-right: solid #888 1px;
+  padding: 2px;
+}
+
 div.model_create {
   background-color: #000;
+  border-bottom: solid #888 1px;
 }
 
 div.relationitem_action {
@@ -740,4 +747,31 @@ img[src*='#right'] {
 img[src*='#center'] {
     display: block;
     margin: auto;
+}
+
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: #888;
+}
+
+.tooltip .tooltiptext {
+  font-size: 12px;
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  border-radius: 6px;
+  padding: 5px;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
 }

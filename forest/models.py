@@ -67,7 +67,7 @@ class Relation(models.Model):
     hide_when_requirements_unmet = models.BooleanField(default=False)
     only_visible_to_node_owner = models.BooleanField(default=False)
     sticky_ordering = models.IntegerField(default=1001)
-    
+
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 

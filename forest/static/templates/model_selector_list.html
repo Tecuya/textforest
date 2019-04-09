@@ -1,9 +1,9 @@
 <% _.each(collection.models, function(model, idx) { %>
-<div class="list_item" data-slug="<%= model.get('slug') %>" tabindex=<%= idx %>>
+<div class="list_item model_selector_item" data-slug="<%= model.get('slug') %>" tabindex=<%= idx %>>
   <%= model.to_string() %>
 </div>
 <% }) %>
 
-<div class="list_item model_create">
+<div class="list_item model_selector_item model_create">
   Create this
 </div>

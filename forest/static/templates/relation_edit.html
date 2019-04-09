@@ -15,25 +15,31 @@
 <div class="form_widget" id="relation_node_select_source">
 </div>
 
-<div class="form_text">
-  Destination:<br>
-  <small>If blank, link to self</small>
+<div class="form_text tooltip">
+  Destination:
+  <span class="tooltiptext">
+    If blank, this will link to the current node (i.e. it will go nowhere).
+  </span>
 </div>
 
 <div class="form_widget" id="relation_node_select_dest">
 </div>
 
-<div class="form_text">
-  Sticky ordering<br>
-  <small>blank = no explicit ordering.  must be node owner.  maximum value: 1000</small>
+<div class="form_text tooltip">
+  Sticky ordering:
+  <span class="tooltiptext">
+    If blank, there will be no explicit ordering.  You must be node owner for this to work.  Maximum value: 1000
+  </span>
 </div>
 <div class="form_widget">
   <input id="relation_edit_sticky_ordering" type=number>
 </div>
 
-<div class="form_text">
-  Hide unless matches this many auto-complete chars:<br>
-  <small>0 = do not hide based on auto-complete</small>
+<div class="form_text tooltip">
+  Hide unless match this many auto-complete chars:<br>
+  <span class="tooltiptext">
+    When 0, this will not be hidden based on auto-complete.
+  </span>
 </div>
 <div class="form_widget">
   <input id="relation_edit_only_discoverable_via_ac_x_chars" type=number>
